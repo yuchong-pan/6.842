@@ -1,0 +1,171 @@
+
+\documentclass[letterpaper, reqno,11pt]{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{color,latexsym,amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage[linesnumbered,lined,boxed,commentsnumbered,noend,noline]{algorithm2e}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{bbm}
+\usepackage{enumitem}
+\usepackage[numbers]{natbib}
+\usepackage{framed}
+\usepackage{titling}
+\usepackage{subcaption}
+
+\allowdisplaybreaks
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\LL}{\mathbb{L}}
+\newcommand{\TT}{\mathbb{T}}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\charcone}{char.cone}
+\DeclareMathOperator{\STAB}{STAB}
+\DeclareMathOperator{\Down}{Down}
+\DeclareMathOperator{\lca}{lca}
+\DeclareMathOperator{\ex}{ex}
+\DeclareMathOperator{\Span}{span}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\begin{document}
+\pagenumbering{arabic}
+\title{Lectures on Probabilistic Methods}
+\author{Yuchong Pan}
+\date{\today}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{claim}{Claim}
+\newtheorem{exercise}{Exercise}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+%\maketitle
+%
+
+\begin{framed}
+\noindent{\bf 6.842 Randomness and Computation} \hfill \thedate
+\begin{center}
+\Large{\thetitle}
+\end{center}
+\noindent{\em Lecturer: Ronitt Rubinfield} \hfill {\em Scribe: \theauthor}
+\end{framed}
+
+The plan of probabilistic methods is to show that some certain ``object'' exists by showing that the probability that it exists is greater than $0$. Since the probability that an object exists is either $0$ or $1$, then being greater than $0$ implies that it has to be $1$.
+
+\section{Example: Hypergraph Coloring}
+
+We consider the following problem: Given a set $X$ of elements and $S_1, \ldots, S_m \subset X$ each of size $\ell$, output whether we can $2$-color objects in $X$ such that each set $S_i$ is not monochromatic.
+
+\begin{theorem}
+  If $m < 2^{\ell - 1}$, then there exists a proper $2$-coloring.
+\end{theorem}
+
+\begin{proof}
+  We randomly color elements of $X$ red or blue, independently with probability $1/2$. Then for all $i \in [m]$,
+  $$ \PP\left[\text{$S_i$ is monochromatic}\right] = \frac{1}{2^\ell} + \frac{1}{2^\ell} = \frac{1}{2^{\ell - 1}}. $$
+  If $m < 2^{\ell - 1}$, then by the union bound,
+  $$ \PP\left[\exists i \in [m] \text{ s.t.\ $S_i$ is monochromatic}\right] \leq \sum_{i = 1}^m \PP\left[\text{$S_i$ is monochromatic}\right] = \frac{m}{2^{\ell - 1}} < \frac{2^{\ell - 1}}{2^{\ell - 1}} = 1. $$
+  Hence, $\PP[\text{all $S_i$'s are $2$-colored}] > 0$, so there exists a setting of colors which is a good $2$-coloring.
+\end{proof}
+
+The above proof does not give an explicit proper $2$-coloring. However, if we require $m$ to be even smaller, we can explicitly and quickly output a proper $2$-coloring.
+
+\begin{theorem}
+  If $m < 2^{\ell - 2}$, then there exists a proper $2$-coloring, and we can find it quickly.
+\end{theorem}
+
+\begin{proof}
+  We prove the second part of the theorem only. As in the previous proof, since $m < 2^{\ell - 2}$,
+  $$ \PP\left[\exists i \in [m] \text{ s.t.\ $S_i$ is monochromatic}\right] = \frac{m}{2^{\ell - 1}} < \frac{1}{2}. $$
+  Therefore, a random coloring of $X$ is good with probability at least $1/2$. (If not good, re-color until you find a good one.) The expected number of times to re-color is $2$.\footnote{Recall that given a coin with bias (i.e., probability of ``heads'') $p$, the expected number of tosses until we see heads is $1/p$.}
+\end{proof}
+
+\section{Example: Dominating Sets}
+
+\begin{definition}
+  Given a graph $G = (V, E)$, a subset $U \subset V$ is a \emph{dominating set} if $v$ has at least one neighbor in $U$ for all $v \in V \setminus U$.
+\end{definition}
+
+\begin{theorem}
+  Let $G$ be a graph. If $G$ has minimum degree $\Delta$, then $G$ has a dominating set of size at most $\frac{4n\ln(4n)}{\Delta + 1}$.
+\end{theorem}
+
+\begin{proof}
+  We construct a subset $\hat{U} \subset V$ by putting each $v \in V$ into $\hat{U}$ independently at random with probability $p = \frac{\ln(4n)}{\Delta + 1}$. For each $w \in V$, the probability that $w$ has no neighbor in $\hat{U}$ and is not in $\hat{U}$ is $(1 - p)^{\Delta + 1}$. Recall that $\lim_{x \to \infty} (1 - 1/x)^x = 1/e$. Hence,
+  \begin{align*}
+    \PP\left[\text{$\hat{U}$ is not a dominating set}\right] &= \PP\left[\exists w \in V \text{ s.t.\ $w$ has no neighbor in $\hat{U}$ and is not in $\hat{U}$}\right] \\
+    &\leq n (1 - p)^{\Delta + 1} = n\left(1 - \frac{\ln(4n)}{\Delta + 1}\right)^{\frac{\Delta + 1}{\ln(4n)} \cdot \ln(4n)} \leq ne^{-\ln(4n)} = \frac{1}{4}.
+  \end{align*}
+  For each $w \in V$, let
+  $$ \sigma_w = \left\{
+    \begin{array}{ll}
+      1, & \text{if $w \in \hat{U}$}, \\
+      0, & \text{otherwise}.
+    \end{array}
+  \right. $$
+  Then $\EE[\sigma_w] = \PP[\sigma_w = 1] = p$. Since $|\hat{U}| = \sum_{w \in V} \sigma_w$,
+  $$ \EE\left[\left|\hat{U}\right|\right] = \sum_{w \in V} \EE\left[\sigma_w\right] = np. $$
+  By Markov's inequality,
+  $$ \PP\left[\left|\hat{U}\right| > 4np\right] \leq \frac{\EE\left[\left|\hat{U}\right|\right]}{4np} = \frac{np}{4np} = \frac{1}{4}. $$
+  Hence,
+  $$ \PP\left[\text{$\hat{U}$ is a dominating set of size at most $\frac{4n\ln(4n)}{\Delta + 1}$}\right] \geq 1 - \frac{1}{4} - \frac{1}{4} = \frac{1}{2} > 0. $$
+  This completes the proof.
+\end{proof}
+
+\section{Example: Sum-Free Subsets}
+
+\begin{definition}
+  A subset $A \subset \NN$ is \emph{sum-free} if there do not exist $a_1, a_2, a_3 \in A$ such that $a_1 + a_2 = a_3$.
+\end{definition}
+
+\begin{theorem}[Erd\H{o}s '65]
+  For any set $B$ of size $n$, there exists a sum-free subset $A \subset B$ such that $|A| > n/3$.
+\end{theorem}
+
+For example, if $B = [n]$, then $A = \{ \lfloor n/2 \rfloor, \ldots, n \}$ is sum-free and $|A| > n/3$.
+
+\begin{proof}
+  Without loss of generality $b_n$ is the maximum element in $B$. Pick a prime $p > 2b_n$ such that $p \equiv 2 \pmod{3}$, i.e., $p = 3k + 2$ for some $k \in \ZZ$. Let $C = \{ k + 1, \ldots, 2k + 1 \}$ be the ``middle third.'' Note that
+  \begin{enumerate}[label=(\roman*), itemsep=0pt]
+    \item $C \subset \ZZ_p$;\footnote{We write $\ZZ_p = \{ 0, \ldots, p - 1 \}$ and $\ZZ_p^* = \{ 1, \ldots, p - 1 \}$. Recall that $\ZZ_p$ has unique multiplicative inverses modulo $p$ since $p$ is a prime.}
+    \item $C$ is sum-free even in $\ZZ_p$ (why? the sum of any two elements is at least $2k + 2$ and at most $4k+2 \equiv k \pmod{3k + 2}$);
+    \item $\frac{|C|}{p - 1} > 1/3$.
+  \end{enumerate}
+  We construct $A$ as follows: pick $x \in_R [p - 1]$, and use $x$ to define a linear map $f_x(a) = x \cdot a \mod{p}$.\footnote{We use ``$\in_R$'' to indicate randomly choosing from a set.} Let $A_x = \{ b \in B : f_x(b) = x \cdot b \mod{p} \in C \}$, i.e., $x$ maps the elements of $A_x$ to the middle third.
+
+  We claim that $A_x$ is sum-free. If not, then there exist $b_1, b_2, b_3 \in A_x$ such that $b_1 + b_2 = b_3$. Hence, $xb_1 + xb_2 \equiv xb_3 \pmod{p}$, a contradiction.
+
+  We claim that there exists $x \in [p - 1]$ such that $|A_x| > n/3$. The following fact follows from the unique inverse property when $p$ is a prime:
+
+  \begin{fact} \label{fact:inverse}
+    For all $y \in \ZZ_p^*$ and for all $b \in B$, exactly one $x \in \ZZ_p^*$ satisfies $y \equiv x \cdot b \pmod{p}$.
+  \end{fact}
+
+  It follows from Fact \ref{fact:inverse} that for all $y \in \ZZ_p^*$ and for all $b \in B$, $\PP_x[\text{$y$ is mapped from $b$}] = \frac{1}{p - 1}$. Moreover, Fact \ref{fact:inverse} implies that for all $b \in B$, there exist $|C|$ choices of $x$ such that $x \cdot b \pmod{p} \in C$.
+
+  For $b \in B$ and $x \in \ZZ_p^*$, define
+  $$ \sigma_b^{(x)} = \left\{
+    \begin{array}{ll}
+      1, & \text{if $x \cdot b \pmod{p} \in C$ (i.e., $b_i$ maps to $C$ under $x$)}, \\
+      0, & \text{otherwise}.
+    \end{array}
+  \right. $$
+  Then
+  $$ \EE_x\left[\sigma_b^{(x)}\right] = \PP_x\left[\sigma_b^{(x)} = 1\right] = \frac{|C|}{p - 1} > \frac{1}{3}. $$
+  Therefore,
+  $$ \EE_x\left[\left|A_x\right|\right] = \EE_x\left[\sum_{b \in B} \sigma_b^{(x)}\right] = \sum_{b \in B} \EE_x\left[\sigma_b^{(x)}\right] > \frac{n}{3}. $$
+  This shows that at least one $x \in \ZZ_p^*$ has $|A_x| > n/3$.
+\end{proof}
+
+\end{document}
