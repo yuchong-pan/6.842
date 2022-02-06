@@ -14,6 +14,7 @@
 \usepackage{framed}
 \usepackage{titling}
 \usepackage{subcaption}
+\usepackage[dvipsnames]{xcolor}
 
 \allowdisplaybreaks
 
@@ -63,7 +64,9 @@
 
 The plan of probabilistic methods is to show that some certain ``object'' exists by showing that the probability that it exists is greater than $0$. Since the probability that an object exists is either $0$ or $1$, then being greater than $0$ implies that it has to be $1$.
 
-\section{Example: Hypergraph Coloring}
+\section{Examples}
+
+\subsection{Hypergraph Coloring}
 
 We consider the following problem: Given a set $X$ of elements and $S_1, \ldots, S_m \subset X$ each of size $\ell$, output whether we can $2$-color objects in $X$ such that each set $S_i$ is not monochromatic.
 
@@ -91,7 +94,7 @@ The above proof does not give an explicit proper $2$-coloring. However, if we re
   Therefore, a random coloring of $X$ is good with probability at least $1/2$. (If not good, re-color until you find a good one.) The expected number of times to re-color is $2$.\footnote{Recall that given a coin with bias (i.e., probability of ``heads'') $p$, the expected number of tosses until we see heads is $1/p$.}
 \end{proof}
 
-\section{Example: Dominating Sets}
+\subsection{Dominating Sets}
 
 \begin{definition}
   Given a graph $G = (V, E)$, a subset $U \subset V$ is a \emph{dominating set} if $v$ has at least one neighbor in $U$ for all $v \in V \setminus U$.
@@ -123,7 +126,7 @@ The above proof does not give an explicit proper $2$-coloring. However, if we re
   This completes the proof.
 \end{proof}
 
-\section{Example: Sum-Free Subsets}
+\subsection{Sum-Free Subsets}
 
 \begin{definition}
   A subset $A \subset \NN$ is \emph{sum-free} if there do not exist $a_1, a_2, a_3 \in A$ such that $a_1 + a_2 = a_3$.
@@ -167,5 +170,144 @@ For example, if $B = [n]$, then $A = \{ \lfloor n/2 \rfloor, \ldots, n \}$ is su
   $$ \EE_x\left[\left|A_x\right|\right] = \EE_x\left[\sum_{b \in B} \sigma_b^{(x)}\right] = \sum_{b \in B} \EE_x\left[\sigma_b^{(x)}\right] > \frac{n}{3}. $$
   This shows that at least one $x \in \ZZ_p^*$ has $|A_x| > n/3$.
 \end{proof}
+
+\section{The Lov\'{a}sz Local Lemma}
+
+Let $A_1, \ldots, A_n$ be ``bad'' events. In probabilistic methods, we would like to show that there is a positive probability that none of the bad events occur. We have the following cases:
+\begin{itemize}[itemsep=0pt]
+  \item If the events $A_i$ are independent and non-trivial (i.e., $\PP[A_i] \neq 1$),
+  $$ \PP\left[\bigcup A_i\right] = 1 - \PP\left[\bigcap \overline{A_i}\right] = 1 - \prod \PP\left[\overline{A_i}\right] < 1. $$
+  \item By the union bound, if $\PP[A_i] < 1/n$ for all $i \in [n]$,
+  $$ \PP\left[\bigcup A_i\right] \leq \sum \PP[\left[A_i\right] < 1. $$
+\end{itemize}
+Is there anything between the union bound and total independence?
+
+\begin{definition}
+  An event $A$ is \emph{independent} of events $B_1, \ldots, B_k$ for all $J \subset [k]$ with $J \neq \emptyset$,
+  $$ \PP\left[A \cap \bigcap_{j \in J} B_j\right] = \PP[A] \cdot \PP\left[\bigcup_{j \in J} B_j\right]. $$
+\end{definition}
+
+\begin{definition}
+  Let $A_1, \ldots, A_n$ be events. The digraph $D = (V, E)$ with $V = [n]$ is the \emph{dependency digraph} of $A_1, \ldots, A_n$ if each $A_i$ is independent of all events $A_j$ that are not neighbors in $D$.
+\end{definition}
+
+\begin{theorem}[Lov\'{a}sz local lemma]
+  Let $A_1, \ldots, A_n$ be events such that $\PP[A_i] \leq p$ for all $i \in [n]$ with dependency digraph $D$ such that $D$ has maximum degree at most $d$. If $ep(d + 1) \leq 1$,
+  $$ \PP\left[\bigcap_{i = 1}^n \overline{A_i}\right] > 0. $$
+\end{theorem}
+
+\subsection{Revisiting Hypergraph Coloring}
+
+\begin{theorem}
+  Let $X$ be a set. Let $S_1, \ldots, S_m \subset X$ such that $|S_i| = \ell$ for all $i \in [m]$ and that each $S_i$ intersects at most $d$ other $S_j$'s. If $e(d + 1) \leq 2^{\ell - 1}$, then one can $2$-color $X$ such that each $S_i$ is not monochromatic.
+\end{theorem}
+
+\begin{proof}
+  Color each element of $X$ red or blue independently with probability $1/2$. For each $i \in [m]$, let $A_i$ be the event that $S_i$ is monochromatic. As before, $\PP[A_i] = 1/2^{\ell - 1}$ for all $i \in [m]$. Note that $A_i$ is independent of all $A_j$'s such that $A_i \cap A_j = \emptyset$, so it depends on at most $d$ other $A_j$'s (this gives the degree bound). Since $ep(d + 1) = e \cdot 1/2^{\ell - 1} \cdot (d + 1) \leq 1$ by assumption, then the Lov\'{a}sz local lemma implies that $\PP[\bigcap_{i = 1}^m \overline{A_i}] > 0$.
+\end{proof}
+
+\subsection{History}
+
+Sometimes we are interested in finding a good solution. The partial history of the algorithmic Lov\'{a}sz local lemma is summarized in Table \ref{tab:lll}.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{c|l}
+    Beck & $d \leq 2^{\ell/1000}$ \\
+    \hline
+    Alon & $d \leq 2^{\ell/8}$ \\
+    \hline
+    $\vdots$ \\
+    \hline
+    Moser & $d \leq 2^{\ell - 1}/e$ \\
+    Moser \& Tardos
+  \end{tabular}
+  \caption{The partial history of the algorithmic Lo\'{a}sz local lemma.}
+  \label{tab:lll}
+\end{table}
+
+\subsection{The Moser-Tardos Algorithm}
+
+We present the Moser-Tardos algorithm for hypergraph coloring in Algorithm \ref{alg:moser-tardos}.
+
+\begin{algorithm}
+  \DontPrintSemicolon
+  $2$-color $X$ randomly \\
+  \Repeat{proper coloring}{
+    pick monochromatic $S_i$ \\
+    randomly re-assign colors
+  }
+  \caption{The Moser-Tardos algorithm for hypergraph coloring.}
+  \label{alg:moser-tardos}
+\end{algorithm}
+
+\subsection{A Beck-like Algorithm}
+
+We present an algorithm similar to Beck's and Alon's with stronger assumptions (to be formulated in \textcolor{red}{red}) in Algorithm \ref{alg:beck}.
+
+\begin{algorithm}
+  \CommentSty{// first pass} \\
+  color each $j \in X$ red or blue randomly \\
+  $S_i$ is \emph{bad} if it has at most $\alpha \ell$ red elements or at most $\alpha \ell$ blue elements \\
+  $B \leftarrow \{ S_i : \text{$S_i$ is bad} \}$ \\
+  first pass is \emph{successful} if all connected components of $B$ are at most $d^2 \log m$; if not, retry \CommentSty{\textcolor{ForestGreen}{(an edge between $A_i$ and $A_j$ if $A_i \cap A_j \neq \emptyset$)}} \\
+  \CommentSty{// second pass} \\
+  brute force to fix each connected component without making neighbors monochromatic
+  \caption{A Beck-like algorithm for hypergraph coloring. The algorithm is given $S_1, \ldots, S_m \subset X$ with $|S_i| = \ell$ for all $i \in [m]$, and assumes that $\ell, d$ are constant.}
+  \label{alg:beck}
+\end{algorithm}
+
+There are some questions that need answering:
+\begin{itemize}[itemsep=0pt]
+  \item \emph{Does a good solution exist?}
+  
+  We have the following cases:
+  \begin{itemize}[label=$\circ$, itemsep=0pt]
+    \item If $S_i$ is not bad and has fewer than $\alpha \ell$ vertices in bad neighbors, then $S_i$ will still be bichromatic after the second pass recoloring.
+    \item If $S_i$ is not bad and has at least $\alpha \ell$ vertices in bad neighbors, then at least $\alpha \ell$ vertices get recolored. If the vertices are recolored randomly, then $\PP[\text{$S_i$ is monochromatic}] = 2^{-\alpha \ell}$. Using the Lov\'{a}sz local lemma and \textcolor{red}{assuming $2e(d + 1) < 2^{\alpha \ell}$}, a solution exists.
+  \end{itemize}
+  \item \emph{For how many times one has to retry in the first pass?}
+  
+  \begin{fact}
+    For each $i \in [m]$, $\PP[\text{$S_i$ is bad}] \leq 2 \cdot 2^{(H(\alpha) - 1) \ell}$, where $H(x) = -x\log_2 x - (1 - x) \log_2(1 - x)$ is the binary entropy function.
+  \end{fact}
+
+  Let $p = 2 \cdot 2^{(H(\alpha) - 1)\ell}$. Then
+  $$ \PP\left[\text{independent sets $S_{i_1}, \ldots, S_{i_k}$ are all in $B$}\right] \leq p^k. $$
+
+  {\bf \em First try.} We have
+  \begin{align*}
+    & \; \PP[\text{a specific big component of size $s$ survives}] \\
+    \leq & \; \PP[\text{a big independent set of size $s' < s$ in the big component survives}] \\
+    \leq & \; p^{s'}.
+  \end{align*}
+  Hence,
+  $$ \PP[\text{any big component survives}] \leq (\text{\# big components}) \cdot p^{s'}. $$
+  The problem is that the number of big components can be at most $\binom{n}{s}$, and that $s' = 1$ if the component is a clique. We shall use the following known fact from graph theory:
+  
+  \begin{fact}
+    Given a subgraph $H$ of size $s$ in a graph of degree at most $\Delta$, there exists an independent set of size at least $\frac{|H|}{\Delta + 1}$.
+  \end{fact}
+
+  \begin{proof}
+    We generate an independent set by Algorithm \ref{alg:indep}. In each round, the size of $I$ increases by $1$, and the number of vertices in $H$ decreases by $\Delta + 1$. Therefore, the number of rounds is at least $\frac{|H|}{\Delta + 1}$, so the size of the independent set is at least $\frac{|H|}{\Delta + 1}$.
+
+    \begin{algorithm}
+      \DontPrintSemicolon
+      $I \leftarrow \emptyset$ \\
+      \Repeat{$H$ is empty}{
+        $I \leftarrow I \cup \{ \text{an arbitrary vertex $u$ in $H$} \}$ \\
+        remove $u$ and all its neighbors from $H$
+      }
+      \caption{A greedy algorithm that finds an independent set in a subgraph $H$.}
+      \label{alg:indep}
+    \end{algorithm}
+  \end{proof}
+
+  Therefore, we can use $s' = \frac{s}{\Delta + 1}$.
+  \item \emph{How much time does the brute force in the second pass need?}
+  
+  Recall that the size of surviving components (i.e., components in $B$) is $O(d^2 \log m)$, and that the number of settings to the variables in each surviving component is $(2^\ell)^{O(d^2 \log m)} = m^{O(\ell d^2)}$. \textcolor{red}{Assuming $\ell$ and $d$ are constant}, $O(\ell d^2) = O(1)$.
+\end{itemize}
 
 \end{document}
