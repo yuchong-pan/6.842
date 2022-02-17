@@ -9,7 +9,7 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{bbm}
-\usepackage{enumitem}
+\usepackage[inline]{enumitem}
 \usepackage[numbers]{natbib}
 \usepackage{framed}
 \usepackage{titling}
@@ -49,6 +49,7 @@
 \DeclareMathOperator{\CNF}{CNF}
 \DeclareMathOperator{\SAT}{SAT}
 \DeclareMathOperator{\BPP}{BPP}
+\DeclareMathOperator{\poly}{poly}
 \newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \begin{document}
@@ -201,7 +202,7 @@ Let $\shSAT$ denote the problem that counts the number of assignments satisfying
   We show that if $\shDNF \in \Poly$, then $\CNF \in \Poly$. By De Morgan's law, a clause $\overline{A \vee B} = \overline{A} \wedge \overline{B}$, which is a conjunction. Therefore, Given a CNF formula $\varphi$ in $n$ variables, $\varphi$ is satisfiable if and only if $\overline \varphi$ (which is a DNF formula) has at most $2^n - 1$ satisfying assignments.
 \end{proof}
 
-\section{Approximate Counting}
+\section{Approximate Counting and Downward Self-Reducibility} \label{sec:approx-counting}
 
 \begin{definition} \label{def:fpras}
   A \emph{fully polynomial randomized approximation scheme (FPRAS)} for DNF is an algorithm which, given a DNF formula $\varphi$ and $\varepsilon > 0$, outputs $y \in \ZZ_+$ such that $z/(1 + \varepsilon) \leq y \leq z(1 + \varepsilon)$ with probability at least $3/4$ in time polynomial in $|\varphi$ and $1/\varepsilon$, where $z$ is the number of satisfying assignments to $\varphi$.
@@ -218,5 +219,90 @@ In Problem Set 1 Problem 1, we shall show that Definition \ref{def:fpras} implie
 
   If $\varphi$ is satisfiable, then the number of satisfying assignments is at least $1$, so $y \geq 1/(1 + \varepsilon) > 0$, which impies that the algorithm outputs ``satisfiable.'' Otherwise, the number of satisfying assignments is $0$, so $y = 0$, which implies that the algorithm outputs ``unsatisfiable.''
 \end{proof}
+
+\emph{Downward self-reducibility (DSR)} refers to the idea of solving a problem via solving its sub-problems. For DNF, we can compute the number of satisfying assignments using the DSR tree in Figure \ref{fig:dsr}, where $F_{b_1, \ldots, b_k}$ denotes the number of satisfying assignments for $\varphi(b_1, \ldots, b_k, x_{k + 1}, \ldots, x_n)$.
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}
+    \fill[black] (0, 0) circle (2pt) node[above, yshift=10pt] (f) {$F = \# \varphi(x_1, \ldots, x_n)$};
+    \fill[black] (-2, -1) circle (2pt) node[left, xshift=-10pt] (f0) {$F_0 = \# \varphi(0, x_2, \ldots, x_n)$};
+    \fill[black] (2, -1) circle (2pt) node[right, xshift=10pt] (f1) {$F_1 = \# \varphi(1, x_2, \ldots, x_n)$};
+    \fill[black] (-3, -2) circle (2pt) node[left] (f00) {};
+    \fill[black] (-1, -2) circle (2pt) node[left] (f01) {};
+    \fill[black] (1, -2) circle (2pt) node[left] (f10) {};
+    \fill[black] (3, -2) circle (2pt) node[right, xshift=10pt] (f11) {$F_{11} = \# \varphi(1, 1, x_3, \ldots, x_n)$};
+
+    \draw (0, 0) -- (-2, -1);
+    \draw (0, 0) -- (2, -1);
+    \draw (-2, -1) -- (-3, -2);
+    \draw (-2, -1) -- (-1, -2);
+    \draw (2, -1) -- (1, -2);
+    \draw (2, -1) -- (3, -2);
+
+    \node at (0, -2.5) {$\vdots$};
+    
+    \fill[black] (-3.5, -3.5) circle (2pt);
+    \fill[black] (-2.5, -3.5) circle (2pt);
+    \fill[black] (-1.5, -3.5) circle (2pt);
+    \fill[black] (-0.5, -3.5) circle (2pt);
+    \fill[black] (0.5, -3.5) circle (2pt);
+    \fill[black] (1.5, -3.5) circle (2pt);
+    \fill[black] (2.5, -3.5) circle (2pt);
+    \fill[black] (3.5, -3.5) circle (2pt) node[right, xshift=10pt] {$F_{b_1, \ldots, b_n} = \# \varphi(b_1, \ldots, b_n) \in \{ 0, 1 \}$};
+  \end{tikzpicture}
+  \caption{The DSR tree for DNF.}
+  \label{fig:dsr}
+\end{figure}
+
+WLOG consider the root of the DSR tree. Then $F = F_0 + F_1$. Let $S_1 = F_1/F$ be the fraction of satisfying assignments for which $x_1 = \T$. Then $F = F_1/S_1$, where $F_1$ can be computed recursively via $F_1 = F_{11}/S_{11}$, with $S_{11}$ the fraction of satisfying assignments to $\varphi(1, x_2, \ldots, x_n)$ for which $x_2 = \T$. The main insights of approximate counting for DNF are:
+\begin{enumerate}[label=(\roman*), itemsep=0pt]
+  \item we can estimate $S_1$ via sampling;
+  \item we can uniformly generate satisfying assignments for DNF.
+\end{enumerate}
+To estimate $S_1$, we use the simple algorithm in Algorithm \ref{alg:est}.
+
+\begin{algorithm}
+  uniformly generate $k$ satisfying assignments to $\varphi$ \\
+  $\widetilde{S_1} \leftarrow (\text{\# generated satisfying assignments with $x_1 = \T$})/k$
+  \caption{An algorithm that estimates $S_1$.}
+  \label{alg:est}
+\end{algorithm}
+
+For $k \in \ZZ_+$ and $b_1, \ldots, b_k \in \{ 0, 1 \}$, define $S_{b_1, \ldots, b_n}$ to be the fraction of satisfying assignments to $\varphi(b_1, \ldots, b_{k - 1}, x_k, \ldots, x_n)$ for which $x_k = b_k$ (note that we use T/F and $1$/$0$ interchangeably), and $\widetilde{S_{b_1, \ldots, b_k}}$ to be the estimate of $S_{b_1, \ldots, b_k}$ similarly computed as in Algorithm \ref{alg:est}. For $b_1, \ldots, b_n \in \{ 0, 1 \}$,
+$$ F = \frac{F_{b_1}}{S_{b_1}} = \frac{1}{S_{b_1}} \cdot \frac{F_{b_1, b_2}}{S_{b_1, b_2}} = \frac{F_{b_1, b_2, b_3}}{S_{b_1} S_{b_1, b_2} S_{b_1, b_2, b_3}} = \ldots = \frac{1}{\prod_{i = 1}^n S_{b_1, \ldots, b_i}}. $$
+
+Two difficulties arise:
+\begin{enumerate}[label=(\roman*), itemsep=0pt]
+  \item What if $F_{b_1, \ldots, b_i} = 0$ for some $i \in [n]$?
+  \item Are the approximations of $S_{b_1, \ldots, b_i}$'s for $i \in [n]$ enough?
+\end{enumerate}
+The solution to both of the difficulties are to always go down to the ``large enough'' child. We note that for the choice of the ``larger'' child, a small additive error implies a small multiplicative error. To see this, suppose that we estimate each $S_{b_1, \ldots, b_i}$ to within an additive error of $\varepsilon/(18n)$ (by Chernoff's bound, we need $\poly(n/\varepsilon)$ samples). Therefore, if $1/3 \leq r \leq 1$, then
+\begin{align*}
+  r + \frac{\varepsilon}{18n} &= r\left(1 + \frac{\varepsilon}{18nr}\right) \leq r\left(1 + \frac{\varepsilon}{6n}\right), \\
+  r - \frac{\varepsilon}{18n} &= r\left(1 - \frac{\varepsilon}{18nr}\right) \geq r\left(1 - \frac{\varepsilon}{6n}\right).
+\end{align*}
+Therefore, the output is at most
+$$ \frac{F_{b_1}}{\widetilde{S_{b_1}}} \leq \ldots \leq \frac{1}{\prod_{i = 1}^n \widetilde{S_{b_1, \ldots, b_i}}} \leq \frac{1}{\prod_{i = 1}^n S_{b_1, \ldots, b_n} \left(1 - \frac{\varphi}{6n}\right)} \leq \frac{\left(1 + \frac{\varepsilon}{3n}\right)^n}{\prod_{i = 1}^n S_{b_1, \ldots, b_n}} \leq F\left(1 + \frac{\varepsilon}{2}\right). $$
+We can similarly show that the output is at least $F/(1 + \varepsilon)$.
+
+\section{Equivalence Between Uniform Generation and Counting}
+
+\begin{theorem}[Jerrum-Valiant-Vazirani]
+  For any problem in NP that is downward self-reducible, one can approximately count the number of solutions to the problem in polynomial time if and only if one can perform generate solutions to the problem almost uniformly in polynomial time.
+\end{theorem}
+
+In this note, we prove the easier case where both of uniform generation and counting are perfect. That perfect uniform generation implies perfect counting is proved in Section \ref{sec:approx-counting}. For the other direction, given a counter for $\shDNF$, we define a recursive algorithm in Algorithm \ref{alg:counter-implies-unifgen} that performs uniform generation for DNF. For any satisfying assignment $b_1, \ldots, b_n$, the probability that Algorithm \ref{alg:counter-implies-unifgen} outputs $b_1, \ldots, b_n$ is
+$$ \frac{F_{b_1}}{F} \cdot \frac{F_{b_1, b_2}}{F_{b_1}} \cdots \frac{1}{F_{b_1, \ldots, b_{n - 1}}} = \frac{1}{F}. $$
+Therefore, the probability that every satisfying assignment is output by Algorithm \ref{alg:counter-implies-unifgen} is equal, so Algorithm \ref{alg:counter-implies-unifgen} is a uniform generator for DNF.
+
+\begin{algorithm}
+  \CommentSty{// at $b_1, \ldots, b_i$} \\
+  use the counter to compute $r_0 = F_{b_1, \ldots, b_i, 0}$ and $r_1 = F_{b_1, \ldots, b_i, 1}$ \\
+  go left on the DSR tree with probability $r_0/(r_0 + r_1)$; else go right \\
+  output $b_1, \ldots, b_n$ when reaching a leaf
+  \caption{A uniform generator for DNF given a counter.}
+  \label{alg:counter-implies-unifgen}
+\end{algorithm}
 
 \end{document}
