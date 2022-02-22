@@ -53,6 +53,8 @@
 \DeclareMathOperator{\RP}{RP}
 \DeclareMathOperator{\EXP}{EXP}
 \DeclareMathOperator{\DTIME}{DTIME}
+\DeclareMathOperator{\NP}{NP}
+\DeclareMathOperator{\MCprime}{MC'}
 \newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \begin{document}
@@ -65,6 +67,7 @@
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{fact}[theorem]{Fact}
+\newtheorem{problem}[theorem]{Problem}
 \newtheorem{claim}{Claim}
 \newtheorem{exercise}{Exercise}
 \theoremstyle{definition}
@@ -126,5 +129,139 @@ Consider a problem $L$ in $\BPP$. Given a randomized algorithm $A$ that decides 
 \begin{corollary}
   $\BPP \subseteq \EXP$.
 \end{corollary}
+
+\section{Pairwise Independence \& Maximum Cut}
+
+\subsection{Maximum Cut}
+
+The maximum cut problem is formulated as follows:
+\begin{problem}[maximum cut]
+  Given a graph $G = (V, E)$, output a partition of $V$ into $S, T$ to maximize $|\{ (u, v) : u \in S, v \in T \}|$, i.e., the size of the $(S, T)$-cut.
+\end{problem}
+
+The maximum cut problem is $\NP$-hard. We give a randomized algorithm in Algorithm \ref{alg:maxcut} that approximates the maximum cut problem.
+
+\begin{algorithm}
+  flip coins $r_1, \ldots, r_n \in \{ 0, 1 \}$ ($n = |V|$) \\
+  put vertex $i$ on side $r_i$ (i.e., if $r_i = 0$ put in $S$, else in $T$) for each $i \in [n]$ to get $S, T$
+  \caption{A randomized algorithm that approximates the maximum cut problem.}
+  \label{alg:maxcut}
+\end{algorithm}
+
+For each $(u, v) \in E$, let
+$$ \mathds 1_{(u, v)} = \left\{
+  \begin{array}{ll}
+    1, & \text{if $r_u \neq r_v$ (i.e., $(u, v)$ crosses the $(S, T)$-cut)}, \\
+    0, & \text{otherwise}.
+  \end{array}
+\right. $$
+Therefore,
+\begin{align*}
+  \EE[\text{cut size}] &= \EE\left[\sum_{(u, v) \in E} \mathds 1_{(u, v)}\right] = \sum_{(u, v) \in E} \EE\left[\mathds 1_{(u, v)}\right] \\
+  &= \sum_{(u, v) \in E} \PP[\text{$(u, v)$ crosses cut}] \\
+  &= \sum_{(u, v) \in E} \PP\left[(r_u = 0, r_v = 1) \text{ or } (r_u = 1, r_v = 0)\right] && (\text{using that $r_u, r_v$ are independent}) \\
+  &= \frac{|E|}{2}.
+\end{align*}
+This implies that there exists a cut of size at least $|E|/2$. By derandomization via enumeration, we try all $2^n$ possible settings of coins and pick the best cut.
+
+The plan to obtain a faster derandomized algorithm is to find a subset of settings of $r_1, \ldots, r_n$ which suffices, so we instead enumerate over this smaller subset.
+
+\subsection{Pairwise Independence}
+
+\begin{definition}
+  Let $T$ be a domain such that $|T| = t$. Let $X_1, \ldots, X_n$ be $n$ random variables such that $X_i \in T$ for each $i \in [n]$. We say that $X_1, \ldots, X_n$ are
+  \begin{itemize}[itemsep=0pt]
+    \item \emph{independent} if for all $b_1, \ldots, b_n \in T$, $\PP[(X_1, \ldots, X_n) = (b_1, \ldots, b_n)] = 1/t^n$;
+    \item \emph{pairwise independent} if for all $i, j \in [n]$ with $i \neq j$ and $b_i, b_j \in T$, $\PP[(X_i, X_j) = (b_i, b_j)] = 1/t^2$;
+    \item \emph{$k$-wise independent} if for all distinct $i_1, \ldots, i_k \in [n]$ and for all $b_{i_1}, \ldots, b_{i_k} \in T$, we have $\PP[(X_{i_1}, \ldots, X_{i_k}) = (b_{i_1}, \ldots, b_{i_k})] = 1/t^k$.
+  \end{itemize}
+\end{definition}
+
+Consider the example given in Table \ref{tab:pairwise-ind}. Note that $r_1', r_2', r_3'$ are not independent because, e.g., $\PP[r_1'r_2'r_3' = 000] = 1/4 \neq 1/8$ and $\PP[r_1'r_2'r_3'=010] = 0 \neq 1/8$. However, $r_1', r_2', r_3'$ are pairwise independent because $\PP[r_i' r_j' = b_i b_j] = \PP[r_i r_j = b_i b_j] = 1/4$ for all $i, j \in [3]$ with $i \neq j$ and for all $b_i, b_j \in \{ 0, 1 \}$. Note that each row on the right half can be represented by two bits, as indicated in the last column.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{cccc|ccccc}
+    \multicolumn{4}{c|}{total independence} & \multicolumn{5}{c}{pairwise independence} \\
+    \hline
+    probability & $r_1$ & $r_2$ & $r_3$ & probability & $r_1'$ & $r_2'$ & $r_3'$ \\
+    $1/8$ & $0$ & $0$ & $0$ & $1/4$ & $0$ & $0$ & $0$ & \textcolor{red}{$00$} \\
+    $1/8$ & $0$ & $0$ & $1$ & $1/4$ & $0$ & $1$ & $1$ & \textcolor{red}{$01$} \\
+    $1/8$ & $0$ & $1$ & $1$ & $1/4$ & $1$ & $0$ & $1$ & \textcolor{red}{$10$} \\
+    $1/8$ & $1$ & $0$ & $1$ & $1/4$ & $1$ & $1$ & $0$ & \textcolor{red}{$11$} \\
+    $1/8$ & $1$ & $0$ & $0$ \\
+    $1/8$ & $1$ & $0$ & $1$ \\
+    $1/8$ & $1$ & $1$ & $0$ \\
+    $1/8$ & $1$ & $1$ & $1$ \\
+  \end{tabular}
+  \caption{An example of pairwise independence.}
+  \label{tab:pairwise-ind}
+\end{table}
+
+A \emph{randomness generator} takes $m$ totally independent random bits $b_1, \ldots, b_m$ as input and outputs $n$ pairwise independent random bits $r_1, \ldots, r_n$. Suppose that we have a randomness generator. Then we can derandomize Algorithm \ref{alg:maxcut} as follows:
+\begin{enumerate}[label=(\roman*), itemsep=0pt]
+  \item Construct a randomized algorithm $\MCprime$ which, given $m$ totally independent random bits $b_1, \ldots, b_m$ and a graph $G$, generates $n$ pairwise independent random bits $r_1, \ldots, r_n$ from $b_1, \ldots, b_m$, and uses the $r_i$'s to run Algorithm \ref{alg:maxcut}.
+  \item Derandomize $\MCprime$ via enumeration, i.e., for all choices of $b_1, \ldots, b_m$, run $\MCprime$, and output the best cut.
+\end{enumerate}
+
+Note that the running time of this derandomized algorithm is
+$$ 2^m \times \left(\text{time for randomness generator} + \text{time for $\MCprime$}\right). $$
+Therefore, if $m = O(\log n)$, then we have a deterministic polynomial time $2$-approxmation algorithm for the maximum cut problem.
+
+\subsection{Generating Pairwise Independence Random Variables}
+
+We consider the case that the random variables are bits and the case that the random variables are integers in $\{ 0, \ldots, q - 1 \}$, where $q$ is a prime.
+
+{\bf \em Bits.} We use Algorithm \ref{alg:randgen-bits}. The correctness of the algorithm will be proved in homework. Therefore, $k$ truly random bits can generate $2^k - 1$ pairwise independent random bits, so $\log n$ truly random bits can generate $n - 1$ pairwise independent random bits.
+
+\begin{algorithm}
+  choose $k$ truly random bits $b_1, \ldots, b_k$ \\
+  \ForEach{$S \subset [k]$ such that $S \neq \emptyset$}{
+    $C_S \leftarrow \bigoplus_{i \in S} b_i$
+  }
+  output all $C_S$'s
+  \caption{A randomness generator for bits.}
+  \label{alg:randgen-bits}
+\end{algorithm}
+
+{\bf \em Integers in $\{ 0, \ldots, q - 1\}$, where $q$ is a prime.} The first idea is that if $q$ can be represented via $\ell$ bits, then we run Algorithm \ref{alg:randgen-bits} for $\ell$ times. The resulting algorithm requires $O(\log q \cdot \log q)$ truly random bits, where the first $\log q$ becomes from Algorithm \ref{alg:randgen-bits} and the second $\log q$ is the number of repetitions. Nevertheless, there exists an algorithm which requires $O(\log q)$ truly random bits only, given in Algorithm \ref{alg:randgen-int}.
+
+\begin{algorithm}
+  pick truly random integers $a, b \in \ZZ_q$ \\
+  \ForEach{$i \in \{ 0, \ldots, q - 1 \}$}{
+    $r_i \leftarrow a \cdot i + b \mod{q}$
+  }
+  output $r_0, \ldots, r_{q - 1}$
+  \caption{A randomness generator for integers in $\{ 0, \ldots, q - 1 \}$, where $q$ is a prime.}
+  \label{alg:randgen-int}
+\end{algorithm}
+
+\begin{definition}
+  A family $\mathcal H = \{ h_i \}_{i \in I}$ of functions such that $h_i : [N] \to [M]$ for each $i \in I$ is said to be \emph{pairwise independent} if $h$ is uniformly random in $H$,
+  \begin{itemize}[itemsep=0pt]
+    \item for all $x \in [N]$, $h(x)$ is uniformly distributed in $[M]$;
+    \item for all $x_1, x_2 \in [N]$ with $x_1 \neq x_2$, $(h(x_1), h(x_2))$ is uniformly distributed in $[M]^2$.
+  \end{itemize}
+\end{definition}
+
+For each $a, b \in \ZZ_q$, let $h_{a, b} : \{ 0, \ldots, q - 1 \} \to \ZZ_q$ be defined by
+$$ h_{a, b}(x) = a \cdot x + b \mod{q}. $$
+Then we can show that $\mathcal H = \{ h_{a, b} : a, b \in \ZZ_q \}$ is pairwise independent. Indeed, for each $x_1, x_2 \in \{ 0, \ldots, q - 1 \}$ with $x_1 \neq x_2$ and for each $c, d \in \ZZ_q$,
+$$ \PP_{a, b}\left[h_{a, b}\left(x_1\right) = c \wedge h_{a, b}\left(x_2\right) = d\right] = \PP_{a, b}\left[ax_1 + b = c \wedge ax_2 + b = d\right] = \frac{1}{q^2}. $$
+To see this, note that the above probability equals
+$$ \PP_{a, b}\left[\begin{pmatrix}
+  x_1 & 1 \\
+  x_2 & 1
+\end{pmatrix} \begin{pmatrix}
+  a \\
+  b
+\end{pmatrix} = \begin{pmatrix}
+  c \\
+  d
+\end{pmatrix}\right] = \frac{1}{q^2}, $$
+because $x_1 \neq x_2$ implies $\det \begin{pmatrix}
+  x_1 & 1 \\
+  x_2 & 1
+\end{pmatrix} \neq 0$ and hence has a unique solution.
 
 \end{document}
