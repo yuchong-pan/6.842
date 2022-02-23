@@ -43,6 +43,7 @@
 \DeclareMathOperator{\diag}{diag}
 \DeclareMathOperator{\comp}{c}
 \DeclareMathOperator{\bernoulli}{Bernoulli}
+\DeclareMathOperator{\Mod}{mod}
 \newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \begin{document}
@@ -122,7 +123,11 @@
 
   \clearpage
 
-  \item \begin{proof}
+  \item \noindent\emph{Collaborators and sources:} none.
+
+  \bigskip
+  
+  \begin{proof}
     Suppose that a Boolean function $f$ can be computed by a randomized polynomial-sized circuit family $\mathcal C = \{ C_n \}_{n \in \NN}$. Let $n \in \NN$. Let $m \in \NN$ be the number of random input bits. Define a $2^n \times 2^m$ matrix $M$ such that
     \begin{itemize}[itemsep=0pt]
       \item each row represents a possible combination of inputs $x_1, \ldots, x_n \in \{ 0, 1 \}$;
@@ -136,6 +141,76 @@
     Since we remove at least half of the rows in each iteration, then there are at most $O(\log 2^n) = O(n)$ iterations, i.e., $k = O(n)$. Since $C_n$ is polynomial-sized, then the size of $C_n$ is upper bounded by $p(n)$. For each $i \in [k]$, since $D_n^{(i)}$ is obtained by hard-wiring random input bits in $C_n$, then the size of $D_n^{(i)}$ is upper bounded by $p(n)$. Finally, since $D_n$ is obtained by taking the ``or'' of $D_n^{(1)}, \ldots, D_n^{(k)}$, then the size of $D$ is upper bounded by $kp(n) + k = O(np(n))$, so $D_n$ is polynomial-sized.
 
     Let $\mathcal D = \{ D_n \}_{n \in \NN}$. We show that $\mathcal D$ computes $f$. Let $x_1, \ldots, x_n \in \{ 0, 1 \}$. If $f(x_1, \ldots, x_n) = 0$, then the row of the original matrix $M$ representing $x_1, \ldots, x_n$ is all-zero and hence never removed, so none of $D_n^{(1)}, D_n^{(2)}, \ldots$ outputs $0$ on inputs $x_1, \ldots, x_n$, which implies that $D_n$ outputs $0$. If $f(x_1, \ldots, x_n) = 1$, then the row of the original matrix $M$ representing $x_1, \ldots, x_n$ has at least half of the entries equal to $1$, and is hence removed in some iteration, say the $i^\text{th}$ iteration, so $D_n^{(i)}$ outputs $1$ on inputs $x_1, \ldots, x_n$, which implies that $D_n$ outputs $1$. This shows that $D_n$ outputs $f(x_1, \ldots, x_n)$ for all combinations of inputs $x_1, \ldots, x_n \in \{ 0, 1 \}$. Therefore, $\mathcal D$ is a deterministic polynomial-sized circuit family which computes $f$, completing the proof.
+  \end{proof}
+
+  \clearpage
+
+  \item \noindent\emph{Collaborators and sources:} none.
+
+  \bigskip
+
+  \begin{proof}
+    Suppose $e(\Delta \delta + 1)(1 - 1/k)^\delta < 1$. WLOG, we assume that each vertex has out-degree $\delta$ by removing an outgoing edge from $v$ whenever a vertex $v$ has out-degree greater than $\delta$; this does not increase the in-degree of any vertex, so the maximum in-degree of the resulting graph is at most $\Delta$.
+
+    Let $f : V \to \{ 0, \ldots, k - 1 \}$ be a random coloring of $V$ obtained by choosing for each $v \in V$, $f(v) \in \{ 0, \ldots, k - 1 \}$ independently according to a uniform distribution. For each $v \in V$, let $A_v$ be the event that there does not exist $u \in V$ such that $(v, u) \in E$ and $f(u) = f(v) + 1 \;\Mod{k}$. For each $v \in V$, we denote by $N^+(v)$ the set of out-neighbors of $v$, and denote by $N^-(v)$ the set of in-neighbors of $v$. Then for each $v \in V$,
+    \begin{align*}
+      \PP\left[A_v\right] &= \PP\left[f(u) \neq f(v) + 1 \;\Mod{k} \;\;\forall u \in N^+(v)\right] \\
+      &= \sum_{i = 0}^{k - 1} \PP[f(v) = i] \PP\left[f(u) \neq f(v) + 1 \;\Mod{k} \;\;\forall u \in N^+(v) \;\middle|\; f(v) = i\right] \\
+      &= \sum_{i = 0}^{k - 1} \PP[f(v) = i] \PP\left[f(u) \neq i + 1 \;\Mod{k} \;\;\forall u \in N^+(v)\right] && (\text{independence}) \\
+      &= \sum_{i = 0}^{k - 1} \PP[f(v) = i] \prod_{u \in N^+(v)} \PP\left[f(u) \neq i + 1 \;\Mod{k}\right] && (\text{independence}) \\
+      &= k \cdot \frac{1}{k} \cdot \left(1 - \frac{1}{k}\right)^\delta = \left(1 - \frac{1}{k}\right)^\delta.
+    \end{align*}
+
+    Let $v \in V$. To simplify notations, let $N_*^+(v) = N^+(v) \cup \{ v \}$ and $\overline{N_*^+(v)} = V \setminus N_*^+(v)$. Let $I(v) = \{ u \in V : u \not \in N_*^+(v), N^+(u) \cap N^+(v) = \emptyset \} \subset \overline{N_*^+(v)}$. We show that $A_v$ is independent of all events $A_u$ with $u \in I(v)$. Let $v_1, \ldots, v_\ell \in I(v)$. By total independence, for all $\{ a_w : w \in V \} \in \{ 0, \ldots, k - 1 \}^V$,
+    \begin{align*}
+      \PP\left[f(w) = a_w \;\forall w \in V \right] &= \prod_{w \in V} \PP\left[f(w) = a_w\right] = \prod_{w \in N_*^+(v)} \PP\left[f(w) = a_w\right] \prod_{w \in \overline{N_*^+(v)}} \PP\left[f(w) = a_w\right] \\
+      &= \PP\left[f(w) = a_w \;\forall w \in N_*^+(v)\right] \PP\left[f(w) = a_w \;\forall w \in \overline{N_*^+(v)}\right].
+    \end{align*}
+    For $i \in [\ell]$, since $v_i \in I(v)$, then $A_{v_i}$ depends upon the values of $f$ on $\overline{N_*^+(v)}$ only. Moreover, $A_v$ depends upon the values of $f$ on $N_*^+(v)$ only. Hence, for all $\{ a_w : w \in V \} \in \{ 0, \ldots, k - 1 \}^V$,
+    \begin{align*}
+      &\quad\; \PP\left[A_v \cap \bigcap_{i = 1}^\ell A_{v_i} \;\middle|\; f(w) = a_w \;\forall w \in V\right] \\
+      &= \left(\prod_{u \in N^+(v)} \mathds 1[a_u \neq a_v + 1 \;\Mod{k}]\right) \left(\prod_{i = 1}^\ell \prod_{u \in N^+\left(v_i\right)} \mathds 1\left[a_u \neq a_{v_i} + 1 \;\Mod{k}\right]\right) \\
+      &= \PP\left[A_v \;\middle|\; f(w) = a_w \;\forall w \in V\right] \PP\left[\bigcap_{i = 1}^\ell A_{v_i} \;\middle|\; f(w) = a_w \;\forall w \in V\right] \\
+      &= \PP\left[A_v \;\middle|\; f(w) = a_w \;\forall w \in N_*^+(v)\right] \PP\left[\bigcap_{i = 1}^\ell A_{v_i} \;\middle|\; f(w) = a_w \;\forall w \in \overline{N_*^+(v)}\right].
+    \end{align*}
+    Therefore,
+    \begin{align*}
+      &\quad\; \PP\left[A_v \cap \bigcap_{i = 1}^\ell A_{v_i}\right] \\
+      &= \sum_{\{ a_w \}_{w \in V} \in \{ 0, \ldots, k - 1 \}^V} \PP\left[f(w) = a_w \;\forall w \in V\right] \PP\left[A_v \cap \bigcap_{i = 1}^\ell A_{v_i} \;\middle|\; f(w) = a_w \;\forall w \in V\right] \\
+      &= \sum_{\{ a_w \}_{w \in V} \in \{ 0, \ldots, k - 1 \}^V} \PP\left[f(w) = a_w \;\forall w \in N_*^+(v)\right] \PP\left[f(w) = a_w \;\forall w \in \overline{N_*^+(v)}\right] \\
+      &\qquad \qquad \qquad \qquad \quad\;\; \PP\left[A_v \;\middle|\; f(w) = a_w \;\forall w \in N_*^+(v)\right] \PP\left[\bigcap_{i = 1}^\ell A_{v_i} \;\middle|\; f(w) = a_w \;\forall w \in \overline{N_*^+(v)}\right] \\
+      &= \left(\sum_{\substack{ a_w \in \{ 0, \ldots, k - 1 \} \\ \forall w \in N_*^+(v) }} \PP\left[f(w) = a_w \;\forall w \in N_*^+(v)\right] \PP\left[A_v \;\middle|\; f(w) = a_w \;\forall w \in N_*^+(v)\right]\right) \\
+      &\quad\; \left(\sum_{\substack{ a_w \in \{ 0, \ldots, k - 1 \} \\ \forall w \in \overline{N_*^+(v)} }} \PP\left[f(w) = a_w \;\forall w \in \overline{N_*^+(v)}\right] \PP\left[\bigcap_{i = 1}^\ell A_{v_i} \;\middle|\; f(w) = a_w \;\forall w \in \overline{N_*^+(v)}\right]\right) \\
+      &= \PP\left[A_v\right] \PP\left[\bigcap_{i = 1}^\ell A_{v_i}\right].
+    \end{align*}
+    This proves that $A_v$ is independent of all events $A_u$ with $u \in I(v)$. Since $D$ is simple, then the maximum degree of the dependency digraph of $\{ A_v : v \in V \}$ is at most
+    \begin{align*}
+      \max_{v \in V} |V \setminus (I(v) \cup \{ v \})| &= \left|\left\{ u \in V : u \in N^+(v) \;\vee\; \left(u \neq v \;\wedge\; N^+(u) \cap N^+(v) \neq \emptyset\right) \right\}\right| \\
+      &= \left|N^+(v) \cup \bigcup_{u \in N^+(v)} \left(N^-(u) \setminus \{ v \}\right)\right| \\
+      &\leq \left|N^+(v)\right| + \sum_{u \in N^+(v)} \left(\left|N^-(u)\right| - 1\right) \\
+      &\leq \delta + \delta(\Delta - 1) = \Delta \delta.
+    \end{align*}
+
+    Since $e(\Delta \delta + 1) (1 - 1/k)^\delta < 1$, then by the Lov\'{a}sz local lemma,
+    $$ \PP[\forall v \in V, \exists u \in N^+(v) \text{ s.t.\ } f(u) = f(v) + 1 \;\Mod{k}] = \PP\left[\bigcap_{v \in V} \overline{A_v}\right] > 0. $$
+    This implies that there exists a coloring $f : V \to \{ 0, \ldots, k - 1 \}$ such that for all $v \in V$, there exists $u \in N^+(v)$ such that $f(u) = f(v) + 1 \;\Mod{k}$.
+    
+    \begin{algorithm}[h]
+      $\ell \leftarrow 1$ \\
+      pick $v_1 \in V$ arbitrarily \\
+      \While{true}{
+        pick $u \in N^+(v)$ such that $f(u) = f(v) + 1 \;\Mod{k}$ \\
+        \If{$\exists i \in [\ell]$ s.t.\ $v_i = u$}{
+          \Return{$(v_i, \ldots, v_\ell, u)$}
+        }
+      }
+      \caption{An algorithm which finds a simple directed cycle whose length is a multiple of $k$, given a digraph $D$ with $e(\Delta \delta + 1)(1 - 1/k)^\delta < 1$ and a coloring $f : V \to \{ 0, \ldots, k - 1 \}$ such that for all $v \in V$, there exists $u \in N^+(v)$ such that $f(u) = f(v) + 1 \;\Mod{k}$, where the out-degree of every vertex in $D$ is $\delta$, and the maximum in-degree of $D$ is $\Delta$.}
+      \label{alg:dicycle}
+    \end{algorithm}
+
+    Consider Algorithm \ref{alg:dicycle}. Since the number of vertices in $D$ is finite, the algorithm eventually visits a vertex which has been visited before, so Algorithm \ref{alg:dicycle} terminates. We show that the returned walk $(v_i, \ldots, v_\ell, u)$ is a simple directed cycle whose length is a multiple of $k$. By definition, since $u$ is the first vertex on this list that has occurred before, then $(v_i, \ldots, v_\ell, u)$ is a simple directed cycle. Since $f(v_j) = f(v_{j - 1}) + 1 \;\Mod{k}$ for each $j \in \{ i + 1, \ldots, \ell \}$, then an inductive argument implies that
+    $$ f\left(v_i\right) = f(u) = f\left(v_\ell\right) + 1 \;\Mod{k} = f\left(v_i\right) + \ell - i + 1 \;\Mod{k}. $$
+    Therefore, the length of the simple directed cyle $(v_i, \ldots, v_\ell, u)$, which equals $\ell - i + 1$, is a multiple of $k$. This completes the proof.
   \end{proof}
 \end{enumerate}
 
