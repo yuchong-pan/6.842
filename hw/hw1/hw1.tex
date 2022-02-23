@@ -94,6 +94,31 @@
     $$ \PP\left[\mathcal B(x, \varepsilon, \delta) \in \left[\frac{f(x)}{1 + \varepsilon}, f(x)(1 + \varepsilon)\right]\right] = 1 - \PP\left[\mathcal B(x, \varepsilon, \delta) \not \in \left[\frac{f(x)}{1 + \varepsilon}, f(x)(1 + \varepsilon)\right]\right] \geq 1 - \delta. $$
     This completes the proof.
   \end{proof}
+
+  \clearpage
+
+  \item \noindent\emph{Collaborators and sources:} none.
+
+  \bigskip
+
+  \begin{proof}
+    Suppose $\binom{m}{t} 2^{1 - \binom{t}{2}} < 1$. To prove $R(t) > m$, it suffices to show that there exists a $2$-edge-coloring of $K_m$ such that for all $S \subset V(K_m)$ of size $t$, $E(K_m[S])$ is not monochromatic. We randomly color the edges of $K_m$ red or blue, independently and equiprobably. For each $S \subset V(K_m)$ of size $t$, there are exactly $2^{\binom{t}{2}}$ two-colorings of $E(K_m[S])$, amongst which two are monochromatic colorings (all red and all blue), so
+    $$ \PP\left[\text{$E\left(K_m[S]\right)$ is monochromatic}\right] = \frac{2}{2^{\binom{t}{2}}} = 2^{1 - \binom{t}{2}}. $$
+    By the union bound,
+    \begin{align*}
+      &\quad \; \PP\left[\exists S \subset V\left(K_m\right), |S| = t, \text{$E\left(K_m[S]\right)$ is monochromatic}\right] \\
+      &\leq \sum_{\substack{S \subset V\left(K_m\right) \\ |S| = t}} \PP\left[\text{$E\left(K_m[S]\right)$ is monochromatic}\right] \\
+      &= \binom{m}{t} 2^{1 - \binom{t}{2}} \\
+      &< 1.
+    \end{align*}
+    Therefore,
+    \begin{align*}
+      &\quad\; \PP\left[\forall S \subset V\left(K_m\right) \text{of size $t$}, \text{$E\left(K_m[S]\right)$ is not monochromatic}\right] \\
+      &= 1 - \PP\left[\exists S \subset V\left(K_m\right), |S| = t, \text{$E\left(K_m[S]\right)$ is monochromatic}\right] \\
+      &> 1 - 1 = 0.
+    \end{align*}
+    This proves that there exists a $2$-edge-coloring of $K_m$ such that for all $S \subset V(K_m)$ of size $t$, $E(K_m[S])$ is not monochromatic. The proof is complete.
+  \end{proof}
 \end{enumerate}
 
 \end{document}
