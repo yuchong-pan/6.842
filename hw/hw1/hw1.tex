@@ -1,0 +1,99 @@
+
+\documentclass[letterpaper, reqno,11pt]{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{color,latexsym,amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage[linesnumbered,lined,boxed,commentsnumbered,noend,noline]{algorithm2e}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{bbm}
+\usepackage{enumitem}
+\usepackage[numbers]{natbib}
+\usepackage{framed}
+\usepackage{titling}
+\usepackage{subcaption}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+
+\tikzset{invclip/.style={clip,insert path={{[reset cm]
+  (-16383.99999pt,-16383.99999pt) rectangle (16383.99999pt,16383.99999pt)}}}}
+
+\allowdisplaybreaks
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\inci}{\mathds{1}}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\charcone}{char.cone}
+\DeclareMathOperator{\STAB}{STAB}
+\DeclareMathOperator{\Down}{Down}
+\DeclareMathOperator{\lca}{lca}
+\DeclareMathOperator{\ex}{ex}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\T}{T}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\comp}{c}
+\DeclareMathOperator{\bernoulli}{Bernoulli}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\begin{document}
+\pagenumbering{arabic}
+\title{Homework 1}
+\author{Yuchong Pan}
+\date{\today}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{claim}{Claim}
+\newtheorem{exercise}{Exercise}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{solution}{Solution}
+%\maketitle
+%
+
+\begin{framed}
+\noindent{\bf 6.842 Randomness and Computation} \hfill \thedate
+\begin{center}
+\Large{\thetitle}
+\end{center}
+%\noindent{\em Lecturer: Ronitt Rubinfield} \hfill {\em Scribe: \theauthor}
+\noindent{\em Yuchong Pan} \hfill {\em MIT ID: 911346847}
+\end{framed}
+
+\begin{enumerate}
+  \item \noindent\emph{Collaborators and sources:} none.
+
+  \bigskip
+
+  \begin{proof}
+    We construct an approximation scheme $\mathcal B$ for $f$ as follows: On input $(x, \varepsilon, \delta)$, run $\mathcal A(x, \varepsilon)$ independently for $k := \lceil 12\log (1/\delta) \rceil$ times with outputs $y_1, \ldots, y_k$, and output a median of $y_1, \ldots, y_k$.
+    
+    Let $t_{\mathcal A}(x, \varepsilon)$ be the running time of $\mathcal A$ on input $(x, \varepsilon)$. Then $\mathcal B$ runs in $O(kt_{\mathcal A}(x, \varepsilon)) = O(\log(1/\delta) t_{\mathcal A}(x, \varepsilon))$. Since $\mathcal A$ runs in time polynomial in $1/\varepsilon$ and $|x|$, then $\mathcal B$ runs in time polynomial in $1/\varepsilon$, $|x|$ and $\log(1/\delta)$.
+
+    By the definition of medians, if more than half of $y_1, \ldots, y_k$ fall in $[f(x)/(1 + \varepsilon), f(x)(1 + \varepsilon)]$, then $\mathcal B(x, \varepsilon, \delta) \in [f(x)/(1 + \varepsilon), f(x)(1 + \varepsilon)]$. Let $X_1, \ldots, X_k \in \{ 0, 1 \}$ be random variables so that $X_i = 1$ with probability $p := \PP[\mathcal A(x, \varepsilon) \not \in [f(x)/(1 + \varepsilon), f(x)(1 + \varepsilon)]] \leq 1 - 3/4 = 1/4$. Then $\sum_{i = 1}^k \EE[X_i] = kp \leq k/4$. Therefore,
+    \begin{align*}
+      &\quad\; \PP\left[\mathcal B(x, \varepsilon, \delta) \not \in \left[\frac{f(x)}{1 + \varepsilon}, f(x)(1 + \varepsilon)\right]\right] \\
+      &\leq \PP\left[\text{at least half of $y_1, \ldots, y_k$ do not fall in $\left[\frac{f(x)}{1 + \varepsilon}, f(x)(1 + \varepsilon)\right]$}\right] \\
+      &= \PP\left[\sum_{i = 1}^k X_i \geq \frac{k}{2}\right] \\
+      &= \PP\left[\sum_{i = 1}^k X_i \geq (1 + 1) \cdot \frac{k}{4}\right] \\
+      &\leq e^{-\frac{k/4}{3}} && (\text{Chernoff bound}) \\
+      &= e^{-\frac{\left\lceil 12\log \frac{1}{\delta} \right\rceil}{12}} \leq e^{-\frac{12\log \frac{1}{\delta}}{12}} = \delta.
+    \end{align*}
+    Therefore,
+    $$ \PP\left[\mathcal B(x, \varepsilon, \delta) \in \left[\frac{f(x)}{1 + \varepsilon}, f(x)(1 + \varepsilon)\right]\right] = 1 - \PP\left[\mathcal B(x, \varepsilon, \delta) \not \in \left[\frac{f(x)}{1 + \varepsilon}, f(x)(1 + \varepsilon)\right]\right] \geq 1 - \delta. $$
+    This completes the proof.
+  \end{proof}
+\end{enumerate}
+
+\end{document}
