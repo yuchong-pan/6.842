@@ -32,6 +32,8 @@
 \newcommand{\EE}{\mathbb{E}}
 \newcommand{\LL}{\mathbb{L}}
 \newcommand{\TT}{\mathbb{T}}
+\newcommand{\GI}{\textrm{GI}}
+\newcommand{\coGI}{\overline{\textrm{GI}}}
 \DeclareMathOperator{\conv}{conv}
 \DeclareMathOperator{\charcone}{char.cone}
 \DeclareMathOperator{\STAB}{STAB}
@@ -55,6 +57,9 @@
 \DeclareMathOperator{\DTIME}{DTIME}
 \DeclareMathOperator{\NP}{NP}
 \DeclareMathOperator{\MCprime}{MC'}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\IP}{IP}
+\DeclareMathOperator{\PSPACE}{PSPACE}
 \newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \begin{document}
@@ -130,7 +135,7 @@ Consider a problem $L$ in $\BPP$. Given a randomized algorithm $A$ that decides 
   $\BPP \subseteq \EXP$.
 \end{corollary}
 
-\section{Pairwise Independence \& Maximum Cut}
+\section{Pairwise Independence}
 
 \subsection{Maximum Cut}
 
@@ -263,5 +268,114 @@ because $x_1 \neq x_2$ implies $\det \begin{pmatrix}
   x_1 & 1 \\
   x_2 & 1
 \end{pmatrix} \neq 0$ and hence has a unique solution.
+
+\subsection{Using Pairwise Independence to Improve Confidence}
+
+Let $\mathcal A$ be a randomized polynomial time algorithm for some language $L \in \RP$ which uses a random string $r$ such that
+\begin{itemize}[itemsep=0pt]
+  \item if $x \in L$, then $\PP_r[A(x, r) = \text{accept}] \geq 1/2$;
+  \item if $x \not \in L$, then $\PP_r[A(x, r) = \text{accept}] = 0$.
+\end{itemize}
+The goal is to reduce the confidence error.
+
+The old way is to repeat $\mathcal A$ for $k$ times with \emph{new} random bits each time. If we ever see ``accept'', output ``accept;'' else output ``reject.'' If $x \in L$, then $\PP[\text{accept}] = 0$. If $x \not \in L$, then $\PP[\text{reject}] \leq (1 - 1/2)^k = 1/2^k$. This approach uses $O(k|r|)$ random bits.
+
+We introduce \emph{$2$-point sampling}. Assume that given a family $\mathcal H$ of pairwise independent fnuctions $[2^{k + 2}] \to \{ 0, 1 \}^r$, we can pick a random $h \in \mathcal H$ with $O(k + r)$ random bits and $\poly(k, r)$ time. The sampling algorithm is given in Algorithm \ref{alg:2-point}.
+
+\begin{algorithm}
+  pick $h \in_R H$ \label{line:2-pt-rand} \\
+  \ForEach{$i \leftarrow 1, \ldots, 2^{k + 2}$}{
+    $r_i \leftarrow h(i)$ \\
+    \If{$\mathcal A(x, r_i) = \text{accept}$}{
+      \Return{accept}
+    }
+  }
+  \Return{reject}
+  \caption{The sampling algorithm for $2$-point sampling.}
+  \label{alg:2-point}
+\end{algorithm}
+
+We analyze the behavior of Algorithm \ref{alg:2-point}. If $x \not \in L$, then $\PP[\text{accept}] = 0$. If $x \in L$, then misclassifying happens if we never see $r_i$ such that $\mathcal A(x, r_i) = \text{accept}$. For each $i \in [2^{k + 2}]$, let
+$$ \sigma\left(r_i\right) = \left\{
+  \begin{array}{lll}
+    0, & \text{if $\mathcal A(x, r_i) = \text{reject}$} & \text{(incorrect)}, \\
+    1, & \text{otherwise} & \text{(correct)}.
+  \end{array}
+\right. $$
+Then $\EE[\sigma(r_i)] = \PP[\sigma(r_i) = 1] = \PP[\text{accept}] \geq 1/2$. Let $\ell = 2^{k + 2}$. Let $Y = \sum_{i = 1}^{\ell} \sigma(r_i)$ be the number of correct answers. Then $\EE[Y] \geq 2^{k + 2}/2$, so $\EE[Y/\ell] \geq 1/2$.
+
+\begin{lemma}[Chebychev's inequality]
+  Let $X$ be a random variable. Let $\mu = \EE[X]$. Then
+  $$ \PP[|X - \mu| \geq \varepsilon] \leq \frac{\Var[X]}{\varepsilon^2}. $$
+\end{lemma}
+
+\begin{lemma}[pairwise independence tail inequality] \label{lem:pi-tail}
+  Let $X_1, \ldots, X_t \in [0, 1]$ be pairwise independent random variables. Let $X = \sum_{i = 1}^t X_i/t$. Let $\mu = \EE[X]$. Then
+  $$ \PP[|X - \mu| \geq \varepsilon] \leq \frac{1}{t\varepsilon^2}. $$
+\end{lemma}
+
+Since $\EE[Y/\ell] \geq 1/2$, then Lemma \ref{lem:pi-tail} implies that
+$$ \PP[\text{error}] = \PP[Y = 0] = \PP\left[\frac{Y}{\ell} = 0\right] \leq \PP\left[\left| \frac{Y}{\ell} - \EE\left[\frac{Y}{\ell}\right] \right| \geq \EE\left[\frac{Y}{\ell}\right]\right] \leq \frac{1}{\ell \left(\frac{1}{2}\right)^2} = \frac{4}{\ell} = \frac{4}{2^{-(k + 2)}} = 2^{-k}. $$
+Note that the only place where randomness is used is Line \ref{line:2-pt-rand} in Algorithm \ref{alg:2-point}, which uses $O(k + r)$ random bits by assumption. The running time of Algorithm \ref{alg:2-point} is $O(2^k T_{\mathcal A}(n))$, where $T_{\mathcal A}(n)$ is the running time of $\mathcal A$ on an input of length $n$.
+
+\subsection{Interactive Proofs}
+
+The model of interactive proofs is illustrated in Figure \ref{fig:ip}. Let $V$ be a polynomial time verifer, and let $P$ be an ``all-power'' prover, which has unbounded time and space but is recurisve. Both $V$ and $P$ have read access to the input, and read/write access to conversation tapes. Each of $V$ and $P$ has a private workspace. Moreover, $V$ has random bits. We can show that $P$ does not need random coins (i.e., anything it can do with coins can be done without coins).
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ip.png}
+  \caption{The model of interactive proofs.}
+  \label{fig:ip}
+\end{figure}
+
+\begin{definition}[Goldwasser, Micali, Rackoff]
+  An \emph{interactive proof system (IPS)} for a language $L$ is a protocol such that
+  \begin{itemize}[itemsep=0pt]
+    \item if $x \in L$ and both $V$ and $P$ follow the protocol, then $\PP_\text{coins of $V$}[\text{$V$ accepts $x$}] \geq 2/3$;
+    \item if $x \not \in L$ and $V$ follows the protocol, then $\PP_\text{coins of $V$}[\text{$V$ rejects $x$}] \geq 2/3$.
+  \end{itemize}
+\end{definition}
+
+\begin{definition}
+  $\IP = \{ L \subset \{ 0, 1 \}^* : \text{$L$ has an IPS} \}$.
+\end{definition}
+
+By definition, $\NP \subseteq \IP$.
+
+\begin{theorem}
+  $\IP = \PSPACE$.
+\end{theorem}
+
+\begin{problem}[graph isomorphism, $\GI$]
+  Given graphs $G$ and $H$, are they isomorphic?
+\end{problem}
+
+\begin{problem}[co-graph isomorphism, $\coGI$]
+  Given graphs $G$ and $H$, are they not isomorphic?
+\end{problem}
+
+We know $\GI \in \NP$. It is unknown that $\coGI \in \NP$. However, $\coGI \in \IP$.
+
+\begin{theorem}
+  $\coGI \in \IP$.
+\end{theorem}
+
+\begin{proof}
+  We give a protocol for $\coGI$, where $G_1$ and $G_2$ are graphs:
+  \begin{enumerate}[label=(\roman*), itemsep=0pt]
+    \item $V$ picks $c \in \{ 1, 2 \}$.
+    \item $V$ picks a random labeling of vertices in $G_c$ and send the new adjacency matrix to $P$.
+    \item $P$ guesses $c$.
+    \item Repeat the above process for $k$ times.
+  \end{enumerate}
+  If $G_1 \not \cong G_2$, then $P$ can guess correctly every time. If $G_1 \cong G_2$, then $P$ needs to guess coin flips correctly each time, and $P$ can do this with probability at most $1/2^k$.
+\end{proof}
+
+Do $V$'s coins need to be private? In the example of $\coGI$, it \emph{seems} that if $P$ saw $V$'s choices, then it could cheat. However, Goldwasser and Sipser gives a surprising answer: anything that has a protocol with private coins also has a (possible different) protocol with public coins.
+
+\begin{theorem}[Goldwasser, Sipser]
+  $\IP_\text{private coins} = \IP_\text{public coins}$.
+\end{theorem}
 
 \end{document}
