@@ -125,12 +125,12 @@ $$ P^t(x, y) = \left\{
 \right. $$
 Interpreted as matrix multiplication, for each $t \in \NN$ with $t > 1$,
 $$ P^t = P \cdot P^{t - 1}. $$
-Let $\Pi^{(0)} = (\Pi_1^{(0)}, \ldots, \Pi_n^{(0)})$ be the initial distribution, where $\Pi_i^{(0)}$ is the probability of starting at vertex $i$ for each $i \in [n]$.\footnote{WLOG, we assume $\Omega = [n]$.} Let $\Pi^{(t)}$ be the distribution after $t$ steps for each $t \in \NN$. For each $t \in \NN$,
-$$ \Pi^{(t)} = \Pi^{(0)} P^t. $$
+Let $\pi^{(0)} = (\pi_1^{(0)}, \ldots, \pi_n^{(0)})$ be the initial distribution, where $\pi_i^{(0)}$ is the probability of starting at vertex $i$ for each $i \in [n]$.\footnote{WLOG, we assume $\Omega = [n]$.} Let $\pi^{(t)}$ be the distribution after $t$ steps for each $t \in \NN$. For each $t \in \NN$,
+$$ \pi^{(t)} = \pi^{(0)} P^t. $$
 
 \begin{definition}
-  A distribution $\Pi^*$ is called a \emph{stationary distribution} of a Markov chain with state set $\Omega$ and transition matrix $P$ if for all $x \in \Omega$,
-  $$ \Pi^*(x) = \sum_{y \in \Omega} \Pi^*(y) P(y, x). $$
+  A distribution $\pi^*$ is called a \emph{stationary distribution} of a Markov chain with state set $\Omega$ and transition matrix $P$ if for all $x \in \Omega$,
+  $$ \pi^*(x) = \sum_{y \in \Omega} \pi^*(y) P(y, x). $$
 \end{definition}
 
 \begin{definition}
@@ -150,7 +150,7 @@ $$ \Pi^{(t)} = \Pi^{(0)} P^t. $$
   Every ergodic Markov chain has a unique stationary distribution.
 \end{theorem}
 
-In the special case of a random walk on an undirected graph $G = (V, E)$, the stationary distribution $\Pi^* = (\Pi_1^*, \ldots, \Pi_n^*)$ is given by $\Pi_i^* = d(i)/(2|E|)$ for all $i \in [n]$. Therefore, for a random walk on a $d$-regular graph or on a directed graph with each in-degree and each out-degree equal to $d$, the stationary distribution is uniform; this is not true in general directed graphs.
+In the special case of a random walk on an undirected graph $G = (V, E)$, the stationary distribution $\pi^* = (\pi_1^*, \ldots, \pi_n^*)$ is given by $\pi_i^* = d(i)/(2|E|)$ for all $i \in [n]$. Therefore, for a random walk on a $d$-regular graph or on a directed graph with each in-degree and each out-degree equal to $d$, the stationary distribution is uniform; this is not true in general directed graphs.
 
 \section{Hitting Time, Cover Time and Commute Time}
 
@@ -159,12 +159,12 @@ In the special case of a random walk on an undirected graph $G = (V, E)$, the st
 \end{definition}
 
 \begin{theorem}
-  Consider a random walk on a graph $G = (V, E)$ with stationary distribution $\Pi^*$. For each $x \in V$,
-  $$ h_{x, x} = \frac{1}{\Pi_*(x)}. $$
+  Consider a random walk on a graph $G = (V, E)$ with stationary distribution $\pi^*$. For each $x \in V$,
+  $$ h_{x, x} = \frac{1}{\pi_*(x)}. $$
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-  Consider a very long walk. Then a $\Pi^*(x)$ fraction of the positions are $x$. Then the average gap between the occurrences of $x$ is $h_{x, x} = \Pi^*(x)^{-1}$.
+  Consider a very long walk. Then a $\pi^*(x)$ fraction of the positions are $x$. Then the average gap between the occurrences of $x$ is $h_{x, x} = \pi^*(x)^{-1}$.
 \end{proof}
 
 \begin{definition}
@@ -209,7 +209,7 @@ Following are several examples of the cover time:
 \end{lemma}
 
 \begin{proof}
-  Construct a graph $G'$ by adding a self-loop at each vertex with probability $1/2$. Let $x, y \in V$. We claim that $C_{x, y}(G') = 2C_{x, y}(G)$. To see this, for each path from $x$ to $y$ in $G'$, removing the self-loops in the path gives a path in $G$, and the expected fraction of self-loops in the path is $1/2$. Then $G'$ is ergodic. This implies that there exists a unique stationary distribution $\Pi^*$.
+  Construct a graph $G'$ by adding a self-loop at each vertex with probability $1/2$. Let $x, y \in V$. We claim that $C_{x, y}(G') = 2C_{x, y}(G)$. To see this, for each path from $x$ to $y$ in $G'$, removing the self-loops in the path gives a path in $G$, and the expected fraction of self-loops in the path is $1/2$. Then $G'$ is ergodic. This implies that there exists a unique stationary distribution $\pi^*$.
 
   Consider a walk $u_1, u_2, \ldots$, where $u_i \in V$ and $(u_i, u_{i + 1}) \in E$ for each $i \in \NN$. We look for commutes of the form
   $$ x \to y \to \ldots \to x \to y. $$
