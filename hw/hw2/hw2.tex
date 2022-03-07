@@ -144,6 +144,16 @@
       $$ s \geq \rank \mathsf{S} = n. $$
       This completes the proof.
     \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} none.
+
+    \bigskip
+
+    \begin{proof}
+      Note that any algorithm which generates $n$ pairwise independent random bits samples a vector $\mathbf x$ from a pairwise independent space $S = \{ \mathbf x^{(1)}, \ldots, \mathbf x^{(s)} \}$ on $n$ variables. By part (b), any pairwise independent space $S$ on $n$ variables has size $|S| \geq n$. Therefore, any algorithm that generates $n$ pairwise independent random bits requires at least $\log n$ truly random bits to sample a vector from a space of size $n$. This implies that the construction is optimal, completing the proof.
+    \end{proof}
   \end{enumerate}
 \end{enumerate}
 
