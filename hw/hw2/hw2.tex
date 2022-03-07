@@ -28,8 +28,8 @@
 \newcommand{\QQ}{\mathbb{Q}}
 \newcommand{\NN}{\mathbb{N}}
 \newcommand{\FF}{\mathbb{F}}
-\newcommand{\PP}{\mathbb{P}}
-\newcommand{\EE}{\mathbb{E}}
+\newcommand{\PP}{\mathop{{}\mathbb{P}}}
+\newcommand{\EE}{\mathop{{}\mathbb{E}}}
 \newcommand{\inci}{\mathds{1}}
 \DeclareMathOperator{\conv}{conv}
 \DeclareMathOperator{\charcone}{char.cone}
@@ -55,6 +55,7 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{fact}[theorem]{Fact}
+\newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{claim}{Claim}
 \newtheorem{exercise}{Exercise}
 \theoremstyle{definition}
@@ -106,6 +107,42 @@
         &= \sum_{\beta \in \{ -1, 1 \}} \frac{1}{2} \cdot \frac{1}{2} \cdot \frac{1}{2} = 2 \cdot \frac{1}{8} = \frac{1}{4} = \frac{1}{2} \cdot \frac{1}{2} = \PP\left[C_S = b\right] \PP\left[C_S = b'\right]. \nonumber
       \end{align}
       Note that \eqref{eq:1a-indep} follows from the fact that $S \setminus S'$ and $S' \setminus S$ are disjoint and thus that $C_{S \setminus S'}$ and $C_{S' \setminus S}$ are independent. This completes the proof that the $n = 2^{\ell} - 1$ random bits $C_S$ for $S \subset [\ell]$ with $S \neq \emptyset$ are pairwise independent.
+    \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} none.
+
+    \bigskip
+
+    For each $i \in [s], j \in [n]$, we denote by $s_{i, j}$ the $(i, j)$-entry of $\mathsf{S}$. For each $j \in [n]$, we denote by $\mathbf s_j$ the $j^\text{th}$ column of $\mathsf{S}$. The condition of pairwise independence says that for all $j, j' \in [n]$ with $j \neq j'$ and for all $b, b' \in \{ -1, 1 \}$,
+    \begin{equation} \label{eq:1b-pw-indep}
+      \PP_{i \in [s]} \left[s_{i, j} = b, s_{i, j'} = b'\right] = \PP_{i \in [s]}\left[\mathbf x_j^{(i)} = b, \mathbf x_{j'}^{(i)} = b'\right] = \frac{1}{4}.
+    \end{equation}
+
+    We show that $S$ contains at least $n$ vectors.
+
+    \begin{proof}
+      WLOG, assume that $n \geq 2$ and that $s \geq 1$. First, we show that $\mathbf s_j \cdot \mathbf s_{j'} = 0$ for all $j, j' \in [n]$ with $j \neq j'$. Let $j, j' \in [n]$ be such that $j \neq j'$. Since $S$ is a pairwise independent space, then \eqref{eq:1b-pw-indep} implies that for all $b, b' \in \{ -1, 1 \}$,
+      $$ \left|\left\{ i \in [s] : s_{i, j} = b, s_{i, j'} = b' \right\}\right| = \frac{s}{4}. $$
+      Therefore,
+      \begin{align*}
+        \mathbf s_j \cdot \mathbf s_{j'} &= \sum_{i = 1}^s s_{i, j} s_{i, j'} = \left|\left\{ i \in [s] : s_{i, j} = s_{i, j'} \right\}\right| - \left|\left\{ i \in [s] : s_{i, j} \neq s_{i, j'} \right\}\right| \\
+        &= \left(\left|\left\{ i \in [s] : s_{i, j} = s_{i, j'} = 1 \right\}\right| + \left|\left\{ i \in [s] : s_{i, j} = s_{i, j'} = -1 \right\}\right|\right) - \\
+        &\quad\, \left(\left|\left\{ i \in [s] : s_{i, j} = 1, s_{i, j'} = -1 \right\}\right| + \left|\left\{ i \in [s] : s_{i, j} = -1, s_{i, j'} = 1 \right\}\right|\right) \\
+        &= \left(\frac{s}{4} + \frac{s}{4}\right) - \left(\frac{s}{4} + \frac{s}{4}\right) = 0.
+      \end{align*}
+
+      Second, we show that $\mathbf s_1, \ldots, \mathbf s_n$ are linearly independent. Suppose for the purpose of contradiction that there exist $\alpha_1, \ldots, \alpha_n \in \RR$ that are not all zeros such that
+      $$ \sum_{j = 1}^n \alpha_j \mathbf s_j = \mathbf 0. $$
+      Let $j' \in [n]$. Since $|\{ i \in [s] : s_{i, j} = 1, s_{i, j'} = 1 \}| = s/4 > 0$ for all $j \in [n] \setminus \{ j' \}$, then $\mathbf s_{j'} \neq \mathbf 0$ and hence $\|\mathbf s_{j'}\|^2 > 0$. Therefore,
+      \begin{align*}
+        0 &= \mathbf 0 \cdot \mathbf s_{j'} = \left(\sum_{j = 1}^n \alpha_j \mathbf s_j\right) \cdot \mathbf s_{j'} = \sum_{j = 1}^n \alpha_j \left(\mathbf s_j \cdot \mathbf s_{j'}\right) = \sum_{\substack{j = 1 \\ j \neq j'}}^n \alpha_j \left(\mathbf s_j \cdot \mathbf s_{j'}\right) + \alpha_{j'} \left(\mathbf s_{j'} \cdot \mathbf s_{j'}\right) \\
+        &= \sum_{\substack{j = 1 \\ j \neq j'}}^n \alpha_j \cdot 0 + \alpha_{j'} \left\| \mathbf s_{j'} \right\|^2 = \alpha_{j'} \left\| \mathbf s_{j'} \right\|^2.
+      \end{align*}
+      This implies that $\alpha_{j'} = 0/\| \mathbf s_{j'} \|^2 = 0$ for all $j' \in [n]$, a contradiction. Hence, $\mathbf s_1, \ldots, \mathbf s_n$ are linearly independent. It follows that
+      $$ s \geq \rank \mathsf{S} = n. $$
+      This completes the proof.
     \end{proof}
   \end{enumerate}
 \end{enumerate}
