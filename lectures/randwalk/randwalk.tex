@@ -61,6 +61,8 @@
 \DeclareMathOperator{\IP}{IP}
 \DeclareMathOperator{\PSPACE}{PSPACE}
 \DeclareMathOperator{\lollipop}{lollipop}
+\DeclareMathOperator{\ustconn}{\textsc{UST-Conn}}
+\DeclareMathOperator{\RL}{RL}
 \newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \begin{document}
@@ -89,7 +91,7 @@
 \noindent{\em Lecturer: Ronitt Rubinfield} \hfill {\em Scribe: \theauthor}
 \end{framed}
 
-\section{Definitions}
+\section{Markov Chains and Random Walks}
 
 \begin{definition}
   Let $\Omega$ be a set of states (throughout this note, $\Omega$ is finite). A sequence of random walks $X_0, X_1, \ldots \in \Omega$ is a \emph{Markov chain} if it satisfies the \emph{Markovian property}, i.e., for each $t \in \NN$ and for all $x_1, \ldots, x_t, y \in \Omega$,
@@ -112,7 +114,9 @@ A random walk on a directed graph is a special case of Markov chains.
 \end{definition}
 
 \begin{definition}
-  An $n \times n$ matrix $P$ is called a \emph{stochastic matrix} if for all $i \in [n]$,
+  Let $P$ be an $n \times n$ matrix. Then $P$ is said to be \emph{stochastic} if for all $i \in [n]$,
+  $$ \sum_{j = 1}^n P(i, j) = 1. $$
+  Moreover, $P$ is said to be \emph{doubly stochastic} if $P$ is stochastic and for all $j \in [n]$,
   $$ \sum_{i = 1}^n P(i, j) = 1. $$
 \end{definition}
 
@@ -230,5 +234,130 @@ Following are several examples of the cover time:
     \label{fig:dfs}
   \end{figure}
 \end{proof}
+
+\section{Unconnected $s$-$t$ Connectivity}
+
+\begin{problem}[undirected $s$-$t$ connectivity, $\ustconn$]
+  Given an undirected graph $G = (V, E)$ and $s, t \in V$, output ``yes'' if $s$ and $t$ are in the same connected component of $G$, and ``no'' otherwise.
+\end{problem}
+
+\begin{definition}
+  Let $\RL$ be the class of problems solvable by randomized log-space computations.
+\end{definition}
+
+The computational model that we consider consists of a read-only input tape of $n$ bits and a read-write tape of $O(\log n)$ bits.
+
+\begin{theorem}
+  $\ustconn \in \RL$.
+\end{theorem}
+
+\begin{proof}
+  Let $G = (V, E)$ be an undirected graph. By Theorem \ref{thm:cover}, $C(G) = O(nm) = O(n^3) = cn^3$ for some constant $c$. We give Algorithm \ref{alg:ustconn} for some parameter $k$.
+
+  \begin{algorithm}
+    starting at $s$, take a random walk for $k \cdot c n^3$ steps \\
+    \If{ever see $t$}{
+      \Return{``yes''}
+    }
+    \Else{
+      \Return{``no''}
+    }
+    \caption{A randomized algorithm for $\ustconn$ on an undirected graph $G = (V, E)$ and vertices $s, t \in V$.}
+    \label{alg:ustconn}
+  \end{algorithm}
+
+  The running time of Algorithm \ref{alg:ustconn} is $O(n^3)$ times the time to pick a random neighbor (which depends on the specific data structure used). For the space of Algorithm \ref{alg:ustconn}, we need to keep track of the step counter, which uses $O(\log n)$ space, and need to pick a random neighbor, which uses $O(\log n)$. Therefore, Algorithm \ref{alg:ustconn} uses $O(\log n)$ space in total.
+
+  Now we analyze the behavior of Algorithm \ref{alg:ustconn}. If $s$ and $t$ are not connected, then the algorithm never outputs ``yes.'' If $s$ and $t$ are connected, then $h_{s, t} \leq C(G_S) \leq n^3$, where $G_S$ is the connected component of $G$ that contains $s$ and $t$. Therefore,
+  \begin{align*}
+    \PP[\text{output ``no''}] &\leq \PP[\text{start at $s$, walk at least $k \cdot h_{s, t}$ steps and still don't see $t$}] \\
+    &= \PP[\text{start at $s$, walk at least $k \cdot \EE[\text{\# steps to start at $s$ and see $t$}]$ steps, not see $t$}] \\
+    &\leq \frac{1}{k}.
+  \end{align*}
+  Note that the last inequality follows from Markov's inequality. This completes the proof.
+\end{proof}
+
+\section{Mixing Time}
+
+We first review some definitions and results from linear algebra.
+
+\begin{definition}
+  A vector $v$ is said to be an \emph{eigenvector} of a matrix $A$ with corresponding \emph{eigenvalue} $\lambda$ if $vA = \lambda v$.
+\end{definition}
+
+\begin{definition}
+  The \emph{$L_2$-norm} of a vector $v = (v_1, \ldots, v_n)$ is defined to be $\sqrt{\sum_{i = 1}^n v_i^2}$.
+\end{definition}
+
+\begin{definition}
+  A set of vectors $v^{(1)}, \ldots, v^{(m)}$ is said to be \emph{orthonormal} if for all $i, j \in [m]$,
+  $$ v^{(i)} \cdot v^{(j)} = \left\{
+    \begin{array}{ll}
+      1, & \text{if $i = j$}, \\
+      0, & \text{if $i \neq j$},
+    \end{array}
+  \right. $$
+  where $v^{(i)} \cdot v^{(j)}$ is the \emph{inner product} of $v^{(i)}$ and $v^{(j)}$, defined to be $\sum_{\ell = 1}^n v_\ell^{(i)} v_\ell^{(j)}$.
+\end{definition}
+
+Let $P$ be the transition matrix of the random walk on a $d$-regular undirected graph. Then $P$ is doubly stochastic. Therefore,
+\begin{align*}
+  \left(\frac{1}{n}, \ldots, \frac{1}{n}\right) \cdot P &= 1 \cdot \left(\frac{1}{n}, \ldots, \frac{1}{n}\right), \\
+  \left(\frac{1}{\sqrt{n}}, \ldots, \frac{1}{\sqrt{n}}\right) \cdot P &= 1 \cdot \left(\frac{1}{\sqrt{n}}, \ldots, \frac{1}{\sqrt{n}}\right).
+\end{align*}
+This shows that $(1/n, \ldots, 1/n)$ and $(1/\sqrt{n}, \ldots, 1/\sqrt{n})$ are eigenvectors of $P$ with eigenvalue $1$. Note that the $L_2$-norm of $(1/\sqrt{n}, \ldots, 1/\sqrt{n})$ equals $1$.
+
+\begin{theorem}
+  Let $P$ be an $n \times n$ transition matrix that is real and symmetric. Then there exist eigenvectors $v^{(1)}, \ldots, v^{(n)}$ that form an orthonormal basis with corresponding eigenvalues $\lambda_1, \ldots, \lambda_n$ such that
+  $$ 1 = \lambda_1 \geq \left|\lambda_2\right| \geq \ldots \left|\lambda_n\right|, $$
+  and that
+  $$ v^{(1)} = \frac{1}{\sqrt{n}}(1, \ldots, 1). $$
+\end{theorem}
+
+\begin{proposition} \label{prop:eig}
+  Let $P$ be a matrix with all positive entries, vectors $v^{(1)}, \ldots, v^{(n)}$, and corresponding eigenvalues $\lambda_1, \ldots, \lambda_n$.
+  \begin{enumerate}[itemsep=0pt, label=(\roman*)]
+    \item \label{item:scalar} For all $\alpha \in \RR$, $\alpha P$ has eigenvectors $v^{(1)}, \ldots, v^{(n)}$ and corresponding eigenvalues $\alpha \lambda_1, \ldots, \alpha \lambda_n$.
+    \item \label{item:id} $P + I$ has eigenvectors $v^{(1)}, \ldots, v^{(n)}$ and corresponding eigenvalues $\lambda_1 + 1, \ldots, \lambda_n + 1$.
+    \item For all $k \in \ZZ_+$, $P^k$ has eigenvectors $v^{(1)}, \ldots, v^{(n)}$ and corresponding eigenvalues $\lambda_1^k, \ldots, \lambda_n^k$.
+    \item If $P$ is stochastic, then $|\lambda_i| \leq 1$ for all $i \in [n]$.
+  \end{enumerate}
+\end{proposition}
+
+Note that \ref{item:scalar} and \ref{item:id} in Proposition \ref{prop:eig} imply that $(P + I)/2$ has eigenvectors $v^{(1)}, \ldots, v^{(n)}$ and corresponding eigenvalues $(\lambda_1 + 1)/2, \ldots, (\lambda_n + 1)/2$.
+
+\begin{proof}
+  \begin{enumerate}[itemsep=0pt, label=(\roman*)]
+    \item Note that $vP = \lambda v$ if and only if $v \cdot \alpha P = \alpha \lambda \cdot v$.
+    \item Note that $v(P + I) = vP + vI = \lambda v + v = (\lambda + 1)v$.
+    \item Note that $vP^k = (vP)P^{k - 1} = \lambda vP^{k - 1} = \lambda (vP)P^{k - 2} = \lambda^2 vP^{k - 2} = \ldots = \lambda^k v$.
+    \item Let $i \in [n]$. Let $I = \{ j \in [n] : v_j^{(i)} > 0 \}$. Then
+    \begin{align*}
+      \lambda_i \sum_{j \in I} v_j^{(i)} &= \sum_{j \in I} \sum_{k = 1}^n v_k^{(i)} P_{k, j} \\
+      &\leq \sum_{j, k \in I} v_k^{(i)} P_{k, j} && (\text{entries of $v$ with coordinates not in $I$ are at most $0$, $P_{k, j} \geq 0$}) \\
+      &= \sum_{k \in I} v_k^{(i)} \sum_{j \in I} P_{k, j} \\
+      &\leq \sum_{k \in I} v_k^{(i)}. && \left(\text{$\sum_{j \in I} P_{k, j} \leq 1$ since $P$ is stochastic}\right)
+    \end{align*}
+    Therefore, $\lambda_i \leq 1$.
+  \end{enumerate}
+\end{proof}
+
+Note that if $v^{(1)}, \ldots, v^{(n)}$ form a basis, then any vector $w$ can be expressed as a linear combination of $v^{(1)}, \ldots, v^{(n)}$, i.e., $w = \sum_{i = 1}^n \alpha_i v^{(i)}$ for some $\alpha_1, \ldots, \alpha_n \in \RR$, and
+$$ \| w \|_2 = \sqrt{w \cdot w} = \sqrt{\sum_{i = 1}^n \alpha_i v^{(i)} \sum_{j = 1}^n \alpha_j v^{(j)}} = \sqrt{\sum_{i = 1}^n \sum_{j = 1}^n \alpha_i \alpha_j v^{(i)} v^{(j)}} = \sqrt{\sum_{i = 1}^n \alpha_i^2}. $$
+Note that the last equality follows from the orthonormality of $v^{(1)}, \ldots, v^{(n)}$.
+
+Mixing times study the following question: How long does it take to reach the stationary distribution?
+
+\begin{definition}
+  For $\varepsilon > 0$, the \emph{mixing time} $T(\varepsilon)$ of a Markov chain $A$ with stationary distribution $\pi$ is the minimum $t \in \ZZ_+$ such that for all initial distribution $\pi^{(0)}$,
+  $$ \left\| \pi - \pi^{(0)} A^t \right\|_1 < \varepsilon. $$
+\end{definition}
+
+\begin{theorem} \label{thm:mixing}
+  Let $P$ be the transition matrix of the random walk on an undirected, $d$-regular and unconnected graph with the greatest common divisor of cycle lengths equal to $1$. Let $\pi_0$ be an initial distribution. Let $\pi$ be the stationary distribution equal to $(1/n, \ldots, 1/n)$ (so $\pi P  = P$). Then
+  $$ \left\| \pi_0 P^t - \pi \right\|_2 \leq \left|\lambda_2\right|^2. $$
+\end{theorem}
+
+Note that the bound $|\lambda_2|^t$ is good (i.e., exponentially decreasing) if $1 - \lambda_2 = \Theta(1)$.
 
 \end{document}
