@@ -44,6 +44,7 @@
 \DeclareMathOperator{\comp}{c}
 \DeclareMathOperator{\bernoulli}{Bernoulli}
 \DeclareMathOperator{\Mod}{mod}
+\DeclareMathOperator{\sign}{sign}
 \SetKwFor{RepTimes}{repeat}{times}{end}
 \newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
@@ -282,6 +283,42 @@
         &\geq 1 - \sum_{e \in E} \frac{n}{n^4} \nonumber = 1 - m \cdot \frac{1}{n^3} \geq 1 - n^2 \cdot \frac{1}{n^3} = 1 - \frac{1}{n} = 1 - o(1). \nonumber
       \end{align}
       Note that \eqref{eq:3b-union} follows from the union bound, and that \eqref{eq:3b-schwartz} follows from the Schwartz-Zippel-DeMill-Lipton theorem and the fact that the determinant of the Tutte matrix of an $n$-vertex bipartite graph is a multivariate polynomial of total degree at most $n$. This completes the proof.
+    \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+
+    \bigskip
+
+    We show that if $G$ contains only one perfect matching of minimum weight equal to $w^*$ and if the binary representation of $|\det A|$ is $|\det A| = \sum_{i = 0}^k b_i 2^i$, where $b_i \in \{ 0, 1 \}$ for all $i \in \{ 0, \ldots, k \}$, then $w^*$ is the smallest $i \in \{ 0, \ldots, k \}$ such that $b_i = 1$.
+
+    \begin{proof}
+      WLOG, assume that $L$ and $R$ are disjoint. For each $M \subset E$, we denote $w(M) = w_{(u, v) \in M} w_{u, v}$. For each permutation $\sigma$ of $[n]$, we deonte by $M_\sigma = \{ (u, \sigma(u)) : u \in L \}$. By the definition of $A$, for each permutation $\sigma$ of $[n]$,
+      $$ \prod_{u \in L} A_{u, \sigma(u)} = \left\{
+        \begin{array}{ll}
+          \prod_{u \in L} 2^{w_{u, \sigma(u)}} = 2^{\sum_{u \in L} w_{u, \sigma(u)}} = 2^{w\left(M_\sigma\right)}, & \text{if $M_\sigma$ is a perfect matching}, \\
+          0, & \text{otherwise}.
+        \end{array}
+      \right. $$
+      Let $\sigma_1, \ldots, \sigma_\ell$ be permutations of $[n]$ such that $M_{\sigma_i}$ is a perfect matching for each $i \in [\ell]$ and that $w(M_{\sigma_1}) < w(M_{\sigma_2}) \leq \ldots \leq w(M_{\sigma_\ell})$. Then
+      \begin{align*}
+        \det A &= \sum_{\text{$\sigma$ permutation of $[n]$}} \sign(\sigma) \prod_{u \in L} A_{u, \sigma(u)}, \\
+        &= \sum_{\substack{\text{$\sigma$ permutation of $[n]$} \\ \text{$M_\sigma$ perfect matching}}} \sign(\sigma) \prod_{u \in L} A_{u, \sigma(u)} + \sum_{\substack{\text{$\sigma$ permutation of $[n]$} \\ \text{$M_\sigma$ not perfect matching}}} \sign(\sigma) \prod_{u \in L} A_{u, \sigma(u)} \\
+        &= \sum_{\substack{\text{$\sigma$ permutation of $[n]$} \\ \text{$M_\sigma$ perfect matching}}} \sign(\sigma) \cdot 2^{w\left(M_\sigma\right)} + \sum_{\substack{\text{$\sigma$ permutation of $[n]$} \\ \text{$M_\sigma$ not perfect matching}}} \sign(\sigma) \cdot 0 \\
+        &= \sum_{\substack{\text{$\sigma$ permutation of $[n]$} \\ \text{$M_\sigma$ perfect matching}}} \sign(\sigma) \cdot 2^{w\left(M_\sigma\right)} \\
+        &= \sum_{i = 1}^\ell \sign\left(\sigma_i\right) \cdot 2^{w\left(M_{\sigma_i}\right)} \\
+        &= 2^{w\left(M_{\sigma_1}\right)} \left(\sign\left(\sigma_1\right) + \sum_{i = 2}^\ell \sign\left(\sigma_i\right) 2^{w\left(M_{\sigma_i}\right) - w\left(M_{\sigma_1}\right)}\right).
+      \end{align*}
+      Therefore,
+      $$ |\det A| = 2^{w\left(M_{\sigma_1}\right)} \left|\sign\left(\sigma_1\right) + \sum_{i = 2}^\ell \sign\left(\sigma_i\right) 2^{w\left(M_{\sigma_i}\right) - w\left(M_{\sigma_1}\right)}\right|. $$
+      For each $i \in \{ 2, \ldots, \ell \}$, since $w(M_{\sigma_i}) > w(M_{\sigma_1})$ and since weights are integers, then $2^{w(M_{\sigma_i}) - w(M_{\sigma_1})}$ is even. Since $\sign(\sigma_i) \in \{ 1, -1 \}$ for all $i \in [\ell]$, then
+      \begin{equation} \label{eq:3c-odd}
+        \left|\sign\left(\sigma_1\right) + \sum_{i = 2}^\ell \sign\left(\sigma_i\right) 2^{w\left(M_{\sigma_i}\right) - w\left(M_{\sigma_1}\right)}\right|
+      \end{equation}
+      is odd. Suppose that the binary representation of \eqref{eq:3c-odd} is $1 + \sum_{i = 1}^{k'} \beta_i 2^i$, where $\beta_i \in \{ 0, 1 \}$ for all $i \in [k]$. Therefore,
+      $$ |\det A| = 2^{w\left(M_{\sigma_1}\right)} \left(1 + \sum_{i = 1}^{k'} \beta_i 2^i\right) = 2^{w\left(M_{\sigma_1}\right)} + \sum_{i = 1}^{k'} \beta_i 2^{w\left(M_{\sigma_1}\right) + i}. $$
+      This completes the proof by the uniqueness of binary representations.
     \end{proof}
   \end{enumerate}
 \end{enumerate}
