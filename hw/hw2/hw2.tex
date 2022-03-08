@@ -294,7 +294,7 @@
     We show that if $G$ contains only one perfect matching of minimum weight equal to $w^*$ and if the binary representation of $|\det A|$ is $|\det A| = \sum_{i = 0}^k b_i 2^i$, where $b_i \in \{ 0, 1 \}$ for all $i \in \{ 0, \ldots, k \}$, then $w^*$ is the smallest $i \in \{ 0, \ldots, k \}$ such that $b_i = 1$.
 
     \begin{proof}
-      WLOG, assume that $L$ and $R$ are disjoint. For each $M \subset E$, we denote $w(M) = w_{(u, v) \in M} w_{u, v}$. For each permutation $\sigma$ of $[n]$, we deonte by $M_\sigma = \{ (u, \sigma(u)) : u \in L \}$. By the definition of $A$, for each permutation $\sigma$ of $[n]$,
+      For each $M \subset E$, we denote $w(M) = \sum_{(u, v) \in M} w_{u, v}$. For each permutation $\sigma$ of $[n]$, we deonte by $M_\sigma = \{ (u, \sigma(u)) : u \in L \}$, and we have
       $$ \prod_{u \in L} A_{u, \sigma(u)} = \left\{
         \begin{array}{ll}
           \prod_{u \in L} 2^{w_{u, \sigma(u)}} = 2^{\sum_{u \in L} w_{u, \sigma(u)}} = 2^{w\left(M_\sigma\right)}, & \text{if $M_\sigma$ is a perfect matching}, \\
