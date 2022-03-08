@@ -320,6 +320,23 @@
       $$ |\det A| = 2^{w\left(M_{\sigma_1}\right)} \left(1 + \sum_{i = 1}^{k'} \beta_i 2^i\right) = 2^{w\left(M_{\sigma_1}\right)} + \sum_{i = 1}^{k'} \beta_i 2^{w\left(M_{\sigma_1}\right) + i}. $$
       This completes the proof by the uniqueness of binary representations.
     \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+
+    \bigskip
+
+    The property from part (c) does not necessarily hold if the random weights $w_{u, v}$ for $(u, v) \in E$ result in more than one perfect matching of minimum weight.
+
+    \begin{proof}
+      Consider $K_{2, 2}$, i.e., $L = R = [2]$ and $E = L \times R$. Let $w_{u, v} = 1$ for all $(u, v) \in E$. There are two perfect matchings of this graph, namely $\{ (1, 1), (2, 2) \}$ and $\{ (1, 2), (2, 1) \}$, both of weight $2$. Hence, the weights $w_{u, v}$ for $(u, v) \in E$ result in more than one perfect matching of minimum weight. Note that $A_{u, v} = X_{u, v} = 2^{w_{u, v}} = 2^1 = 2$ for all $(u, v) \in L \times R = E$. Therefore,
+      $$ \det A = \det \begin{pmatrix}
+        2 & 2 \\
+        2 & 2
+      \end{pmatrix} = 2 \cdot 2 - 2 \cdot 2 = 0. $$
+      This shows that the property from part (c) does not hold, completing the proof.
+    \end{proof}
   \end{enumerate}
 \end{enumerate}
 
