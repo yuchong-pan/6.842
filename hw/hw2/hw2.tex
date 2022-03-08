@@ -44,6 +44,7 @@
 \DeclareMathOperator{\comp}{c}
 \DeclareMathOperator{\bernoulli}{Bernoulli}
 \DeclareMathOperator{\Mod}{mod}
+\SetKwFor{RepTimes}{repeat}{times}{end}
 \newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \begin{document}
@@ -227,7 +228,7 @@
         }
         $M = \emptyset$ \\
         $G' \leftarrow G$ \\
-        \ForEach{$e = \{ u, v \} \in E$}{
+        \ForEach{$e = (u, v) \in E$}{
           $G' \leftarrow (V(G') \setminus \{ u, v \}, E(G') \setminus \{ e \})$ \\
           \If{$\mathcal A(G') = 1$}{
             $M \leftarrow M \cup \{ e \}$
@@ -238,7 +239,45 @@
         \label{alg:find-pm}
       \end{algorithm}
 
-      Since $\mathcal B$ makes $m + 1$ calls to $\mathcal A$, then $\mathcal B$ runs in time $O((m + 1) \cdot T_{\mathcal A}^\textit{seq}(G)) = O(m \cdot T_{\mathcal A}^\textit{seq}(G))$. We show that $\mathcal B$ is correct. If $G$ does not contain a perfect matching, then $\mathcal B$ correctly reports so. Suppose that $G$ contains a perfect matching. If an edge $e \in E$ is in a perfect matching of $G$, then the graph $G'$ obtained by removing $e$ from $G$ also contains a perfect matching $M'$, and $M' \cup \{ e \}$ is a perfect matching of $G$; otherwise, any perfect matching of $G$ is still contained in $G'$. This justifies the correctness of $\mathcal B$, completing the proof.
+      Since $\mathcal B$ makes $m + 1$ calls to $\mathcal A$, then $\mathcal B$ runs in time $O((m + 1) \cdot T_{\mathcal A}^\textit{seq}(G)) = O(m \cdot T_{\mathcal A}^\textit{seq}(G))$. We show that $\mathcal B$ is correct. If $G$ does not contain a perfect matching, then $\mathcal B$ correctly reports so. Suppose that $G$ contains a perfect matching. If an edge $e \in E$ is in a perfect matching of $G$, then the graph $G'$ obtained by removing $e$ and its endpoints from $G$ contains a perfect matching $M'$, and $M' \cup \{ e \}$ is a perfect matching of $G$; otherwise, any perfect matching of $G$ is still contained in $G'$. This justifies the correctness of $\mathcal B$, completing the proof.
+    \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+
+    \bigskip
+
+    \begin{proof}
+      We claim that, with high probability, Algorithm \ref{alg:find-pm-parallel} correctly finds the unique perfect matching in a bipartite graph $G$ that has exactly one perfect matching, given an oracle for determinant computations, such that all calls to the oracle are simultaneous.
+
+      \begin{algorithm}
+        $\mathcal T \leftarrow \emptyset$ \\
+        pick $n^4$ random points $S = \{ s_1, \ldots, s_{n^4}$ \} \\
+        \ForEach{$e = (u, v) \in E$}{
+          $E' \leftarrow E \setminus \{ e \}$ \\
+          \ForEach{$(u', v') \in E'$}{
+            pick $x_{u', v'} \in S$ uniformly at random
+          }
+          let $A \in \RR^{n \times n}$ such that $\forall u, v \in V$, $A_{u', v'}$ equals $x_{u', v'}$ if $(u', v') \in E'$ and $0$ otherwise \\
+          $\mathcal T \leftarrow \mathcal T \cup \{ \text{task to compute $\det A$ and save the result to variable $d_e$} \}$
+        }
+        run tasks in $\mathcal T$ in parallel, obtaining variables $d_e$ for $e \in E$ \\
+        $M \leftarrow \{ e \in E : d_e = 0 \}$ \\
+        \Return{$M$}
+        \caption{An algorithm for finding the unique perfect matching in a bipartite graph $G = (V, E)$ that has exactly one perfect matching, given an oracle for determinant computations, such that all calls to the oracle are simultaneous.}
+        \label{alg:find-pm-parallel}
+      \end{algorithm}
+
+      Note that if an edge $e \in E$ is contained in the unique perfect matching of $G$, then the graph $G_e$ obtained by removing $e$ (and keeping its endpoints) from $G$ contains no perfect matching; otherwise, $G_e$ stills contains the unique perfect matching. Recall that $G_e$ contains a perfect matching if and only if its (symbolic) Tutte matrix has a determinant that is a non-zero multivariate polynomial. We denote by $T_e$ the (symbolic) Tutte matrix of $G_e$. This implies that an edge $e \in E$ is contained in the unique perfect matching of $G$ if and only if $\det T_e \equiv 0$. For each $e \in E$ with $\det T_e \equiv 0$, we always have $d_e = 0$ and hence $e \in M$, so $\PP[e \not \in M] = 0$. Therefore,
+      \begin{align}
+        \PP[\text{Algorithm \ref{alg:find-pm-parallel} is correct}] &= 1 - \PP\left[\text{$\exists e \in M, \det T_e \not\equiv 0$ or $\exists e \in E \setminus M, \det T_e \equiv 0$}\right] \nonumber \\
+        &\geq 1 - \sum_{\substack{e \in E \\ \det T_e \not\equiv 0}} \PP\left[e \in M\right] - \sum_{\substack{e \in E \\ \det T_e \equiv 0}} \PP[e \not \in M] \label{eq:3b-union} \\
+        &= 1 - \sum_{\substack{e \in E \\ \det T_e \not\equiv 0}} \PP\left[d_e = 0\right] - \sum_{\substack{e \in E \\ \det T_e \equiv 0}} 0 \nonumber \\
+        &\geq 1 - \sum_{\substack{e \in E \\ \det T_e \not\equiv 0}} \frac{n}{|S|} \label{eq:3b-schwartz} \\
+        &\geq 1 - \sum_{e \in E} \frac{n}{n^4} \nonumber = 1 - m \cdot \frac{1}{n^3} \geq 1 - n^2 \cdot \frac{1}{n^3} = 1 - \frac{1}{n} = 1 - o(1). \nonumber
+      \end{align}
+      Note that \eqref{eq:3b-union} follows from the union bound, and that \eqref{eq:3b-schwartz} follows from the Schwartz-Zippel-DeMill-Lipton theorem and the fact that the determinant of the Tutte matrix of an $n$-vertex bipartite graph is a multivariate polynomial of total degree at most $n$. This completes the proof.
     \end{proof}
   \end{enumerate}
 \end{enumerate}
