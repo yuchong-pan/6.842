@@ -155,6 +155,29 @@
       Note that any algorithm which generates $n$ pairwise independent random bits samples a vector $\mathbf x$ from a pairwise independent space $S = \{ \mathbf x^{(1)}, \ldots, \mathbf x^{(s)} \}$ on $n$ variables. By part (b), any pairwise independent space $S$ on $n$ variables has size $|S| \geq n$. Therefore, any algorithm that generates $n$ pairwise independent random bits requires at least $\log n$ truly random bits to sample a vector from a space of size $n$. This implies that the construction is optimal, completing the proof.
     \end{proof}
   \end{enumerate}
+
+  \clearpage
+
+  \item \begin{enumerate}
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+
+    \bigskip
+
+    \begin{proof}
+      Let $x \in [n]$. Since $w_x$ is chosen from $S$ uniformly at random, then for all $s \in \ZZ$,
+      $$ \PP\left[w_x = s\right] = \left\{
+        \begin{array}{ll}
+          0, & \text{if $s \not \in S$}, \\
+          \frac{1}{|S|}, & \text{if $s \in S$},
+        \end{array}
+      \right\} \leq \frac{1}{|S|}. $$
+      Therefore,
+      $$ \PP[\alpha(x) = w_x] = \PP\left[w_x = \min_{\substack{i \in [k] \\ x \not \in M_i}} w\left(M_i\right) - \min_{\substack{i \in [k] \\ x \in M_i}} w\left(M_i \setminus \{ x \}\right)\right] \leq \frac{1}{|S|}. $$
+      By the union bound,
+      $$ \PP\left[\exists x \in [n] \text{ such that } \alpha(x) = w_x\right] \leq \sum_{x = 1}^n \PP\left[\alpha(x) = w_x\right] \leq n \cdot \frac{1}{|S|} = \frac{n}{|S|}. $$
+      This completes the proof.
+    \end{proof}
+  \end{enumerate}
 \end{enumerate}
 
 \end{document}
