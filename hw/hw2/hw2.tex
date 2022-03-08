@@ -264,7 +264,7 @@
           \ForEach{$(u', v') \in E'$}{
             pick $x_{u', v'} \in S$ uniformly at random
           }
-          let $A \in \RR^{n \times n}$ such that $\forall u, v \in V$, $A_{u', v'}$ equals $x_{u', v'}$ if $(u', v') \in E'$ and $0$ otherwise \\
+          let $A \in \RR^{n \times n}$ be such that $\forall u', v' \in V$, $A_{u', v'}$ equals $x_{u', v'}$ if $(u', v') \in E'$ and $0$ otherwise \\
           $\mathcal T \leftarrow \mathcal T \cup \{ \text{task to compute $\det A$ and save the result to variable $d_e$} \}$
         }
         run tasks in $\mathcal T$ in parallel, obtaining variables $d_e$ for $e \in E$ \\
@@ -336,6 +336,36 @@
         2 & 2
       \end{pmatrix} = 2 \cdot 2 - 2 \cdot 2 = 0. $$
       This shows that the property from part (c) does not hold, completing the proof.
+    \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+
+    \bigskip
+
+    Suppose that $G$ contains only one perfect matching of minimum weight. Suppose that we know $\det A$ and its binary representation $\det A = \sum_{i = 0}^k b_i 2^i$, where $b_i \in \{ 0, 1 \}$ for all $i \in \{ 0, \ldots, k \}$. Let $i^*$ be the smallest $i \in \{ 0, \ldots, k \}$ such that $b_i = 1$. Then we can detect whether a specific edge $e \in E$ is in the minimum weight perfect matching using Algorithm \ref{alg:specific-edge}, which uses a single call to an oracle for determinant computations.
+
+    \begin{algorithm}
+      let $A' \in \RR^{n \times n}$ be s.t.\ $\forall u, v \in V$, $A_{u, v}'$ equals $2^{w_{u, v}}$ for all $(u, v) \in E \setminus \{ e \}$ and $0$ otherwise \\
+      let the binary representation of $\det A'$ be $\sum_{j = 0}^{k'} b_j' 2^j$, where $b_j' \in \{ 0, 1 \}$ for all $j \in \{ 0, \ldots, k' \}$ \\
+      let $j^*$ be the smallest $j \in \{ 0, \ldots, k' \}$ such that $b_j' = 1$ \\
+      \If{$i^* = j^*$}{
+        \Return{``$e$ is not in the minimum weight perfect matching''}
+      }
+      \Else{
+        \Return{``$e$ is in the minimum weight perfect matching''}
+      }
+      \caption{An algorithm for checking whether a specific edge $e \in E$ is in the minimum weight perfect matching of a bipartite graph $G = (V, E)$ that contains only one perfect matching of minimum weight, using a single call to an oracle for determinant computations.}
+      \label{alg:specific-edge}
+    \end{algorithm}
+
+    \begin{proof}
+      Let $M$ be the unique perfect matching of minimum weight $w^*$ in $G$. Let $G'$ be the graph obtained by removing $e$ from $G$. Let $w'$ be the minimum weight of a perfect matching in $G'$. Let $M'$ be a perfect matching in $G'$ of weight $w'$.
+      
+      Note that if $e$ is contained in $M$, then $w' > w^*$; otherwise, since $M'$ is also a perfect matching of $G$, then there would be more than one perfect matchings of minimum weight in $G$, a contradiction to the assumption. On the other hand, if $e$ is not contained in $M$, then $M$ is still a minimum weight perfect matching of $G'$, so $w' = w^*$.
+
+      By part (c) and by the definitions of $i^*, j^*$, we have $i^* = w^*$ and $j^* = w'$. Therefore, $i^* = j^*$ if and only if $e$ is not in the minimum weight perfect matching of $G$. This justifies Algorithm \ref{alg:specific-edge}, completing the proof.
     \end{proof}
   \end{enumerate}
 \end{enumerate}
