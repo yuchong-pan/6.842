@@ -220,7 +220,7 @@
     \bigskip
 
     \begin{proof}
-      Let $\mathcal B$ be the sequential algorithm given in Algorithm \ref{alg:find-pm} for finding a perfect matching, given a black box algorithm $\mathcal A$ that checks whether a given graph contains a perfect matching or not. In other words, $\mathcal B$ removes each edge from the graph, checks whether the resulting graph has a perfect matching, and if so, adds this edge to the perfect matching.
+      Let $\mathcal B$ be the sequential algorithm given in Algorithm \ref{alg:find-pm} for finding a perfect matching in a bipartite graph, given a black box algorithm $\mathcal A$ that checks whether a given bipartite graph contains a perfect matching or not. In other words, for each edge $e \in E$, $\mathcal B$ checks whether the graph $G''$ obtained by removing $e$ and its endpoints from $G$ has a perfect matching; if so, then $\mathcal B$ replaces the current graph with $G''$; otherwise, $\mathcal B$ removes $e$ from the current graph (and keeps its endpoints).
 
       \begin{algorithm}
         \If{$\mathcal A(G) = 0$}{
@@ -229,17 +229,21 @@
         $M = \emptyset$ \\
         $G' \leftarrow G$ \\
         \ForEach{$e = (u, v) \in E$}{
-          $G' \leftarrow (V(G') \setminus \{ u, v \}, E(G') \setminus \{ e \})$ \\
-          \If{$\mathcal A(G') = 1$}{
-            $M \leftarrow M \cup \{ e \}$
+          $G'' \leftarrow (V(G') \setminus \{ u, v \}, E(G') \setminus \{ e \})$ \\
+          \If{$\mathcal A(G'') = 0$}{
+            $M \leftarrow M \cup \{ e \}$ \\
+            $G' \leftarrow G''$
+          }
+          \Else{
+            $G' \leftarrow (V(G'), E(G') \setminus \{ e \})$
           }
         }
         \Return{$M$}
-        \caption{A sequential algorithm for finding a perfect matching in a graph $G = (V, E)$, given a black box algorithm $\mathcal A$ that checks whether a given graph contains a perfect matching.}
+        \caption{A sequential algorithm for finding a perfect matching in a bipartite graph $G = (V, E)$, given a black box algorithm $\mathcal A$ that checks whether a given bipartite graph contains a perfect matching.}
         \label{alg:find-pm}
       \end{algorithm}
 
-      Since $\mathcal B$ makes $m + 1$ calls to $\mathcal A$, then $\mathcal B$ runs in time $O((m + 1) \cdot T_{\mathcal A}^\textit{seq}(G)) = O(m \cdot T_{\mathcal A}^\textit{seq}(G))$. We show that $\mathcal B$ is correct. If $G$ does not contain a perfect matching, then $\mathcal B$ correctly reports so. Suppose that $G$ contains a perfect matching. If an edge $e \in E$ is in a perfect matching of $G$, then the graph $G'$ obtained by removing $e$ and its endpoints from $G$ contains a perfect matching $M'$, and $M' \cup \{ e \}$ is a perfect matching of $G$; otherwise, any perfect matching of $G$ is still contained in $G'$. This justifies the correctness of $\mathcal B$, completing the proof.
+      Since $\mathcal B$ makes $m + 1$ calls to $\mathcal A$, then $\mathcal B$ runs in time $O((m + 1) \cdot T_{\mathcal A}^\textit{seq}(G)) = O(m \cdot T_{\mathcal A}^\textit{seq}(G))$. We show that $\mathcal B$ is correct. If $G$ does not contain a perfect matching, then $\mathcal B$ correctly reports so. Suppose that $G$ contains a perfect matching. If an edge $e \in E$ is in a perfect matching of $G$, then the graph $G''$ obtained by removing $e$ and its endpoints from $G$ contains a perfect matching $M'$ such that $M' \cup \{ e \}$ is a perfect matching of $G$; otherwise, any perfect matching of $G$ still exists if we remove $e$ (and keep its endpoints). This justifies the correctness of $\mathcal B$, completing the proof.
     \end{proof}
 
     \clearpage
