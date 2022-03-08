@@ -177,6 +177,34 @@
       $$ \PP\left[\exists x \in [n] \text{ such that } \alpha(x) = w_x\right] \leq \sum_{x = 1}^n \PP\left[\alpha(x) = w_x\right] \leq n \cdot \frac{1}{|S|} = \frac{n}{|S|}. $$
       This completes the proof.
     \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+
+    \bigskip
+
+    \begin{proof}
+      Suppose that there exist two distinct $M_j$ and $M_\ell$ with $j, \ell \in [k]$ that have the same minimum weight (compared to all other $w(M_i)$ with $i \in [k]$). Then there exists $x \in M_j \triangle M_\ell$. WLOG, suppose that $x \not \in M_j$ and $x \in M_\ell$. Since $M_j$ and $M_\ell$ have the same minimum weight, then
+      \begin{gather*}
+        w\left(M_j\right) = w\left(M_\ell\right), \\
+        \min_{i \in [k], x \not \in M_i} w(M_i) = w(M_j), \\
+        \min_{i \in [k], x \in M_i} w(M_i) = w(M_\ell).
+      \end{gather*}
+      Hence,
+      \begin{align*}
+        \alpha(x) &= \min_{\substack{i \in [k] \\ x \not \in M_i}} w\left(M_i\right) - \min_{\substack{i \in [k] \\ x \in M_i}} w\left(M_i \setminus \{ x \}\right) = \min_{\substack{i \in [k] \\ x \not \in M_i}} w\left(M_i\right) - \min_{\substack{i \in [k] \\ x \in M_i}} \left(w\left(M_i\right) - w_x\right) \\
+        &= \min_{\substack{i \in [k] \\ x \not \in M_i}} w\left(M_i\right) - \min_{\substack{i \in [k] \\ x \in M_i}} w\left(M_i\right) + w_x = w\left(M_j\right) - w\left(M_\ell\right) + w_x = w_x.
+      \end{align*}
+      This implies that
+      \begin{align}
+        &\quad\; \PP\left[\exists \text{a unique $w(M_i)$ with $i \in [k]$ of minimum weight}\right] \nonumber \\
+        &= 1 - \PP\left[\exists \text{distinct $M_j, M_\ell$ with $j, \ell \in [k]$ that have the same minimum weight}\right] \nonumber \\
+        &\geq 1 - \PP\left[\exists x \in [n] \text{ such that $\alpha(x) = w_x$}\right] \nonumber \\
+        &\geq 1 - \frac{n}{|S|}. \label{eq:2a}
+      \end{align}
+      Note that \eqref{eq:2a} follows from part (a). This completes the proof.
+    \end{proof}
   \end{enumerate}
 \end{enumerate}
 
