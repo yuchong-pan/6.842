@@ -411,16 +411,16 @@
         }
         run tasks in $\mathcal T$ in parallel, obtaining variables $d^*$ and $d_e$ for $e \in E$ \\
         $w^* \leftarrow \text{index of the lowest one in the binary representation in $|d^*|$}$ \\
-        \ForEach{$e \in E$}{
+        \ForEach{$e \in E$ with $d_e \neq 0$}{
           $w_e \leftarrow \text{index of the lowest one in the binary representation of $|d_e|$}$
         }
-        $M \leftarrow \{ e \in E : w_e \neq w^* \}$ \\
+        $M \leftarrow \{ e \in E : d_e = 0 \text{ or } w_e \neq w^* \}$ \\
         \Return{$M$}
         \caption{A randomized algorithm for finding a perfect matching in a bipartite graph $G = (V, E)$, given an oracle for determinant computations, such that all calls to the oracle are simultaneous.}
         \label{alg:3f}
       \end{algorithm}
 
-      By part (e), if $G$ has only one perfect matching of minimum weight, then an edge $e \in E$ is contained in this (unique) minimum weight perfect matching if and only if $w_e \neq w^*$, where $w_e$ is the index of the lowest one in the binary representation of $|d_e| = |\det A^{(e)}|$, and $w^*$ is the index of the lowest one in the binary representation of $|d^*| = |\det A|$. Therefore, if $G$ has only one perfect matching of minimum weight, then $M$ is this (unique) perfect matching, so Algorithm \ref{alg:3f} returns a perfect matching. By Problem 2 part (b),
+      By part (e), if $G$ has only one perfect matching of minimum weight, then an edge $e \in E$ is contained in this (unique) minimum weight perfect matching if and only if $d_e = \det A^{(e)} \neq 0$ or $w_e \neq w^*$ (where $w_e$ and $w^*$ are defined as in Algorithm \ref{alg:3f}). Hence, if $G$ has only one perfect matching of minimum weight, then $M$ is this (unique) perfect matching, so Algorithm \ref{alg:3f} returns a perfect matching. By Problem 2 part (b),
       \begin{align*}
         \PP[\text{Algorithm \ref{alg:3f} is correct}] &\geq \PP[\text{$G$ has only one perfect matching of minimum weight}] \\
         &\geq 1 - \frac{|E|}{\left|n^3\right|} \geq 1 - \frac{n^2}{n^3} = 1 - \frac{1}{n} = 1 - o(1).
