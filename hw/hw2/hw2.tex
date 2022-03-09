@@ -45,6 +45,7 @@
 \DeclareMathOperator{\bernoulli}{Bernoulli}
 \DeclareMathOperator{\Mod}{mod}
 \DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\LowestOne}{\textsc{LowestOne}}
 \SetKwFor{RepTimes}{repeat}{times}{end}
 \newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
@@ -258,27 +259,25 @@
 
       \begin{algorithm}
         $\mathcal T \leftarrow \emptyset$ \\
-        pick $n^4$ random points $S = \{ s_1, \ldots, s_{n^4}$ \} \\
+        \ForEach{$(u, v) \in E$}{
+          pick $x_{u, v} \in [n^4]$ uniformly at random
+        }
         \ForEach{$e = (u, v) \in E$}{
-          $E' \leftarrow E \setminus \{ e \}$ \\
-          \ForEach{$(u', v') \in E'$}{
-            pick $x_{u', v'} \in S$ uniformly at random
-          }
-          let $A \in \RR^{n \times n}$ be such that $\forall u', v' \in V$, $A_{u', v'}$ equals $x_{u', v'}$ if $(u', v') \in E'$ and $0$ otherwise \\
-          $\mathcal T \leftarrow \mathcal T \cup \{ \text{task to compute $\det A$ and save the result to variable $d_e$} \}$
+          let $A^{(e)} \in \RR^{n \times n}$ be s.t.\ $\forall u', v' \in V$, $A_{u', v'}^{(e)} = x_{u', v'}$ if $(u', v') \in E \setminus \{ e \}$ and $0$ otherwise \\
+          $\mathcal T \leftarrow \mathcal T \cup \{ \text{task to compute $\det A^{(e)}$ and save the result to variable $d_e$} \}$
         }
         run tasks in $\mathcal T$ in parallel, obtaining variables $d_e$ for $e \in E$ \\
         $M \leftarrow \{ e \in E : d_e = 0 \}$ \\
         \Return{$M$}
-        \caption{An algorithm for finding the unique perfect matching in a bipartite graph $G = (V, E)$ that has exactly one perfect matching, given an oracle for determinant computations, such that all calls to the oracle are simultaneous.}
+        \caption{A randomized algorithm for finding the unique perfect matching in a bipartite graph $G = (V, E)$ that has exactly one perfect matching, given an oracle for determinant computations, such that all calls to the oracle are simultaneous.}
         \label{alg:find-pm-parallel}
       \end{algorithm}
 
-      Note that if an edge $e \in E$ is contained in the unique perfect matching of $G$, then the graph $G_e$ obtained by removing $e$ (and keeping its endpoints) from $G$ contains no perfect matching; otherwise, $G_e$ stills contains the unique perfect matching. Recall that $G_e$ contains a perfect matching if and only if its (symbolic) Tutte matrix has a determinant that is a non-zero multivariate polynomial. We denote by $T_e$ the (symbolic) Tutte matrix of $G_e$. This implies that an edge $e \in E$ is contained in the unique perfect matching of $G$ if and only if $\det T_e \equiv 0$. For each $e \in E$ with $\det T_e \equiv 0$, we always have $d_e = 0$ and hence $e \in M$, so $\PP[e \not \in M] = 0$. Therefore,
+      Note that if an edge $e \in E$ is contained in the unique perfect matching of $G$, then the graph $G_e$ obtained by removing $e$ (and keeping its endpoints) from $G$ contains no perfect matching; otherwise, $G_e$ stills contains the unique perfect matching. Recall that $G_e$ contains a perfect matching if and only if its (symbolic) Tutte matrix has a determinant that is a non-zero multivariate polynomial. We denote by $T_e$ the (symbolic) Tutte matrix of $G_e$. This implies that an edge $e \in E$ is contained in the unique perfect matching of $G$ if and only if $\det T_e \equiv 0$. For each $e \in E$ with $\det T_e \equiv 0$, we always have $d_e = 0$ and hence $e \in M$, so $\PP[e \not \in M] = 0$. Note that $\det A^{(e)}$ is the evaluation of multivariate polynomial $\det T_e$ at values $x_{u, v}$ for $(u, v) \in E$. Therefore,
       \begin{align}
         \PP[\text{Algorithm \ref{alg:find-pm-parallel} is correct}] &= 1 - \PP\left[\text{$\exists e \in M, \det T_e \not\equiv 0$ or $\exists e \in E \setminus M, \det T_e \equiv 0$}\right] \nonumber \\
         &\geq 1 - \sum_{\substack{e \in E \\ \det T_e \not\equiv 0}} \PP\left[e \in M\right] - \sum_{\substack{e \in E \\ \det T_e \equiv 0}} \PP[e \not \in M] \label{eq:3b-union} \\
-        &= 1 - \sum_{\substack{e \in E \\ \det T_e \not\equiv 0}} \PP\left[d_e = 0\right] - \sum_{\substack{e \in E \\ \det T_e \equiv 0}} 0 \nonumber \\
+        &= 1 - \sum_{\substack{e \in E \\ \det T_e \not\equiv 0}} \PP\left[\det A^{(e)} = 0\right] - \sum_{\substack{e \in E \\ \det T_e \equiv 0}} 0 \nonumber \\
         &\geq 1 - \sum_{\substack{e \in E \\ \det T_e \not\equiv 0}} \frac{n}{|S|} \label{eq:3b-schwartz} \\
         &\geq 1 - \sum_{e \in E} \frac{n}{n^4} \nonumber = 1 - m \cdot \frac{1}{n^3} \geq 1 - n^2 \cdot \frac{1}{n^3} = 1 - \frac{1}{n} = 1 - o(1). \nonumber
       \end{align}
@@ -366,6 +365,44 @@
       Note that if $e$ is contained in $M$, then $w' > w^*$; otherwise, since $M'$ is also a perfect matching of $G$, then there would be more than one perfect matchings of minimum weight in $G$, a contradiction to the assumption. On the other hand, if $e$ is not contained in $M$, then $M$ is still a minimum weight perfect matching of $G'$, so $w' = w^*$.
 
       By part (c) and by the definitions of $i^*, j^*$, we have $i^* = w^*$ and $j^* = w'$. Therefore, $i^* = j^*$ if and only if $e$ is not in the minimum weight perfect matching of $G$. This justifies Algorithm \ref{alg:specific-edge}, completing the proof.
+    \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+
+    \bigskip
+
+    \begin{proof}
+      We claim that, with high probability, Algorithm \ref{alg:3f} finds a perfect matching in a bipartite graph $G$, given an oracle for determinant computations, such that all calls to the oracle are simultaneous. Note that we can obtain the index of the lowest one in the binary representation of a positive integer $x \in \NN$ (i.e., the smallest $i \in \{ 0, \ldots, k \}$ such that $b_i = 1$ if the binary representation of $x$ is $\sum_{i = 0}^k b_i 2^i$, where $b_i \in \{ 0, 1 \}$ for all $i \in \{ 0, \ldots, k \}$) by successively dividing $x$ by $2$ until the resulting integer is odd.
+
+      \begin{algorithm}
+        let $A \in \RR^{n \times n}$ be such that $\forall u, v \in V$, $A_{u, v}$ equals $2^{w_{u, v}}$ if $(u, v) \in E$ and $0$ otherwise \\
+        $\mathcal T \leftarrow \{ \text{task to compute $\det A$ and save the result to variable $d^*$} \}$ \\
+        \ForEach{$(u, v) \in E$}{
+          pick $w_{u, v} \in [n^3]$ uniformly at random
+        }
+        \ForEach{$e = (u, v) \in E$}{
+          let $A^{(e)} \in \RR^{n \times n}$ be obtained by setting the $(u, v)$-entry of $A$ to $0$ \\
+          $\mathcal T \leftarrow \mathcal T \cup \{ \text{task to compute $\det A^{(e)}$ and save the result to variable $d_e$} \}$
+        }
+        run tasks in $\mathcal T$ in parallel, obtaining variables $d^*$ and $d_e$ for $e \in E$ \\
+        $w^* \leftarrow \text{index of the lowest one in the binary representation in $|d^*|$}$ \\
+        \ForEach{$e \in E$}{
+          $w_e \leftarrow \text{index of the lowest one in the binary representation of $|d_e|$}$
+        }
+        $M \leftarrow \{ e \in E : w_e \neq w^* \}$ \\
+        \Return{$M$}
+        \caption{A randomized algorithm for finding a perfect matching in a bipartite graph $G = (V, E)$, given an oracle for determinant computations, such that all calls to the oracle are simultaneous.}
+        \label{alg:3f}
+      \end{algorithm}
+
+      By part (e), if $G$ has only one perfect matching of minimum weight, then an edge $e \in E$ is contained in this (unique) minimum weight perfect matching if and only if $w_e \neq w^*$, where $w_e$ is the index of the lowest one in the binary representation of $|d_e| = |\det A^{(e)}|$, and $w^*$ is the index of the lowest one in the binary representation of $|d^*| = |\det A|$. Therefore, if $G$ has only one perfect matching of minimum weight, then $M$ is this (unique) perfect matching, so Algorithm \ref{alg:3f} returns a perfect matching. By Problem 2 part (b),
+      \begin{align*}
+        \PP[\text{Algorithm \ref{alg:3f} is correct}] &\geq \PP[\text{$G$ has only one perfect matching of minimum weight}] \\
+        &\geq 1 - \frac{|E|}{\left|n^3\right|} \geq 1 - \frac{n^2}{n^3} = 1 - \frac{1}{n} = 1 - o(1).
+      \end{align*}
+      This completes the proof.
     \end{proof}
   \end{enumerate}
 \end{enumerate}
