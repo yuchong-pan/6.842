@@ -290,10 +290,10 @@
 
     \bigskip
 
-    We show that if $G$ contains only one perfect matching of minimum weight equal to $w^*$ and if the binary representation of $|\det A|$ is $|\det A| = \sum_{i = 0}^k b_i 2^i$, where $b_i \in \{ 0, 1 \}$ for all $i \in \{ 0, \ldots, k \}$, then $w^*$ is the smallest $i \in \{ 0, \ldots, k \}$ such that $b_i = 1$.
+    We show that if $G$ contains only one perfect matching of minimum weight equal to $w^*$, then $\det A \neq 0$ and $w^*$ is the smallest $i \in \{ 0, \ldots, k \}$ such that $b_i = 1$, where the binary representation of $|\det A|$ is $\sum_{i = 0}^k b_i 2^i$ with $b_i \in \{ 0, 1 \}$ for all $i \in \{ 0, \ldots, k \}$.
 
     \begin{proof}
-      For each $M \subset E$, we denote $w(M) = \sum_{(u, v) \in M} w_{u, v}$. For each permutation $\sigma$ of $[n]$, we deonte by $M_\sigma = \{ (u, \sigma(u)) : u \in L \}$, and we have
+      We assume that the random integer weights $w_{u, v}$ for every edge $(u, v) \in E$ are non-negative (as we can choose the sample space of these weights when we design the algorithm for part (f)). For each $M \subset E$, we denote $w(M) = \sum_{(u, v) \in M} w_{u, v}$. For each permutation $\sigma$ of $[n]$, we deonte by $M_\sigma = \{ (u, \sigma(u)) : u \in L \}$, and we have
       $$ \prod_{u \in L} A_{u, \sigma(u)} = \left\{
         \begin{array}{ll}
           \prod_{u \in L} 2^{w_{u, \sigma(u)}} = 2^{\sum_{u \in L} w_{u, \sigma(u)}} = 2^{w\left(M_\sigma\right)}, & \text{if $M_\sigma$ is a perfect matching}, \\
@@ -305,17 +305,16 @@
         \det A &= \sum_{\text{$\sigma$ permutation of $[n]$}} \sign(\sigma) \prod_{u \in L} A_{u, \sigma(u)}, \\
         &= \sum_{\substack{\text{$\sigma$ permutation of $[n]$} \\ \text{$M_\sigma$ perfect matching}}} \sign(\sigma) \prod_{u \in L} A_{u, \sigma(u)} + \sum_{\substack{\text{$\sigma$ permutation of $[n]$} \\ \text{$M_\sigma$ not perfect matching}}} \sign(\sigma) \prod_{u \in L} A_{u, \sigma(u)} \\
         &= \sum_{\substack{\text{$\sigma$ permutation of $[n]$} \\ \text{$M_\sigma$ perfect matching}}} \sign(\sigma) \cdot 2^{w\left(M_\sigma\right)} + \sum_{\substack{\text{$\sigma$ permutation of $[n]$} \\ \text{$M_\sigma$ not perfect matching}}} \sign(\sigma) \cdot 0 \\
-        &= \sum_{\substack{\text{$\sigma$ permutation of $[n]$} \\ \text{$M_\sigma$ perfect matching}}} \sign(\sigma) \cdot 2^{w\left(M_\sigma\right)} \\
-        &= \sum_{i = 1}^\ell \sign\left(\sigma_i\right) \cdot 2^{w\left(M_{\sigma_i}\right)} \\
+        &= \sum_{\substack{\text{$\sigma$ permutation of $[n]$} \\ \text{$M_\sigma$ perfect matching}}} \sign(\sigma) \cdot 2^{w\left(M_\sigma\right)} = \sum_{i = 1}^\ell \sign\left(\sigma_i\right) \cdot 2^{w\left(M_{\sigma_i}\right)} \\
         &= 2^{w\left(M_{\sigma_1}\right)} \left(\sign\left(\sigma_1\right) + \sum_{i = 2}^\ell \sign\left(\sigma_i\right) 2^{w\left(M_{\sigma_i}\right) - w\left(M_{\sigma_1}\right)}\right).
       \end{align*}
       Therefore,
       $$ |\det A| = 2^{w\left(M_{\sigma_1}\right)} \left|\sign\left(\sigma_1\right) + \sum_{i = 2}^\ell \sign\left(\sigma_i\right) 2^{w\left(M_{\sigma_i}\right) - w\left(M_{\sigma_1}\right)}\right|. $$
-      For each $i \in \{ 2, \ldots, \ell \}$, since $w(M_{\sigma_i}) > w(M_{\sigma_1})$ and since weights are integers, then $2^{w(M_{\sigma_i}) - w(M_{\sigma_1})}$ is even. Since $\sign(\sigma_i) \in \{ 1, -1 \}$ for all $i \in [\ell]$, then
+      For each $i \in \{ 2, \ldots, \ell \}$, since $w(M_{\sigma_i}) > w(M_{\sigma_1})$ and since weights are non-negative integers, then $2^{w(M_{\sigma_i}) - w(M_{\sigma_1})}$ is even. Since $\sign(\sigma_i) \in \{ 1, -1 \}$ for all $i \in [\ell]$, then
       \begin{equation} \label{eq:3c-odd}
         \left|\sign\left(\sigma_1\right) + \sum_{i = 2}^\ell \sign\left(\sigma_i\right) 2^{w\left(M_{\sigma_i}\right) - w\left(M_{\sigma_1}\right)}\right|
       \end{equation}
-      is odd. Suppose that the binary representation of \eqref{eq:3c-odd} is $1 + \sum_{i = 1}^{k'} \beta_i 2^i$, where $\beta_i \in \{ 0, 1 \}$ for all $i \in [k]$. Therefore,
+      is odd and at least $1$. Since weights are non-negative integers, then $2^{w(M_{\sigma_1})} \geq 1$, so $|\det A| \geq 1 \cdot 1 = 1$ and hence $\det A \neq 0$. Suppose that the binary representation of \eqref{eq:3c-odd} is $1 + \sum_{i = 1}^{k'} \beta_i 2^i$, where $\beta_i \in \{ 0, 1 \}$ for all $i \in [k]$. Therefore,
       $$ |\det A| = 2^{w\left(M_{\sigma_1}\right)} \left(1 + \sum_{i = 1}^{k'} \beta_i 2^i\right) = 2^{w\left(M_{\sigma_1}\right)} + \sum_{i = 1}^{k'} \beta_i 2^{w\left(M_{\sigma_1}\right) + i}. $$
       This completes the proof by the uniqueness of binary representations.
     \end{proof}
