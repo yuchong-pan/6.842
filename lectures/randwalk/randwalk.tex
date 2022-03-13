@@ -28,8 +28,8 @@
 \newcommand{\QQ}{\mathbb{Q}}
 \newcommand{\NN}{\mathbb{N}}
 \newcommand{\FF}{\mathbb{F}}
-\newcommand{\PP}{\mathbb{P}}
-\newcommand{\EE}{\mathbb{E}}
+\newcommand{\PP}{\mathop{{}\mathbb{P}}}
+\newcommand{\EE}{\mathop{{}\mathbb{E}}}
 \newcommand{\LL}{\mathbb{L}}
 \newcommand{\TT}{\mathbb{T}}
 \newcommand{\GI}{\textrm{GI}}
@@ -65,6 +65,7 @@
 \DeclareMathOperator{\RL}{RL}
 \newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
+\SetKwFor{RepTimes}{repeat}{times}{end}
 \begin{document}
 \pagenumbering{arabic}
 \title{Lectures on Random Walks}
@@ -336,14 +337,16 @@ Note that \ref{item:scalar} and \ref{item:id} in Proposition \ref{prop:eig} impl
       \lambda_i \sum_{j \in I} v_j^{(i)} &= \sum_{j \in I} \sum_{k = 1}^n v_k^{(i)} P_{k, j} \\
       &\leq \sum_{j, k \in I} v_k^{(i)} P_{k, j} && (\text{entries of $v$ with coordinates not in $I$ are at most $0$, $P_{k, j} \geq 0$}) \\
       &= \sum_{k \in I} v_k^{(i)} \sum_{j \in I} P_{k, j} \\
-      &\leq \sum_{k \in I} v_k^{(i)}. && \left(\text{$\sum_{j \in I} P_{k, j} \leq 1$ since $P$ is stochastic}\right)
+      &\leq \sum_{k \in I} v_k^{(i)}. && \text{($\sum_{j \in I} P_{k, j} \leq 1$ since $P$ is stochastic)}
     \end{align*}
     Therefore, $\lambda_i \leq 1$.
   \end{enumerate}
 \end{proof}
 
 Note that if $v^{(1)}, \ldots, v^{(n)}$ form a basis, then any vector $w$ can be expressed as a linear combination of $v^{(1)}, \ldots, v^{(n)}$, i.e., $w = \sum_{i = 1}^n \alpha_i v^{(i)}$ for some $\alpha_1, \ldots, \alpha_n \in \RR$, and
-$$ \| w \|_2 = \sqrt{w \cdot w} = \sqrt{\sum_{i = 1}^n \alpha_i v^{(i)} \sum_{j = 1}^n \alpha_j v^{(j)}} = \sqrt{\sum_{i = 1}^n \sum_{j = 1}^n \alpha_i \alpha_j v^{(i)} v^{(j)}} = \sqrt{\sum_{i = 1}^n \alpha_i^2}. $$
+\begin{equation} \label{eq:l2-norm}
+  \| w \|_2 = \sqrt{w \cdot w} = \sqrt{\sum_{i = 1}^n \alpha_i v^{(i)} \sum_{j = 1}^n \alpha_j v^{(j)}} = \sqrt{\sum_{i = 1}^n \sum_{j = 1}^n \alpha_i \alpha_j v^{(i)} v^{(j)}} = \sqrt{\sum_{i = 1}^n \alpha_i^2}.
+\end{equation}
 Note that the last equality follows from the orthonormality of $v^{(1)}, \ldots, v^{(n)}$.
 
 Mixing times study the following question: How long does it take to reach the stationary distribution?
@@ -359,5 +362,101 @@ Mixing times study the following question: How long does it take to reach the st
 \end{theorem}
 
 Note that the bound $|\lambda_2|^t$ is good (i.e., exponentially decreasing) if $1 - \lambda_2 = \Theta(1)$.
+
+\begin{proof}
+  Since $P$ is real and symmetric, then there exist eigenvectors $v^{(1)}, \ldots, v^{(n)}$ that form an orthonormal eigenbasis with eigenvalues $1 = \lambda_1 \geq |\lambda_2| \geq \ldots \geq |\lambda_n|$. Therefore, there exist $\alpha_1, \ldots, \alpha_n \in \RR$ such that
+  $$ \pi_0 = \sum_{i = 1}^n \alpha_i v^{(i)}. $$
+  Hence,
+  $$ \pi_0 P^t = \sum_{i = 1}^n \alpha_i v^{(i)} P^t = \sum_{i = 1}^n \alpha_i \lambda_i^t v^{(i)} = \alpha_1 \lambda_1^t v^{(1)} + \sum_{i = 2}^n \alpha_i \lambda_i^t v^{(i)} = \alpha_1 \cdot 1^t \cdot \frac{1}{\sqrt{n}} (1, \ldots, 1) + \sum_{i = 2}^n \alpha_i \lambda_i^t v^{(i)}. $$
+  Note that
+  $$ \alpha_1 = \pi_0 \cdot v^{(1)} = \pi_0 \cdot \frac{1}{\sqrt{n}} (1, \ldots, 1) = \frac{1}{\sqrt{n}} \pi_0 \cdot (1, \ldots, 1) = \frac{1}{\sqrt{n}} \sum_{i = 1}^n \left(\pi_0\right)_i \cdot 1 = \frac{1}{\sqrt{n}} \cdot 1 = \frac{1}{\sqrt{n}}. $$
+  Note also that
+  $$ \pi_0 \cdot v^{(1)} = \sum_{i = 1}^n \alpha_i v^{(i)} \cdot v^{(1)} = \alpha_1. $$
+  Hence, $\alpha_1 = 1/\sqrt{n}$. It follows that
+  \begin{align*}
+    \left\| \pi_0 P^t - \alpha_1 v^{(1)} \right\|_2 &= \left\| \sum_{i = 2}^n \alpha_i \lambda_i^t v^{(i)} \right\|_2 = \sqrt{\sum_{i = 2}^n \alpha_i^2 \lambda_i^{2t}} && (\text{by \eqref{eq:l2-norm}}) \\
+    &\leq \sqrt{\sum_{i = 2}^n \alpha_i^2 \lambda_2^{2t}} && \text{(since $\left|\lambda_2\right|$ is the second largest)} \\
+    &\leq \lambda_2^t \sqrt{\sum_{i = 1}^n \alpha_i^2} && \text{(since $\alpha_1 \geq 0$ and by \eqref{eq:l2-norm})} \\
+    &\leq \lambda_2^t \left\| \pi_0 \right\|_2 \\
+    &= \lambda_2^t. && \text{(since $\left\| \pi_0 \right\|_2 \leq \left\| \pi_0 \right\|_1 = 1$)}
+  \end{align*}
+  This completes the proof.
+\end{proof}
+
+\section{Saving Random Bits via Random Walks}
+
+Let $L$ be a language. Let $\mathcal A$ be an algorithm for $L$ using $r$ random bits such that
+\begin{enumerate}[itemsep=0pt, label=(\roman*)]
+  \item for all $x \in L$, $\PP_\text{$\mathcal A$'s coins}[\mathcal A(x) = 1] \geq 99/100$ (i.e., usually correct);
+  \item for all $x \not \in L$, $\PP_\text{$\mathcal A$'s coins}[\mathcal A(x) = 0] = 1$ (i.e., always correct).
+\end{enumerate}
+We have several approaches to get an error of at most $2^{-k}$, summarized in Table \ref{tab:error}. In this section, we introduce the approach of random walks to save random bits.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{c|c}
+    approaches & number of random bits \\
+    \hline
+    \hline
+    run $k$ times & $k \cdot r$ \\
+    \hline
+    use pairwise independence & $O(k + r)$ \\
+    \hline
+    use random walks & $r + O(k)$
+  \end{tabular}
+  \caption{Approaches to get an error of at most $2^{-k}$.}
+  \label{tab:error}
+\end{table}
+
+Let $G$ be a $2^r$-vertex, $d$-regular (so the stationary distribution is uniform), connected and aperiodic graph such that $|\lambda_2| \leq 1/10$ and that a vertex in $G$ corresponds to a random string of $r$ bits. We consider Algorithm \ref{alg:save}. It takes $r$ random bits to pick a random starting vertex $w \in \{ 0, 1 \}^r$, and $O(\log d) = O(1)$ random bits to pick a random neighbor of $w$ in each of the $k$ iterations (assuming that $d$ is a constant). Therefore, the number of random bits used in Algorithm \ref{alg:save} is $r + O(k)$. Note that if $G$ is arbitrary, then it is possible that the random walk is only on ``bad strings'' and never reach ``good strings'', e.g., if $G$ is a line with $2^r/100$ consecutive bad strings.
+
+\begin{algorithm}
+  pick a random starting vertex $w \in \{ 0, 1 \}^r$ \\
+  \RepTimes{$k$}{
+    $w \leftarrow \text{a random neighbor of $w$}$ \\
+    run $\mathcal A(x)$ with $w$ as random bits
+    \If{$\mathcal A$ outputs ``$x \in L$''}{
+      \Return{``$x \in L$''}
+    }
+  }
+  \Return{``$x \not \in L$''}
+  \caption{An algorithm for saving random bits via random walks to obtain an error of at most $2^{-k}$.}
+  \label{alg:save}
+\end{algorithm}
+
+\begin{proposition} \label{prop:error}
+  The error of Algorithm \ref{alg:save} is at most $(1/5)^k$.
+\end{proposition}
+
+If $x \not \in L$, then the algorithm has no error (i.e., no bad strings). Let $x \in L$. Let
+  $$ B = \{ w \in \{ 0, 1 \}^r : \text{$\mathcal A(x)$ with random bits $w$ is incorrect, i.e., says ``$x \not \in L$''} \}. $$
+  Then $|B| \leq 2^r/100$. Let $N$ be an $2^r \times 2^r$ diagonal matrix such that the $w^\text{th}$ diagonal entry is
+  $$ N_w = \left\{
+    \begin{array}{ll}
+      1, & \text{if $w \in B$ (i.e., incorrect)}, \\
+      0, & \text{otherwise (i.e., correct)}.
+    \end{array}
+  \right. $$
+  Given a probability distribution $q$, $qN$ deletes weights that find ``witnesses'' to $x \in L$. Therefore,
+  $$ \| qN \|_1 = \PP_{w \sim q}[\text{$w$ is bad}]. $$
+  Moreover, for all $i \in \ZZ_+$,
+  $$ \left\| q(PN)^i \right\|_1 = \PP_{w \sim q}[\text{start at $q$, take $i$ steps, and each is ``bad''}]. $$
+
+\begin{lemma} \label{lem:pi-p-n}
+  For any probability distribution $\pi$, we have $\| \pi PN \|_2 \leq \| \pi \|_2/5$.
+\end{lemma}
+
+We show that Lemma \ref{lem:pi-p-n} implies Proposition \ref{prop:error}.
+
+\begin{proof}[Proof of Proposition \ref{prop:error}]
+  Note that the answer is incorrect only if we always see bad $w$'s. Let $p_0$ be the starting distribution, i.e., $p_0 = (1/2^r, \ldots, 1/2^r)$, so $\| p_0 \|_2 = \sqrt{1/2^r}$. Then
+  \begin{align*}
+    \PP[\text{incorrect}] &\leq \left\| p_0 (PN)^k \right\|_1 \\
+    &\leq \sqrt{2^r} \left\| p_0 (PN)^k \right\|_2 && \text{(since $\| p \|_1 \leq \sqrt{\text{domain size}} \, \| p \|_2$ for any vector $p$)} \\
+    &\leq \sqrt{2^r} \cdot \frac{1}{5^k} \| p_0 \|_2 && \text{(Lemma \ref{lem:pi-p-n})} \\
+    &= \frac{1}{5^k}. && \text{(since $\| p_0 \|_2 = \sqrt{1/2^r}$)}
+  \end{align*}
+  This completes the proof.
+\end{proof}
 
 \end{document}
