@@ -439,11 +439,11 @@ If $x \not \in L$, then the algorithm has no error (i.e., no bad strings). Let $
   \right. $$
   Given a probability distribution $q$, $qN$ deletes weights that find ``witnesses'' to $x \in L$. Therefore,
   $$ \| qN \|_1 = \PP_{w \sim q}[\text{$w$ is bad}]. $$
-  Moreover, for all $i \in \ZZ_+$,
+  Let $P$ be the transition matrix of the random walk on $G$. Then for all $i \in \NN$,
   $$ \left\| q(PN)^i \right\|_1 = \PP_{w \sim q}[\text{start at $q$, take $i$ steps, and each is ``bad''}]. $$
 
 \begin{lemma} \label{lem:pi-p-n}
-  For any probability distribution $\pi$, we have $\| \pi PN \|_2 \leq \| \pi \|_2/5$.
+  For any vector $\pi \in \RR^{2^r}$, we have $\| \pi PN \|_2 \leq \| \pi \|_2/5$.
 \end{lemma}
 
 We show that Lemma \ref{lem:pi-p-n} implies Proposition \ref{prop:error}.
@@ -456,6 +456,26 @@ We show that Lemma \ref{lem:pi-p-n} implies Proposition \ref{prop:error}.
     &\leq \sqrt{2^r} \cdot \frac{1}{5^k} \| p_0 \|_2 && \text{(Lemma \ref{lem:pi-p-n})} \\
     &= \frac{1}{5^k}. && \text{(since $\| p_0 \|_2 = \sqrt{1/2^r}$)}
   \end{align*}
+  This completes the proof.
+\end{proof}
+
+Now we prove Lemma \ref{lem:pi-p-n}.
+
+\begin{proof}[Proof of Lemma \ref{lem:pi-p-n}]
+  Let $v_1, \ldots, v_{2^r}$ be the eigenvectors of $P$ that form an orthonormal basis of $\RR^{2^r}$ such that $v_1 = (1/\sqrt{2^r}, \ldots, 1/\sqrt{2^r})$. Then there exist $\alpha_1, \ldots, \alpha_{2^r}$ such that
+  $$ \pi = \sum_{i = 1}^{2^r} \alpha_i v_i. $$
+  Hence, $\| \pi \|_2 = \sqrt{\sum_{i = 1}^{2^r} \alpha_i^2} \geq |\alpha_1|$. By the trianle inequality,
+  $$ \| \pi PN \|_2 = \left\| \sum_{i = 1}^{2^r} \alpha_i v_i PN \right\|_2 = \left\| \sum_{i = 1}^{2^r} \alpha_i \lambda_i v_i N \right\|_2 \leq \left\| \alpha_1 \lambda_1 v_1 N \right\|_2 + \left\| \sum_{i = 1}^{2^r} \alpha_i \lambda_i v_i N \right\|. $$
+  Since $\lambda_1 = 1$, $v_1 = (1/\sqrt{2^r}, \ldots, 1/\sqrt{2^r})$, $|B|/2^r < 1/100$ and $\|\pi\|_2 \geq |\alpha_1|$, then
+  $$ \left\| \alpha_1 \lambda_1 v_1 N \right\|_2 = \left\| \alpha_1 v_1 N \right\|_2 = \left|\alpha_1\right| \sqrt{\sum_{i \in B} \left(\frac{1}{\sqrt{2^r}}\right)^2} = \left|\alpha_1\right| \sqrt{\frac{|B|}{2^r}} \leq \frac{\left|\alpha_1\right|}{10} \leq \frac{\| \pi \|_2}{10}. $$
+  Note that for any vector $w \in \RR^{2^r}$, we have $\| wN \|_2 = \sqrt{\sum_{i \in B} w_i^2} \leq \sqrt{\sum_{i = 1}^{2^r} w_i^2} = \| w \|_2$. Therefore,
+  \begin{align*}
+    \left\| \sum_{i = 1}^{2^r} \alpha_i \lambda_i v_i N \right\|_2 &\leq \left\| \sum_{i = 1}^{2^r} \alpha_i \lambda_i v_i \right\|_2 = \sqrt{\sum_{i = 2}^{2^r} \left(\alpha_i \lambda_i\right)^2} && \text{(by \eqref{eq:l2-norm})} \\
+    &\leq \sqrt{\sum_{i = 2}^{2^r} \alpha_i^2 \left(\frac{1}{10}\right)^2} && \text{(since $|\lambda_i| \leq |\lambda_2| \leq 1/10$)} \\
+    &= \frac{1}{10} \sqrt{\sum_{i = 2}^{2^r} \alpha_i^2} \leq \frac{1}{10} \sqrt{\sum_{i = 1}^{2^r} \alpha_i^2} = \frac{\| \pi \|_2}{10}.
+  \end{align*}
+  It follows that
+  $$ \| \pi PN \|_2 \leq \left\| \alpha_1 \lambda_1 v_1 N \right\|_2 + \left\| \sum_{i = 1}^{2^r} \alpha_i \lambda_i v_i N \right\| = \frac{\| \pi \|_2}{10} + \frac{\| \pi \|_2}{10} = \frac{\| \pi \|_2}{5}. $$
   This completes the proof.
 \end{proof}
 
