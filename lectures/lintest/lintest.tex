@@ -1,0 +1,115 @@
+
+\documentclass[letterpaper, reqno,11pt]{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{color,latexsym,amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage[linesnumbered,lined,boxed,commentsnumbered,noend,noline]{algorithm2e}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{bbm}
+\usepackage[inline]{enumitem}
+\usepackage[numbers]{natbib}
+\usepackage{framed}
+\usepackage{titling}
+\usepackage{subcaption}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+
+\tikzset{invclip/.style={clip,insert path={{[reset cm]
+  (-16383.99999pt,-16383.99999pt) rectangle (16383.99999pt,16383.99999pt)}}}}
+
+\allowdisplaybreaks
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\PP}{\mathop{{}\mathbb{P}}}
+\newcommand{\EE}{\mathop{{}\mathbb{E}}}
+\newcommand{\LL}{\mathbb{L}}
+\newcommand{\TT}{\mathbb{T}}
+\newcommand{\GI}{\textrm{GI}}
+\newcommand{\coGI}{\overline{\textrm{GI}}}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\charcone}{char.cone}
+\DeclareMathOperator{\STAB}{STAB}
+\DeclareMathOperator{\Down}{Down}
+\DeclareMathOperator{\lca}{lca}
+\DeclareMathOperator{\ex}{ex}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\T}{T}
+\DeclareMathOperator{\F}{F}
+\DeclareMathOperator{\shP}{\# P}
+\DeclareMathOperator{\shSAT}{\# SAT}
+\DeclareMathOperator{\shDNF}{\# DNF}
+\DeclareMathOperator{\DNF}{DNF}
+\DeclareMathOperator{\Poly}{P}
+\DeclareMathOperator{\CNF}{CNF}
+\DeclareMathOperator{\SAT}{SAT}
+\DeclareMathOperator{\BPP}{BPP}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\RP}{RP}
+\DeclareMathOperator{\EXP}{EXP}
+\DeclareMathOperator{\DTIME}{DTIME}
+\DeclareMathOperator{\NP}{NP}
+\DeclareMathOperator{\MCprime}{MC'}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\IP}{IP}
+\DeclareMathOperator{\PSPACE}{PSPACE}
+\DeclareMathOperator{\lollipop}{lollipop}
+\DeclareMathOperator{\ustconn}{\textsc{UST-Conn}}
+\DeclareMathOperator{\RL}{RL}
+\newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\SetKwFor{RepTimes}{repeat}{times}{end}
+\begin{document}
+\pagenumbering{arabic}
+\title{Lectures on Linearity Testing}
+\author{Yuchong Pan}
+\date{\today}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{claim}{Claim}
+\newtheorem{exercise}{Exercise}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+%\maketitle
+%
+
+\begin{framed}
+\noindent{\bf 6.842 Randomness and Computation} \hfill \thedate
+\begin{center}
+\Large{\thetitle}
+\end{center}
+\noindent{\em Lecturer: Ronitt Rubinfield} \hfill {\em Scribe: \theauthor}
+\end{framed}
+
+\begin{definition}
+  Let $G$ and $H$ be finite groups. Let $f : G \to H$. Then $f$ is said to be \emph{linear} (i.e., is a \emph{homomorphism}) if for all $x, y \in G$,
+  $$ f(x) +_H f(y) = f\left(x +_G y\right). $$
+  For all $\varepsilon > 0$, $f$ is said to be \emph{$\varepsilon$-linear} if there exists a linear function $g : G \to H$ such that $f$ and $g$ agree on at least $1 - \varepsilon$ fraction of inputs in $G$, i.e.,
+  $$ \PP_{x \in G}[f(x) = g(x)] \geq 1 - \varepsilon, $$
+  or equivalently,
+  $$ \frac{|\{ x \in G : f(x) = g(x) \}|}{|G|} \geq 1 - \varepsilon. $$
+\end{definition}
+
+Algorithm \ref{alg:natural-lintest} is a natural test for the linearity of a function $f : G \to H$, where $G$ and $H$ are finite groups.
+
+\begin{algorithm}
+  \RepTimes{?}{
+    pick random $x, y \in G$ \\
+    test $f(x) + f(y) = f(x + y)$
+  }
+  \caption{A natural test for the linearity of a function $f : G \to H$, where $G$ and $H$ are finite groups.}
+  \label{alg:natural-lintest}
+\end{algorithm}
+
+\end{document}
