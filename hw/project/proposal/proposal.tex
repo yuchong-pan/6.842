@@ -1,0 +1,67 @@
+
+\documentclass[letterpaper, reqno,12pt]{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{color,latexsym,amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage[linesnumbered,lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage[numbers]{natbib}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  mathescape
+}
+
+\allowdisplaybreaks
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\mynote}[3][red]
+  {{\color{#1} \fbox{\bfseries\sffamily\scriptsize#2}
+  {\small$\blacktriangleright$\textsf{\emph{#3}}$\blacktriangleleft$}}~}
+\newcommand{\yp}[1]{\mynote{YP}{#1}}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\charcone}{char.cone}
+\DeclareMathOperator{\STAB}{STAB}
+\DeclareMathOperator{\Down}{Down}
+\DeclareMathOperator{\lca}{lca}
+\DeclareMathOperator{\LPO}{LPO}
+\DeclareMathOperator{\OPT}{OPT}
+\DeclareMathOperator{\LHS}{LHS}
+\DeclareMathOperator{\RHS}{RHS}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\vol}{vol}
+\DeclareMathOperator{\argmin}{arg\,min}
+\DeclareMathOperator{\argmax}{arg\,max}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\Span}{span}
+\begin{document}
+\pagenumbering{arabic}
+\title{\Large Randomization in Recent Progress on Traveling Salesman Problem \\ {\large \em Proposal for 6.842 Course Project}}
+\author{Yuchong Pan\thanks{MIT, \href{mailto:yuchong@mit.edu}{yuchong@mit.edu}.}}
+\date{\today}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition} \newtheorem{defn}{Definition}
+\maketitle
+%
+
+One of the most appealing yet challenging problems in combinatorial optimization is the (metric) traveling salesman problem (TSP): given $n$ vertices and pairwise symmetric distances $c : V \times V \to \RR_+$ which satisfy the triangle inequality, find the shortest Hamiltonian cycle.\footnote{We denote by $\RR_+$ the set of non-negative real numbers.} The Christofides-Serdyukov algorithm \cite{christofides1976worst,serdyukov1978nekotorykh} gives a $3/2$-approximation to the metric TSP. Briefly speaking, their algorithm chooses a minimum spanning tree, and then adds the minimum cost matching on the odd degree vertices of the tree. Wolsey \cite{wolsey1980heuristic} adapted the Christofides-Serdyukov analysis to show an upper bound of $3/2$ for the integrality gap of the subtour elimination LP of the TSP.
+
+This had remained the best known for the metric TSP until the recent breakthroughs of Karlin, Klein and Oveis Gharan \cite{karlin2021slightly,karlin2021slightlyig}, which give a $(3/2 - \varepsilon)$-approximation algorithm and an upper bound of $3/2 - \varepsilon$ for the integrality gap, for some $\varepsilon > 10^{-36}$, thereby making the first step towards the conjectured integrality gap of $4/3$ in nearly half a century. Their works adapt the Christofides-Serdyukov algorithm using randomization; instead of choosing the minimum spanning tree, their algorithm first samples a spanning tree from the \emph{max-entropy distribution} with marginals matching the subtour elimination LP solution, and then adds an $O$-join on the odd-degree vertices in the tree. More recently, Gupta et al.\ \cite{gupta2021matroid} give a $(3/2 - \varepsilon')$-approximation rounding algorithm for half-integral solutions to the subtour elimination polytope, where $\varepsilon' = 0.001695$. Their algorithm is still in the same framework of Christofides-Serdyukov and Karlin-Klein-Oveis Gharan, but combines max-entropy sampling and matroid intersection.
+
+It can be seen from the aforementioned works that randomization gives enormous power in recent progress on the metric TSP. Therefore, the goal of this project is to understand key ingredients of randomization in these works on the metric TSP, and how they are used to break the $3/2$ barrier; this includes the notions of \emph{strongly Reyleigh (SR)} distributions, \emph{$\lambda$-uniform} distributions on spanning trees, and the \emph{max-entropy distribution} on spanning trees. It is hopeful that an understanding of these results will shed a light on further steps towards the conjectured integrality gap of $4/3$.
+
+\bibliographystyle{alpha}
+\bibliography{proposal.bib}
+
+\end{document}
