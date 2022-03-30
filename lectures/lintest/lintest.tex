@@ -73,6 +73,7 @@
 \DeclareMathOperator{\lollipop}{lollipop}
 \DeclareMathOperator{\ustconn}{\textsc{UST-Conn}}
 \DeclareMathOperator{\RL}{RL}
+\DeclareMathOperator{\dist}{dist}
 \newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \SetKwFor{RepTimes}{repeat}{times}{end}
@@ -225,7 +226,7 @@ Note that the closest linear function $g : \ZZ_m \to \ZZ_m$ to $f$ is given by $
 $$ \delta_f = \PP_{x, y \in \ZZ_m}[f(x) + f(y) \neq f(x + y)] = \frac{2}{9}. $$
 Fortunately, $2/9$ is the threshold; in other words, Coppersmith's example is the worst example. If $\delta_f < 2/9$ for some function $f : G \to G$ and finite group $G$, then $f$ must be $\delta_f$-close to being linear.
 
-\section{Fourier Analysis for Boolean Functions}
+\section{Fourier Analysis for Boolean Functions} \label{sec:fourier}
 
 The \emph{$n$-dimensional Boolean hypercube} $\{ 0, 1 \}^n$ can be interpreted as having $n + 1$ layers, where the $i^\text{th}$ layer consists of $n$-bit Boolean strings with $i$ ones for each $i \in \{ 0, \ldots, n \}$, and where two $n$-bit Boolean strings in consecutive layers are joined by an edge if they differ at exactly one bit. What are linear maps $\{ 0, 1 \}^n \to \{ 0, 1 \}$?
 
@@ -247,7 +248,125 @@ To simplify the presentation, we change the notation by letting $a \mapsto (-1)^
   \chi_S(x) = \prod_{i \in S} x_i, && \text{for fixed $S \subset [n]$}.
 \end{align*}
 
-Now, the linearity test accepts if and only if $f(x) \cdot f(y) = f(x \odot y)$. Then
+We want to find a basis to describe all functions $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$. The first idea is to use the ``input-output table''; in other words, the basis consists of all indicator functions
+$$ e_a(x) = \left\{
+  \begin{array}{ll}
+    1, & \text{if $x = a$}, \\
+    0, & \text{otherwise},
+  \end{array}
+\right. $$
+for all $a \in \{ \pm 1 \}^n$. Then for any function $f :  \{ \pm 1 \}^n \to \{ \pm 1 \}$,
+$$ f(x) = \sum_{a \in \{ \pm 1 \}^n} f(a) e_a(x). $$
+For the purpose of linearity testing, we introduce the second idea, i.e., to use linear functions (a.k.a.\ \emph{parity functions}) $\chi_S(x) = \prod_{i \in S} x_i$ for all $S \subset [n]$.
+
+\begin{definition}
+  Given $f, g : \{ \pm 1 \}^n \to \{ \pm 1 \}$, the \emph{(normalized) inner product} of $f, g$ is defined to be
+  $$ \langle f, g \rangle = \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} f(x) g(x). $$
+\end{definition}
+
+\begin{proposition}
+  The set of parity functions $\{ \chi_S : S \subset [n] \}$ is an orthonormal basis with respect to the inner product.
+\end{proposition}
+
+\begin{proof}
+  For $S \subset [n]$,
+  $$ \left\langle \chi_S, \chi_S \right\rangle = \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} \left(\chi_S(x)\right)^2 = \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} 1 = 1. $$
+  Let $S, T \subset [n]$ be such that $S \neq T$. Then
+  \begin{align*}
+    \left\langle \chi_S, \chi_T \right\rangle &= \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} \chi_S(x) \chi_T(x) = \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} \left(\prod_{i \in S} x_i\right) \left(\prod_{i \in T} x_i\right) \\
+    &= \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} \left(\prod_{i \in S \cap T} x_i^2\right) \left(\prod_{i \in S \triangle T} x_i\right) = \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} 1 \cdot \prod_{i \in S \triangle T} x_i \\
+    &= \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} \chi_{S \triangle T}(x).
+  \end{align*}
+  Note $S \triangle T \neq \emptyset$ since $S \neq T$. Let $j \in S \triangle T$. Let $x^{\oplus j}$ be obtained by flipping the $j^\text{th}$ bit in $x$. Then
+  \begin{align}
+    \left\langle \chi_S, \chi_T \right\rangle &= \frac{1}{2^n} \sum_{\text{pairs $x, x^{\oplus j}$}} \left(\chi_{S \triangle T}(x) + \chi_{S \triangle T}\left(x^{\oplus j}\right)\right) \nonumber \\
+    &= \frac{1}{2^n} \sum_{\text{pairs $x, x^{\oplus j}$}} \left(x_j\prod_{i \in (S \triangle T) \setminus \{ j \}} x_i + \left(-x_j\right)\prod_{i \in (S \triangle T) \setminus \{ j \}} x_i\right) \nonumber \\
+    &= \frac{1}{2^n} \sum_{\text{pairs $x, x^{\oplus j}$}} 0 = 0. \label{eq:zero}
+  \end{align}
+  This completes the proof.
+\end{proof}
+
+\begin{corollary}
+  Any function $f :  \{ \pm 1 \}^n \to \{ \pm 1 \}$ is uniquely expressible as a linear combination of the parity functions $\chi_S$ for $S \subset [n]$.
+\end{corollary}
+
+\begin{definition}
+  For any function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ and any $S \subset [n]$, the \emph{Fourier coefficient} of $f$ at $S$ is defined to be
+  $$ \hat{f}(S) := \left\langle f, \chi_S \right\rangle = \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} f(x) \chi_S(x). $$
+\end{definition}
+
+\begin{theorem}
+  For any function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$,
+  $$ f(x) = \sum_{S \subset [n]} \hat{f}(S) \chi_S(x). $$
+\end{theorem}
+
+\begin{proposition}[Fourier coefficients of linear functions] \label{prop:fourier-linear}
+  Any function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ is linear if and only if there exists $S \subset [n]$ such that $\hat{f}(S) = 1$ and $\hat{f}(T) = 0$ for all $T \subset [n]$ with $T \neq S$.
+\end{proposition}
+
+\begin{proposition} \label{prop:fourier-coeff-dist}
+  For any $S \subset [n]$,
+  $$ \hat{f}(S) = 1 - 2\dist\left(f, \chi_S\right), $$
+  where
+  $$ \dist\left(f, \chi_S\right) := \PP_{x \in \{ \pm 1 \}^n}\left[f(x) \neq \chi_S(x)\right] = \frac{\left|\left\{ x \in \{ \pm 1 \}^n : f(x) \neq \chi_S(x) \right\}\right|}{2^n}. $$
+\end{proposition}
+
+\begin{proof}
+  We have
+  \begin{align*}
+    2^n \hat{f}(S) &= \sum_{x \in \{ \pm 1 \}^n} f(x) \chi_S(x) = \sum_{\substack{x \in \{ \pm 1 \}^n \\ f(x) = \chi_S(x)}} 1 + \sum_{\substack{x \in \{ \pm 1 \}^n \\ f(x) \neq \chi_S(x)}} (-1) \\
+    &= \left(1 - \dist\left(f, \chi_S\right)\right) \cdot 2^n \cdot 1 + \dist\left(f, \chi_S\right) \cdot 2^n \cdot (-1) \\
+    &= 2^n \left(1 - 2\dist\left(f, \chi_S\right)\right).
+  \end{align*}
+  This completes the proof.
+\end{proof}
+
+\begin{lemma}
+  Any two distinct linear functions differ on exactly half of the inputs.
+\end{lemma}
+
+\begin{proof}
+  Let $S, T \subset [n]$ be such that $S \neq T$. Then
+  \begin{align*}
+    0 &= \left\langle \chi_S, \chi_T \right\rangle && \text{(orthonormality)} \\
+    &= \widehat{\chi_S}(T) \\
+    &= 1 - 2\dist\left(\chi_S, \chi_T\right) && \text{(Proposition \ref{prop:fourier-coeff-dist})}.
+  \end{align*}
+  This implies that $\dist(\chi_S, \chi_T) = 1/2$, completing the proof.
+\end{proof}
+
+\begin{lemma}[Pancherel's identity]
+  For functions $f, g : \{ \pm 1 \}^n \to \{ \pm 1 \}$,
+  $$ \langle f, g \rangle = \sum_{S \subset [n]} \hat{f}(S) \hat{g}(S). $$
+\end{lemma}
+
+\begin{proof}
+  For functions $f, g : \{ \pm 1 \}^n \to \{ \pm 1 \}$,
+  \begin{align*}
+    \langle f, g \rangle &= \left\langle \sum_{S \subset [n]} \hat{f}(S) \chi_S, \sum_{T \subset [n]} \hat{g}(T) \chi_T \right\rangle \\
+    &= \sum_{S, T \subset [n]} \hat{f}(S) \hat{g}(T) \left\langle \chi_S, \chi_T \right\rangle && \text{(bilinearity)} \\
+    &= \sum_{S \subset [n]} \hat{f}(S) \hat{g}(S). && \text{(orthonormality)}
+  \end{align*}
+  This completes the proof.
+\end{proof}
+
+\begin{corollary}[Boolean Parseval's identity] \label{cor:bool-parseval}
+  For any function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$,
+  $$ \sum_{S \subset [n]} \hat{f}(S)^2 = \langle f, f \rangle = \frac{1}{2^n} \sum_{x \in \{ \pm  1\}^n} f(x)^2 = \frac{1}{2^n} \sum_{x \in \{ \pm  1\}^n} 1 = 1. $$
+\end{corollary}
+
+\section{Linearity Testing for Boolean Functions}
+
+Now we apply Fourier analysis for Boolean functions developed in Section \ref{sec:fourier} to linearity testing for Boolean functions. By Propositions \ref{prop:fourier-linear} and \ref{prop:fourier-coeff-dist}, a function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ is $\varepsilon$-linear if and only if there exists $S \subset [n]$ such that $\hat{f}(S) \geq 1 - 2\varepsilon$.
+
+\begin{algorithm}
+  pick random $x, y \in \{ \pm 1 \}^n$ \\
+  test $f(x) \cdot f(y) = f(x \odot y)$
+  \caption{A linearity test for a given Boolean function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$}
+  \label{alg:lintest-bool}
+\end{algorithm}
+
+Now, we define a linearity test for a given Boolean function in Algorithm \ref{alg:lintest-bool}. Then
 $$ f(x) f(y) f(x \odot y) = \left\{
   \begin{array}{ll}
     1, & \text{if the test accepts}, \\
@@ -261,7 +380,46 @@ $$ \mathds 1_{f(x) \cdot f(y) \neq f(x \odot y)} = \frac{1 - f(x) f(y) f(x \odot
     1, & \text{if the test rejects}.
   \end{array}
 \right. $$
-This allows us to express the rejection probability in terms of the indicator variable:
-$$ \delta_f = \PP_{x, y \in \{ 1, -1 \}^n}[f(x) \cdot f(y) \neq f(x \odot y)] = \EE_{x, y \in \{ 1, -1 \}^n}\left[\frac{1 - f(x) f(y) f(x \odot y)}{2}\right]. $$
+This allows us to express the \emph{rejection probability} in terms of the indicator variable:
+\begin{equation} \label{eq:rejection}
+  \delta_f := \PP_{x, y \in \{ 1, -1 \}^n}[f(x) \cdot f(y) \neq f(x \odot y)] = \EE_{x, y \in \{ 1, -1 \}^n}\left[\frac{1 - f(x) f(y) f(x \odot y)}{2}\right].
+\end{equation}
+
+\begin{theorem}
+  Any function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ is $\delta_f$-close to some linear function.
+\end{theorem}
+
+\begin{proof}
+  We have
+  \begin{align*}
+    &\quad\; \EE_{x, y \in \{ \pm 1 \}^n}[f(x) f(y) f(x \odot y)] \\
+    &= \EE_{x, y \in \{ \pm 1 \}^n}\left[\left(\sum_{S \subset [n]} \hat{f}(S) \chi_S(x)\right) \left(\sum_{T \subset [n]} \hat{f}(T) \chi_T(y)\right) \left(\sum_{U \subset [n]} \hat{f}(U) \chi_U(x \odot y)\right)\right] \\
+    &= \EE_{x, y \in \{ \pm 1 \}^n}\left[\sum_{S, T, U \subset [n]} \hat{f}(S) \hat{f}(T) \hat{f}(U) \chi_S(x) \chi_T(y) \chi_U(x \odot y)\right] \\
+    &= \sum_{S, T, U \subset [n]} \hat{f}(S) \hat{f}(T) \hat{f}(U) \EE_{x, y \in \{ \pm 1 \}^n}\left[\chi_S(x) \chi_T(y) \chi_U(x \odot y)\right].
+  \end{align*}
+  For any $S \subset [n]$,
+  \begin{align*}
+    \chi_S(x) \chi_S(y) \chi_S(x \odot y) &= \left(\prod_{i \in S} x_i\right) \left(\prod_{i \in S} y_i\right) \left(\prod_{i \in S} x_i y_i\right) = \left(\prod_{i \in S} x_i^2\right) \left(\prod_{i \in S} y_i^2\right) = 1.
+  \end{align*}
+  For any $S, T, U \subset [n]$ such that it is not the case that $S = T = U$,
+  \begin{align}
+    \EE_{x, y \in \{ \pm 1 \}^n}\left[\chi_S(x) \chi_T(y) \chi_U(x \odot y)\right] &= \EE_{x, y \in \{ \pm 1 \}^n}\left[\left(\prod_{i \in S} x_i\right) \left(\prod_{i \in T} y_i\right) \left(\prod_{i \in U} x_i y_i\right)\right] \nonumber \\
+    &= \EE_{x, y \in \{ \pm 1 \}^n}\left[\left(\prod_{i \in S \triangle U} x_i\right) \left(\prod_{i \in T \triangle U} y_i\right)\right] \nonumber \\
+    &= \EE_{x, y \in \{ \pm 1 \}^n}\left[\prod_{i \in S \triangle U} x_i\right] \EE_{x, y \in \{ \pm 1 \}^n}\left[\prod_{i \in T \triangle U} y_i\right] \label{eq:indep} \\
+    &= \EE_{x \in \{ \pm 1 \}^n}\left[\prod_{i \in S \triangle U} x_i\right] \EE_{x \in \{ \pm 1 \}^n}\left[\prod_{i \in T \triangle U} x_i\right]. \nonumber
+  \end{align}
+  Note that \eqref{eq:indep} follows from the independence of $x$ and $y$. Since it is not the case that $S = T = U$, then either $S \neq U$ or $T \neq U$. WLOG, assume $S \neq U$. By \eqref{eq:zero}, $\EE_{x \in \{ \pm 1 \}^n}[\prod_{i \in S \triangle U} x_i] = 0$. Therefore, $\EE_{x, y \in \{ \pm 1 \}^n}[\chi_S(x) \chi_T(y) \chi_U(x \odot y)] = 0 \cdot 0 = 0$. It follows that
+  \begin{align*}
+    \EE_{x, y \in \{ \pm 1 \}^n}[f(x) f(y) f(x \odot y)] &= \sum_{S \subset [n]} \hat{f}(S)^3 \\
+    &\leq \left(\max_{S \subset [n]} \hat{f}(S)\right) \sum_{S \subset [n]} \hat{f}(S)^2 \\
+    &= \left(\max_{S \subset [n]} \hat{f}(S)\right) \cdot 1 && \text{(Corollary \ref{cor:bool-parseval})} \\
+    &= \max_{S \subset [n]} \hat{f}(S) \\
+    &= \max_{S \subset [n]} \left(1 - 2\dist\left(f, \chi_S\right)\right) && \text{(Proposition \ref{prop:fourier-coeff-dist})} \\
+    &= 1 - 2\min_{S \subset [n]} \dist\left(f, \chi_S\right).
+  \end{align*}
+  By \eqref{eq:rejection},
+  $$ \delta_f \geq \frac{1 - \left(1 - 2\min_{S \subset [n]} \dist\left(f, \chi_S\right)\right)}{2} = \min_{S \subset [n]} \dist\left(f, \chi_S\right). $$
+  This completes the proof.
+\end{proof}
 
 \end{document}
