@@ -85,16 +85,18 @@
     \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
     
     \begin{proof}
-      Let $\{ x, y \} \subset A$ be such that $x \neq y$. Then for any pairwise independent hash function $h \in H$,
+      Let $\{ x, y \} \subset A$ be such that $x \neq y$. Then for any pairwise independent hash function $h \in B$,
       $$ (h(x), h(y)) \in_U T^2. $$
       Therefore,
-      $$ \PP_{h \in_U H}[h(x) = h(y)] = \sum_{z \in T} \PP_{h \in_U H}[(h(x), h(y)) = (z, z)] = \sum_{z \in T} \frac{1}{\left|T^2\right|} = |T| \cdot \frac{1}{|T|^2} = \frac{1}{|T|} = \frac{1}{t}. $$
+      \begin{equation} \label{eq:2a-prob}
+        \PP_{h \in_U B}[h(x) = h(y)] = \sum_{z \in T} \PP_{h \in_U B}[(h(x), h(y)) = (z, z)] = |T| \cdot \frac{1}{\left|T^2\right|} = t \cdot \frac{1}{t^2} = \frac{1}{t}.
+      \end{equation}
       It follows that
       \begin{align*}
-        \EE_{h \in_U H}[\text{\# colliding pairs for $h$}] &= \EE_{h \in_U H}\left[\sum_{\substack{\{ x, y \} \subset A \\ x \neq y}} \mathds 1_{\text{$\{ x, y \}$ is a colliding pair for $h$}}\right] \\
-        &= \sum_{\substack{\{ x, y \} \subset A \\ x \neq y}} \EE_{h \in_U H}\left[\mathds 1_{\text{$\{ x, y \}$ is a colliding pair for $h$}}\right] \\
-        &= \sum_{\substack{\{ x, y \} \subset A \\ x \neq y}} \PP_{h \in_U H}\left[\text{$\{ x, y \}$ is a colliding pair for $h$}\right] \\
-        &= \sum_{\substack{\{ x, y \} \subset A \\ x \neq y}} \PP_{h \in_U H}[h(x) = h(y)] \\
+        \EE_{h \in_U B}[\text{\# colliding pairs for $h$}] &= \EE_{h \in_U B}\left[\sum_{\substack{\{ x, y \} \subset A \\ x \neq y}} \mathds 1_{\text{$\{ x, y \}$ is a colliding pair for $h$}}\right] \\
+        &= \sum_{\substack{\{ x, y \} \subset A \\ x \neq y}} \EE_{h \in_U B}\left[\mathds 1_{\text{$\{ x, y \}$ is a colliding pair for $h$}}\right] \\
+        &= \sum_{\substack{\{ x, y \} \subset A \\ x \neq y}} \PP_{h \in_U B}\left[\text{$\{ x, y \}$ is a colliding pair for $h$}\right] \\
+        &= \sum_{\substack{\{ x, y \} \subset A \\ x \neq y}} \PP_{h \in_U B}[h(x) = h(y)] \\
         &= |\{ \{ x, y \} \subset A : x \neq y \}| \cdot \frac{1}{t} \\
         &= \binom{|A|}{2} \cdot \frac{1}{t} \\
         &= \binom{n}{2} \cdot \frac{1}{t}.
@@ -118,6 +120,41 @@
         &= \sqrt{|A| \cdot \frac{1 + \varepsilon^2 - 2 + 1}{|A|}} \\
         &= \sqrt{\varepsilon^2} \\
         &= \varepsilon.
+      \end{align*}
+      This completes the proof.
+    \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+    
+    \begin{proof}
+      Let $q$ be a distribution over $B \times T$ be defined as in the problem. Let $x, y \in A$. If $x = y$, then $h(x) = h(y)$ for any $h \in B$. If $x \neq y$, then \eqref{eq:2a-prob} implies that for any $h \in B$,
+      $$ \PP_{x, y \in_U W}[h(x) = h(y) \mid x \neq y] = \frac{1}{t} = \frac{1}{|T|}. $$
+      For any set $\Omega$,
+      \begin{align*}
+        \PP_{\omega_1, \omega_2 \in_U \Omega}\left[\omega_1 = \omega_2\right] &= \sum_{\omega \in \Omega} \PP_{\omega_1, \omega_2 \in_U \Omega}\left[\omega_1 = \omega_2 = \omega\right] \\
+        &= \sum_{\omega \in \Omega} \PP_{\omega_1 \in_U \Omega}\left[\omega_1 = \omega\right] \PP_{\omega_2 \in_U \Omega}\left[\omega_2 = \omega\right] && \text{(independence)} \\
+        &= |\Omega| \cdot \frac{1}{|\Omega|} \cdot \frac{1}{|\Omega|} \\
+        &= \frac{1}{|\Omega|}.
+      \end{align*}
+      This implies that $\PP_{h_1, h_2 \in_U B}[h_1 = h_2] = 1/|B|$ and that $\PP_{x_1, x_2 \in_U W}[x_1 = x_2] = 1/|W|$. Fix $h \in B$. Then
+      \begin{align*}
+        \PP_{x_1, x_2 \in_U W}\left[h\left(x_1\right) = h\left(x_2\right)\right] &= \PP_{x_1, x_2 \in_U W}\left[x_1 = x_2\right] \PP_{x_1, x_2 \in_U W}\left[h\left(x_1\right) = h\left(x_2\right) \;\middle|\; x_1 = x_2\right] + \\
+        &\quad\; \PP_{x_1, x_2 \in_U W}\left[x_1 \neq x_2\right] \PP_{x_1, x_2 \in_U W}\left[h\left(x_1\right) = h\left(x_2\right) \;\middle|\; x_1 \neq x_2\right] \\
+        &\leq \frac{1}{|W|} \cdot 1 + 1 \cdot \frac{1}{|T|} \\
+        &= \frac{1}{|W|} + \frac{1}{|T|}.
+      \end{align*}
+      Therefore,
+      \begin{align*}
+        c(q) &= \PP_{\left\langle h_1, y_1 \right\rangle, \left\langle h_2, y_2 \right\rangle \in_q B \times T}\left[\left\langle h_1, y_1 \right\rangle = \left\langle h_2, y_2 \right\rangle\right] \\
+        &= \PP_{\substack{h_1, h_2 \in_U B \\ x_1, x_2 \in_U W}}\left[h_1 = h_2, h_1\left(x_1\right) = h_2\left(x_2\right)\right] \\
+        &= \PP_{h_1, h_2 \in_U B}\left[h_1 = h_2\right] \PP_{\substack{h_1, h_2 \in_U B \\ x_1, x_2 \in_U W}} \left[h_1\left(x_1\right) = h_2\left(x_2\right) \;\middle|\; h_1 = h_2\right] && \text{(independence)} \\
+        &= \frac{1}{|B|} \PP_{\substack{h \in B \\ x_1, x_2 \in_U W}} \left[h\left(x_1\right) = h\left(x_2\right) \;\middle|\; h\right] \\
+        &\leq \frac{1}{|B|} \left(\frac{1}{|W|} + \frac{1}{|T|}\right) \\
+        &= \frac{1}{|B|} \cdot \frac{|T|/|W| + 1}{|T|} \\
+        &= \frac{1 + |T|/|W|}{|B| \cdot |T|} \\
+        &= \frac{1 + |T|/|W|}{|B \times T|}.
       \end{align*}
       This completes the proof.
     \end{proof}
