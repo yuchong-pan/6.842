@@ -109,7 +109,7 @@
     \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
     
     \begin{proof}
-      Let $p = (p_i)_{i \in A}$ be a distribution over $A$ such that $c(p) \leq (1 + \varepsilon^2)/|A|$. Then $\sum_{i \in A} p_i = 1$ and $\sum_{i \in A} p_i^2 \leq (1 + \varepsilon^2)/|A|$. Therefore,
+      Let $p = (p_i)_{i \in A}$ be a distribution over $A$ such that $c(p) \leq (1 + \varepsilon^2)/|A|$ for some $\varepsilon > 0$. Then $\sum_{i \in A} p_i = 1$ and $\sum_{i \in A} p_i^2 \leq (1 + \varepsilon^2)/|A|$. Therefore,
       \begin{align*}
         \left\| p - U_A \right\|_1 &\leq \sqrt{|A|} \left\| p - U_A \right\|_2 && \text{(Cauchy-Schwarz inequality)} \\
         &= \sqrt{|A|} \sqrt{\sum_{i \in A} \left(p_i - \frac{1}{|A|}\right)^2} \\
@@ -156,6 +156,18 @@
         &= \frac{1 + |T|/|W|}{|B| \cdot |T|} \\
         &= \frac{1 + |T|/|W|}{|B \times T|}.
       \end{align*}
+      This completes the proof.
+    \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+    
+    \begin{proof}
+      Note that it follows from the same argument of part (b) that for any distribution $\mu$ over any finite set $\Omega$, if $c(\mu) \leq (1 + \varepsilon^2)/|\Omega|$ for some $\varepsilon > 0$, then $\|\mu - U_\Omega\|_1 \leq \varepsilon$. Let $\Omega = B \times T$. Let $\varepsilon = \sqrt{|T|/|W|} > 0$. Then $|T|/|W| = \varepsilon^2$. By part (c),
+      $$ c(q) \leq \frac{1 + |T|/|W|}{|B \times T|} = \frac{1 + \varepsilon^2}{|\Omega|}. $$
+      Since $q$ is a distribution over $B \times T = \Omega$, then
+      $$ \left\| q - U_{B \times T}\right\|_1 = \left\| q - U_\Omega \right\|_1 \leq \varepsilon = \sqrt{|T|/|W|}. $$
       This completes the proof.
     \end{proof}
   \end{enumerate}
