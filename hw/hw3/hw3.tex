@@ -101,6 +101,26 @@
       \end{align*}
       This completes the proof.
     \end{proof}
+    
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+    
+    \begin{proof}
+      Let $p = (p_i)_{i \in A}$ be a distribution over $A$ such that $c(p) \leq (1 + \varepsilon^2)/|A|$. Then $\sum_{i \in A} p_i = 1$ and $\sum_{i \in A} p_i^2 \leq (1 + \varepsilon^2)/|A|$. Therefore,
+      \begin{align*}
+        \left\| p - U_A \right\|_1 &\leq \sqrt{|A|} \left\| p - U_A \right\|_2 && \text{(Cauchy-Schwarz inequality)} \\
+        &= \sqrt{|A|} \sqrt{\sum_{i \in A} \left(p_i - \frac{1}{|A|}\right)^2} \\
+        &= \sqrt{|A|} \sqrt{\sum_{i \in A} \left(p_i^2 - \frac{2p_i}{|A|} + \frac{1}{|A|^2}\right)} \\
+        &= \sqrt{|A|} \sqrt{\sum_{i \in A} p_i^2 - \frac{2}{|A|}\sum_{i \in A} p_i + \sum_{i \in A} \frac{1}{|A|^2}} \\
+        &\leq \sqrt{|A|} \sqrt{\frac{1 + \varepsilon^2}{|A|} - \frac{2}{|A|} \cdot 1 + |A| \cdot \frac{1}{|A|^2}} \\
+        &= \sqrt{|A|} \sqrt{\frac{1 + \varepsilon^2}{|A|} - \frac{2}{|A|} + \frac{1}{|A|}} \\
+        &= \sqrt{|A| \cdot \frac{1 + \varepsilon^2 - 2 + 1}{|A|}} \\
+        &= \sqrt{\varepsilon^2} \\
+        &= \varepsilon.
+      \end{align*}
+      This completes the proof.
+    \end{proof}
   \end{enumerate}
 \end{enumerate}
 
