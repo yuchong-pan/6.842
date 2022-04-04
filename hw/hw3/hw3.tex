@@ -79,6 +79,38 @@
 \begin{enumerate}
   \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
   
+  \begin{proof}
+    Let $\mathbf x^* = \langle x_1^*, \ldots, x_n^* \rangle$ be a satisfying assignment, and let $\mathbf x = \langle x_1, \ldots, x_n \rangle$ be the assignment in the algorithm. We denote by $d(\mathbf x^*, \mathbf x)$ the number of locations at which $\mathbf x^*$ and $\mathbf x$ differ for any assignment $\mathbf x$. Consider an iteration of the algorithm that picks an unsatisfied clause $C_k$ involving variables $X_{k_1}$ and $X_{k_2}$. We say that a variable $X_{k_i}$ is \emph{tight} for clause $C_k$ if its corresponding literal in $C_k$ evaluates to \emph{true}; otherwise we say that it is \emph{slack} for $C_k$. Then $X_{k_1}$ and $X_{k_2}$ cannot be both slack with respect to $\mathbf x^*$, and $X_{k_1}$ and $X_{k_2}$ must be both slack before the modification in the iteration. Table \ref{tab:1} indicates the change of $d(\mathbf x^*, \mathbf x)$ for each combination of the tightnesses/slacknesses of $X_{k_1}$ and $X_{k_2}$ with respect to $\mathbf x^*$ and $\mathbf x$, respectively.
+
+    \begin{table}[h]
+      \centering
+      \begin{tabular}{c||c|c|c}
+        $(X_{k_1}, X_{k_2})$ & (slack, tight) & (tight, slack) & (tight, tight) \\
+        \hline
+        \hline
+        (slack, tight) & $1 \to 0$ & $1 \to 2$ & $2 \to 1$ \\
+        \hline
+        (tight, slack) & $1 \to 2$ & $1 \to 0$ & $2 \to 1$
+      \end{tabular}
+      \caption{Indicating the change of $d(\mathbf x^*, \mathbf x)$ for each combination of the tightnesses/slacknesses of $X_{k_1}$ and $X_{k_2}$ with respect to $\mathbf x^*$ and $\mathbf x$, respectively, where rows correspond to combinations with respect to $\mathbf x$ after the modification in the iteration, columns correspond to combinations with respect to $\mathbf x^*$, and each entry indicates the change of $d(\mathbf x^*, \mathbf x)$ for $X_{k_1}$ and $X_{k_2}$.}
+      \label{tab:1}
+    \end{table}
+
+    Since the algorithm complements one of the two literals uniformly at random, then Table \ref{tab:1} implies that $d(\mathbf x^*, \mathbf x)$ decreases by $1$ with probability $p_- \geq 1/2$, and increases by $1$ with probability at most $p_+ \leq 1/2$, such that $p_- + p_+ = 1$.
+
+    Let $G = (V, E)$ be a path graph with $V = \{ 0, \ldots, n \}$ and $E = \{ (i - 1, i) : i \in [n] \}$, where vertex $i$ corresponds to the value of $d(\mathbf x^*, \mathbf x)$ in the algorithm. Let $d_0$ be the value of $d(\mathbf x^*, \mathbf x)$ at the beginning of the algorithm. Consider the following stochastic process: Start at vertex $d_0$; in each iteration, move to the left or to the right according to the change of $d(\mathbf x^*, \mathbf x)$ in the iteration. For all $i, j \in V$, let $h(i, j)$ be the expected time needed to reach $j$ (for the first time) from $i$. Then $h(n, n - 1) = 1$. For each $i \in [n - 1]$,
+    \begin{align}
+      h(i, i - 1) &= \PP[i \to i - 1] \cdot 1 + \PP[i \to i + 1] \cdot (1 + h(i + 1, i - 1)) \nonumber \\
+      &\leq \frac{1}{2} \cdot 1 + \frac{1}{2}\left(1 + h(i + 1, i - 1)\right) \label{eq:1} \\
+      &\leq 1 + \frac{1}{2}(h(i + 1, i) + h(i, i - 1)). \nonumber
+    \end{align}
+    Note that \eqref{eq:1} follows from the facts that $h(i + 1, i - 1) \geq 0$, that $\PP[i \to i - 1] \geq 1/2$ and that $\PP[i \to i + 1] \leq 1/2$. Therefore, $h(i, i - 1) \leq h(i + 1, i) + 2$ for each $i \in [n - 1]$. Solving this recurrence relation gives $h(i, i - 1) \leq 2(n - i) + 1$ for each $i \in [n]$. It follows that
+    $$ h\left(d_0, 0\right) \leq \sum_{i = 1}^{d_0} h(i, i - 1) \leq \sum_{i = 1}^n h(i, i - 1) \leq \sum_{i = 1}^n (2(n - i) + 1) = \frac{((2n - 1) + 1) \cdot n}{2} = n^2. $$
+    Let $Z$ be the minimum value of $s$ needed for a specific execution of the algorithm to output a satisfying assignment. Then $\EE[Z] = h(d_0, 0) \leq n^2$. By Markov's inequality,
+    $$ \PP\left[Z \geq 4n^2\right] \leq \frac{\EE[Z]}{4n^2} \leq \frac{n^2}{4n^2} = \frac{1}{4}. $$
+    Therefore, if $s = 4n^2$, then the algorithm will output a satisfying assignment with probability at least $3/4$. This completes the proof.
+  \end{proof}
+  
   \clearpage
 
   \item \begin{enumerate}
