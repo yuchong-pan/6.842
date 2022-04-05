@@ -203,6 +203,56 @@
       This completes the proof.
     \end{proof}
   \end{enumerate}
+
+  \clearpage
+
+  \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+  
+  \begin{proof}
+    Let $A$ be a randomized one-sided error polynomial time algorithm which unique-solves $\Pi$ such that for any Boolean circuit $C$ which takes an $r$-bit input, any polynomial time computable function $h : \{ 0, 1 \}^r \to \{ 0, 1 \}^{k + 2}$ and any $\alpha \in \{ 0, 1 \}^{k + 2}$,
+    \begin{align*}
+      & \PP[\text{$A$ accepts $(C, h, \alpha)$}] \geq 1/2, && \text{if $(C, h, \alpha)$ has exactly one satisfying assignment}, \\
+      & \PP[\text{$A$ rejects $(C, h, \alpha)$}] = 1, && \text{if $(C, h, \alpha)$ has no satisfying assignment}.
+    \end{align*}
+    For each $k \in [r]$, let $B_k$ be an algorithm presented in Algorithm \ref{alg:3-circuit-sat} that, given a Boolean circuit $C$ which takes an $r$-bit input, decides the membership in \textsf{CIRCUIT-SAT} of $C$ using oracle calls to $A$, assuming that the number $N$ of satisfying assignments to $C$ has either $N = 0$ or $2^{k - 1} \leq N \leq 2^k$. since $A$ runs in polynomial time, since we can uniformly choose $\alpha \in \{ 0, 1 \}^{k + 2}$ in $O(\log 2^{k + 2}) = O(k) = O(r)$ time and since we can uniformly choose a pairwise independent hash function in $O(\log(2^r \cdot 2^{k + 2})) = O(r + k) = O(r)$ time, then $B_k$ runs in polynomial time for each $k \in [r]$.
+
+    \begin{algorithm}
+      uniformly choose a pairwise independent hash function $h : \{ 0, 1 \}^r \to \{ 0, 1 \}^{k + 2}$ \\
+      uniformly choose $\alpha \in \{ 0, 1 \}^{k + 2}$ \\
+      call $A$ with input $(C, h, \alpha)$ \\
+      \Return{the same output as $A$}
+      \caption{An algorithm that, given a Boolean circuit $C$ which takes an $r$-bit input, decides the membership in \textsf{CIRCUIT-SAT} of $C$ using oracle calls to $A$, assuming that the number $N$ of satisfying assignments to $C$ has either $N = 0$ or $2^{k - 1} \leq N \leq 2^k$.}
+      \label{alg:3-circuit-sat}
+    \end{algorithm}
+
+    Let $X$ be the number of colliding pairs of satisfying assignments for $h$, as defined in Problem 2 part (a). By the same argument for Problem 2 part (a),
+    $$ \EE[X]  = \frac{1}{2^{k + 2}} \binom{N}{2} = \frac{1}{2^{k + 2}} \cdot \frac{N(N - 1)}{2} < \frac{1}{2^{k + 2}} \cdot \frac{2^k N}{2} = \frac{N}{8}. $$
+    By Markov's inequality,
+    $$ \PP\left[X \geq \frac{N}{4}\right] \leq \frac{\EE[X]}{N/4} < \frac{N/8}{N/4} = \frac{1}{2}. $$
+    Therefore, $\PP[X < N/4] = 1 - \PP[X \geq N/4] > 1 - 1/2 = 1/2$. This implies that, with probability greater than $1/2$, fewer than $N/2$ satisfying assignments to $C$ are involved in some colliding pair for $h$. Hence, with probability greater than $1/2$, at least $N/2$ satisfying assignments to $C$ are not involved in any colliding pair for $h$. Conditioned on this event, the probability that there exists a unique satisfying assignment mapping to $\alpha$ is at least
+    $$ \frac{N/2}{2^{k + 2}} \geq \frac{2^{k - 1}/2}{2^{k + 2}} = \frac{1}{16}. $$
+    Since the event that at least $N/2$ satisfying assignments to $C$ are not involved in any colliding pair for $h$ and the event that there exists a unique satisfying assignment mapping to $\alpha$ are independent, then the unconditional probability that there exists a unique satisfying assignment mapping to $\alpha$ is greater than $(1/2) \cdot (1/16) = 1/32$.
+    On the other hand, if $C$ is not satisfiable, then $A$ always rejects $(C, h, \alpha)$ for any pairwise independent hash function $h : \{ 0, 1 \}^r \to \{ 0, 1 \}^{k + 2}$ and any $\alpha \in \{ 0, 1 \}^{k + 2}$. Therefore, for each $k \in [r]$ and for any Boolean circuit $C$ which takes an $r$-bit input,
+    \begin{align*}
+      & \PP\left[\text{$B_k$ accepts $C$}\right] \geq 1/32, && \text{if $C \in \textsf{CIRCUIT-SAT}$}, \\
+      & \PP\left[\text{$B_k$ rejects $C$}\right] = 1, && \text{if $C \not \in \textsf{CIRCUIT-SAT}$}.
+    \end{align*}
+
+    Let $B$ be the algorithm that first uniformly chooses $k \in [r]$, and then executes $B_k$. Since we can uniformly choose $k \in [r]$ in $O(\log r)$ time and since $B_k$ runs in polynomial time for each $k \in [r]$, then $B$ runs in polynomial time. Let $C$ be a Boolean circuit which takes an $r$-bit input. If $C \not \in \textsf{CIRCUIT-SAT}$, then $B_k$ rejects $C$ with probability $1$ for any $k \in [r]$. Now, suppose $C \in \textsf{CIRCUIT-SAT}$. Since there exists at least one value of $k \in [r]$ such that either $N = 0$ or $2^{k - 1} \leq N \leq 2^k$, then $\PP[2^{k - 1} \leq N \leq 2^k] \geq 1/r$. By the previous paragraph, $B_k$ rejects $C$ with probability $1/32$ if either $N = 0$ or $2^{k - 1} \leq N \leq 2^k$. Since the sampling of $k$ and the randomness of $B_k$ are independent, then $B$ accepts $C$ with probability at least $(1/32) \cdot (1/r) = 1/(32r)$. Hence, for any Boolean circuit $C$ which takes an $r$-bit input,
+    \begin{align*}
+      & \PP[\text{$B$ accepts $C$}] \geq 1/(32r), && \text{if $C \in \textsf{CIRCUIT-SAT}$}, \\
+      & \PP[\text{$B$ rejects $C$}] = 1, && \text{if $C \not \in \textsf{CIRCUIT-SAT}$}.
+    \end{align*}
+
+    Let $B'$ be the algorithm that repeatedly executes $B$ for $32r$ times, and outputs ``yes'' if and only if any execution of $B$ outputs ``yes.'' Since $B$ runs in polynomial time, then so does $B'$. Let $C$ be a Boolean circuit which takes an $r$-bit input. If $C \not \in \textsf{CIRCUIT-SAT}$, then any execution of $B$ outputs ``no,'' so $B'$ outputs ``no'' with probability $1$. If $C \in \textsf{CIRCUIT-SAT}$,
+    $$ \PP\left[\text{$B'$ accepts $C$}\right] = 1 - \PP\left[\text{$B'$ rejects $C$}\right] = 1 - \PP[\text{$B$ rejects $C$}]^{32r} \geq \left(1 - \frac{1}{32r}\right)^{32r} \geq 1 - \frac{1}{e} > \frac{1}{2}. $$
+    Therefore,
+    \begin{align*}
+      & \PP\left[\text{$B'$ accepts $C$}\right] > 1/2, && \text{if $C \in \textsf{CIRCUIT-SAT}$}, \\
+      & \PP\left[\text{$B'$ rejects $C$}\right] = 1, && \text{if $C \not \in \textsf{CIRCUIT-SAT}$}.
+    \end{align*}
+    This shows that $B'$ is a randomized one-sided error polynomial time algorithm which solves \textsf{CIRCUIT-SAT}. Since $\textsf{CIRCUIT-SAT}$ is $\textsf{NP}$-complete, then $\textsf{RP} = \textsf{NP}$, completing the proof.
+  \end{proof}
 \end{enumerate}
 
 \end{document}
