@@ -1,0 +1,181 @@
+
+\documentclass[letterpaper, reqno,11pt]{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{color,latexsym,amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage[linesnumbered,lined,boxed,commentsnumbered,noend,noline]{algorithm2e}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{bbm}
+\usepackage[inline]{enumitem}
+\usepackage[numbers]{natbib}
+\usepackage{framed}
+\usepackage{titling}
+\usepackage{subcaption}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{hobby}
+\usetikzlibrary{shapes.multipart}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.7}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{patterns}
+
+\tikzset{invclip/.style={clip,insert path={{[reset cm]
+  (-16383.99999pt,-16383.99999pt) rectangle (16383.99999pt,16383.99999pt)}}}}
+
+\allowdisplaybreaks
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\PP}{\mathop{{}\mathbb{P}}}
+\newcommand{\EE}{\mathop{{}\mathbb{E}}}
+\newcommand{\LL}{\mathbb{L}}
+\newcommand{\TT}{\mathbb{T}}
+\newcommand{\GI}{\textrm{GI}}
+\newcommand{\coGI}{\overline{\textrm{GI}}}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\charcone}{char.cone}
+\DeclareMathOperator{\STAB}{STAB}
+\DeclareMathOperator{\Down}{Down}
+\DeclareMathOperator{\lca}{lca}
+\DeclareMathOperator{\ex}{ex}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\T}{\mathsf{T}}
+\DeclareMathOperator{\F}{\mathsf{F}}
+\DeclareMathOperator{\shP}{\# P}
+\DeclareMathOperator{\shSAT}{\# SAT}
+\DeclareMathOperator{\shDNF}{\# DNF}
+\DeclareMathOperator{\DNF}{DNF}
+\DeclareMathOperator{\Poly}{P}
+\DeclareMathOperator{\CNF}{CNF}
+\DeclareMathOperator{\SAT}{SAT}
+\DeclareMathOperator{\BPP}{BPP}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\RP}{RP}
+\DeclareMathOperator{\EXP}{EXP}
+\DeclareMathOperator{\DTIME}{DTIME}
+\DeclareMathOperator{\NP}{NP}
+\DeclareMathOperator{\MCprime}{MC'}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\IP}{IP}
+\DeclareMathOperator{\PSPACE}{PSPACE}
+\DeclareMathOperator{\lollipop}{lollipop}
+\DeclareMathOperator{\ustconn}{\textsc{UST-Conn}}
+\DeclareMathOperator{\RL}{RL}
+\DeclareMathOperator{\dist}{dist}
+\DeclareMathOperator{\Ex}{Ex}
+\DeclareMathOperator{\error}{error}
+\newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\SetKwFor{RepTimes}{repeat}{times}{end}
+\begin{document}
+\pagenumbering{arabic}
+\title{Lectures on Learning Theory}
+\author{Yuchong Pan}
+\date{\today}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{claim}{Claim}
+\newtheorem{exercise}{Exercise}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+%\maketitle
+%
+
+\begin{framed}
+\noindent{\bf 6.842 Randomness and Computation} \hfill \thedate
+\begin{center}
+\Large{\thetitle}
+\end{center}
+\noindent{\em Lecturer: Ronitt Rubinfield} \hfill {\em Scribe: \theauthor}
+\end{framed}
+
+\section{PAC Learning}
+
+The model of \emph{learning from random, uniform examples} is as follows: Given the \emph{example oracle} $\Ex(f)$ of a function $f$, pick $m$ i.i.d.\ random variables $x_1, \ldots, x_m$ uniformly (or from some distribution $\mathcal D$, which might not be known to the learner in general), and call $\Ex(f)$ to obtain $m$ random labeled examples $(x_1, f(x_1)), \ldots, (x_m, f(x_m))$; after seeing these examples, the learner outputs a hypothesis $h$ of the function $f$.
+
+Should we require $h = f$? This is probably too much to ask. However, we can at least require $\dist(h, f) := \PP_{x \sim \mathcal D}(h(x) \neq f(x)) \leq \varepsilon$, where $\dist(h, f)$ is also called $\error_{\mathcal D}(h)$ with respect to $f$.
+
+\begin{definition}
+  A \emph{uniform distribution learning algorithm for a concept class $\mathcal C$} is an algorithm $\mathcal A$ that, given $\varepsilon > 0$, $\delta > 0$ and access to $\Ex(f)$ for $f \in \mathcal C$, outputs a function $h$ such that with probability at least $1 - \delta$, $\error(h)$ with respect to $f$ is at most $\varepsilon$. This is called \emph{probably approximately correct (PAC) learning}.
+\end{definition}
+
+We are interested in the following parameters:
+\begin{itemize}[itemsep=0pt]
+  \item $m$, the \emph{sample complexity};
+  \item $\varepsilon$, the \emph{accuracy} parameter;
+  \item $\delta$, the \emph{confidence} parameter;
+  \item the running time, which we hope to be $\poly(\log(\text{domain size}), 1/\varepsilon, 1/\delta)$;
+  \item the \emph{description} of $h$, which at least should be compact (i.e., $O(\log |\mathcal C|)$) and efficient to evaluate; it require $h \in \mathcal C$, then this is called \emph{proper learning}.
+\end{itemize}
+Note that the uniform case is a special case of the PAC model. The more general PAC model is given $\Ex_{\mathcal D}(f)$ and bounds $\error_{\mathcal D}(h)$ with respect to $f$.
+
+\section{Learning Conjunctions}
+
+Let $\mathcal C$ be the class of conjunctions (i.e., $1$-term DNF) over $\{ 0, 1 \}^n$. We cannot hope for $0$-error from a sub-exponential number of random samples; to see this, note that it is hard to distinguish $f(x) = x_1 \cdots x_n$ and $f(x) = \F$. Algorithm \ref{alg:conjunction} gives a polynomial time sampling algorithm for conjunction learning, where ``\textcolor{red}{\bf ?}'' indicates a parameter to be determined.
+
+\begin{algorithm}
+  draw $\poly(1/\varepsilon)$ samples \\
+  estimate $\PP[f(x) = 1]$ to additive error at most $\pm \varepsilon/4$ and confidence at least $1 - \delta/2$ \\
+  \If{estimate is less than $\varepsilon/2$}{
+    \Return{$h(x) = 0$}
+  }
+  \CommentSty{(estimate is at least $\varepsilon/2$; see a new positive example every $O(1/\varepsilon)$ samples)} \\
+  collect \textcolor{red}{\bf ?} more positive examples \\
+  $V \leftarrow \text{set of indices of variables that are set in the same way in each positive example}$ \\
+  \Return{$h(x) = \bigwedge_{i \in V} x_i^{b_i}$, where each $b_i$ indicates if $x_i$ is complemented or not}
+  \caption{A polynomial time sampling algorithm for conjunction learning.}
+  \label{alg:conjunction}
+\end{algorithm}
+
+For $x_i$ in the conjunction, it must be set in the same way in each positive example, so $i \in V$. For $x_i$ not in the conjunction,
+$$ \PP[i \in V] = \PP\left[\text{$x_i$ is set is the same way in each of the $k$ positive examples}\right] = \frac{1}{2^{k - 1}}. $$
+By the union bound,
+$$ \PP\left[\text{any $x_i$ not in the conjunction survives}\right] \leq \frac{n}{2^{k - 1}} \leq \delta, $$
+if we pick $k = \log (n/\delta)$. Therefore, if we need $\Omega(\log(n/\delta))$ positive examples, or $\Omega((1/\varepsilon) \log(n/\delta))$ total examples to rule out every $x_i$ not in the conjunction.
+
+\section{Occam's Razor}
+
+In a high level, \emph{Occam's Razor} claims the following:
+\begin{itemize}[itemsep=0pt]
+  \item If we ignore the running time, then learning is easy (with a polynomial number of samples).
+  \item The shortest explanation is the best.
+\end{itemize}
+To see the first claim, we consider the brute-force algorithm in Algorithm \ref{alg:occam}.
+
+\begin{algorithm}
+  draw $M = (1/\varepsilon) (\ln |\mathcal C| + \ln |1/\delta|)$ \\
+  search over all $h \in \mathcal C$ until find one consistent with the samples \\
+  \Return{$h$}
+  \caption{A brute-force learning algorithm that demonstrates Occam's Razor.}
+  \label{alg:occam}
+\end{algorithm}
+
+We say that a function $h$ is \emph{bad} if $\error(h)$ with respect to $f$ is at least $\varepsilon$. For a bad function $h$,
+$$ \PP[\text{$h$ is consistent with the samples}] \leq (1 - \varepsilon)^M. $$
+By the union bound,
+$$ \PP[\text{any bad function $h$ is consistent with the samples}] \leq |\mathcal C| (1 - \varepsilon)^M = |\mathcal C| (1 - \varepsilon)^{\frac{1}{\varepsilon}\left(\ln |\mathcal C| + \ln \left|\frac{1}{\delta}\right|\right)} = \delta. $$
+Hence, it is unlikely to output a bad hypothesis $h$. For example, for conjunction learning, this analysis requires $O((1/\varepsilon)(n + 1/\delta))$ samples, where Algorithm \ref{alg:conjunction} has a better sample complexity. On the other hand, if we have a \emph{good} hypothesis $h$,
+\begin{enumerate}[label=(\roman*), itemsep=0pt]
+  \item we can \emph{predict} values of $f$ on new random inputs according to distribution $\mathcal D$, since
+  $$ \PP_{x \sim \mathcal D}[f(x) = h(x)] \geq 1 - \delta; $$
+  \item we can \emph{compress} the description of samples $(x_1, f(x_1)), (x_2, f(x_2)), \ldots, (x_m, f(x_m))$ from the na\"ive description which takes $m(\log |D| + \log |R|)$ bits, where $D$ and $R$ are the domain and the range of $f$, respectively, to the form ``$x_1, \ldots, x_m$ plus the description of $h$'' which requires $m\log |D| + \log |\mathcal C|$ bits only.
+\end{enumerate}
+
+\end{document}
