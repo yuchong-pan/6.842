@@ -56,26 +56,30 @@
 \DeclareMathOperator{\shP}{\# P}
 \DeclareMathOperator{\shSAT}{\# SAT}
 \DeclareMathOperator{\shDNF}{\# DNF}
-\DeclareMathOperator{\DNF}{DNF}
-\DeclareMathOperator{\Poly}{P}
-\DeclareMathOperator{\CNF}{CNF}
-\DeclareMathOperator{\SAT}{SAT}
-\DeclareMathOperator{\BPP}{BPP}
+\DeclareMathOperator{\DNF}{\textsf{DNF}}
+\DeclareMathOperator{\Poly}{\textsf{P}}
+\DeclareMathOperator{\CNF}{\textsf{CNF}}
+\DeclareMathOperator{\SAT}{\textsf{SAT}}
+\DeclareMathOperator{\BPP}{\textsf{BPP}}
 \DeclareMathOperator{\poly}{poly}
-\DeclareMathOperator{\RP}{RP}
-\DeclareMathOperator{\EXP}{EXP}
-\DeclareMathOperator{\DTIME}{DTIME}
-\DeclareMathOperator{\NP}{NP}
+\DeclareMathOperator{\RP}{\textsf{RP}}
+\DeclareMathOperator{\EXP}{\textsf{EXP}}
+\DeclareMathOperator{\DTIME}{\textsf{DTIME}}
+\DeclareMathOperator{\NP}{\textsf{NP}}
 \DeclareMathOperator{\MCprime}{MC'}
 \DeclareMathOperator{\Var}{Var}
-\DeclareMathOperator{\IP}{IP}
-\DeclareMathOperator{\PSPACE}{PSPACE}
+\DeclareMathOperator{\IP}{\textsf{IP}}
+\DeclareMathOperator{\PSPACE}{\textsf{PSPACE}}
 \DeclareMathOperator{\lollipop}{lollipop}
-\DeclareMathOperator{\ustconn}{\textsc{UST-Conn}}
-\DeclareMathOperator{\RL}{RL}
+\DeclareMathOperator{\ustconn}{\textsf{UST-Conn}}
+\DeclareMathOperator{\RL}{\textsf{RL}}
 \DeclareMathOperator{\dist}{dist}
 \DeclareMathOperator{\Ex}{Ex}
 \DeclareMathOperator{\error}{error}
+\DeclareMathOperator{\AND}{\mathsf{AND}}
+\DeclareMathOperator{\ANDbar}{\mathsf{\overline{AND}}}
+\DeclareMathOperator{\val}{val}
+\DeclareMathOperator{\sign}{sign}
 \newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \SetKwFor{RepTimes}{repeat}{times}{end}
@@ -177,5 +181,140 @@ Hence, it is unlikely to output a bad hypothesis $h$. For example, for conjuncti
   $$ \PP_{x \sim \mathcal D}[f(x) = h(x)] \geq 1 - \delta; $$
   \item we can \emph{compress} the description of samples $(x_1, f(x_1)), (x_2, f(x_2)), \ldots, (x_m, f(x_m))$ from the na\"ive description which takes $m(\log |D| + \log |R|)$ bits, where $D$ and $R$ are the domain and the range of $f$, respectively, to the form ``$x_1, \ldots, x_m$ plus the description of $h$'' which requires $m\log |D| + \log |\mathcal C|$ bits only.
 \end{enumerate}
+
+\section{Learning via Fourier Representations}
+
+In this section, we study learning algorithms that are based on estimating the Fourier representation of a function $f$.
+
+\subsection{Approximating One Fourier Coefficient}
+
+\begin{lemma}
+  For any $S \subset [n]$, one can approximate $\hat{f}(S)$ to within additive error $\gamma$ (i.e., $|\text{output} - \hat{f}(S)| \leq \gamma$) with probability at least $1 - \delta$ in $O(1/\gamma^2 \log 1/\delta)$ samples.
+\end{lemma}
+
+\begin{proof}
+  Recall that $\hat{f}(S) = 2\PP_{x \in \{ 0, 1 \}^n}[f(x) \neq \chi_S(x)] - 1$. Hence, we can approximate $\hat{f}(S)$ by estimating $\PP_{x \in \{ 0, 1 \}^n}[f(x) \neq \chi_S(x)]$ and applying the Chernoff bound.
+\end{proof}
+
+We examine the Fourier representations of some important examples:
+\begin{enumerate}[label=(\roman*)]
+  \item Let $T = \{ i_1, \ldots, i_k \} \subset [n]$ be such that $|T| = k$. Let $\ANDbar : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be defined by
+  $$ \ANDbar(x) = \left\{
+    \begin{array}{ll}
+      1, & \text{if $x_i = -1$ for all $i \in T$}, \\
+      -1, & \text{otherwise}.
+    \end{array}
+  \right. $$
+  Let $f : \{ \pm 1 \}^n \to \{ 0, 1 \}$ be defined by
+  \begin{align*}
+    f(x) &= \left\{
+      \begin{array}{ll}
+        1, & \text{if $x_i = -1$ for all $i \in T$}, \\
+        0, & \text{otherwise},
+      \end{array}
+    \right. \\
+    &= \frac{1 - x_{i_1}}{2} \cdot \frac{1 - x_{i_2}}{2} \cdots \frac{1 - x_{i_k}}{2} \\
+    &= \frac{1}{2^k} \sum_{S \subset T} (-1)^{|S|} \chi_S(x).
+  \end{align*}
+  Note that all Fourier coefficients $\hat{f}(S)$ for $S \not \subset T$ are $0$. Then
+  $$ \ANDbar(x) = 2f(x) - 1 = -1 + \frac{2}{2^k} + \sum_{\substack{S \subset T \\ S \neq \emptyset}} \frac{(-1)^{|S|}}{2^k} \chi_S(x). $$
+  \item {\bf \em Decision trees.} Consider a decision tree $T$, e.g., Figure \ref{fig:decision-tree}. For each leaf $\ell$ of $T$, let $V_\ell$ denote the set of indices of variables visited on the path from the root to leaf $\ell$, and let $f_\ell : \{ \pm 1 \}^n \to \{ 0, 1 \}$ be defined by
+  \begin{align*}
+    f_\ell(x) &= \prod_{i \in V_\ell} \frac{1 \pm x_i}{2} && \text{(``$\pm$'' denotes a left turn or a right turn)} \\
+    &= \frac{1}{2^{\left|V_\ell\right|}} \sum_{S \subset V_\ell} (-1)^\text{\# left turns taken in $S$} \chi_S.
+  \end{align*}
+  Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be defined by
+  $$ f(x) = \sum_{\ell: \text{ leaf of $T$}} f_\ell(x) \val(\ell). $$
+  Note that for each $x \in \{ \pm 1 \}^n$, exactly one of the values $f_\ell(x)$ is $1$ for leaves $\ell$ of $T$, and all others are $0$.
+  
+  \begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+      \node[minimum size=30pt, circle, draw] (root) at (0, 0) {$x_3$};
+      \node[minimum size=30pt, circle, draw] (v0) at (-2, -1.5) {$x_2$};
+      \node[minimum size=30pt, circle, draw] (v1) at (2, -1.5) {$x_4$};
+      \node[minimum size=30pt, circle, draw] (v00) at (-3, -3.5) {$-1$};
+      \node[minimum size=30pt, circle, draw] (v01) at (-1, -3.5) {$x_1$};
+      \node[minimum size=30pt, circle, draw] (v010) at (-2, -5.5) {$-1$};
+      \node[minimum size=30pt, circle, draw] (v011) at (0, -5.5) {$+1$};
+      \node[minimum size=30pt, circle, draw] (v10) at (1, -3.5) {$+1$};
+      \node[minimum size=30pt, circle, draw] (v11) at (3, -3.5) {$x_2$};
+      \node[minimum size=30pt, circle, draw] (v110) at (2, -5.5) {$-1$};
+      \node[minimum size=30pt, circle, draw] (v111) at (4, -5.5) {$+1$};
+      \draw (root) -- (v0) node[midway, left, yshift=5pt] {$-1$};
+      \draw (root) -- (v1) node[midway, right, yshift=5pt] {$+1$};
+      \draw (v0) -- (v00) node[midway, left, yshift=2pt] {$-1$};
+      \draw (v0) -- (v01) node[midway, right, yshift=2pt] {$+1$};
+      \draw (v01) -- (v010) node[midway, left, yshift=2pt] {$-1$};
+      \draw (v01) -- (v011) node[midway, right, yshift=2pt] {$+1$};
+      \draw (v1) -- (v10) node[midway, left, yshift=2pt] {$-1$};
+      \draw (v1) -- (v11) node[midway, right, yshift=2pt] {$+1$};
+      \draw (v11) -- (v110) node[midway, left, yshift=2pt] {$-1$};
+      \draw (v11) -- (v111) node[midway, right, yshift=2pt] {$+1$};
+    \end{tikzpicture}
+    \caption{A decision tree.}
+    \label{fig:decision-tree}
+  \end{figure}
+\end{enumerate}
+
+\subsection{Fourier Concentration}
+
+\begin{definition}
+  For all $\varepsilon \in (0, 1)$ and $n \in \NN$, we say that a function $f : \{ \pm 1 \}^n \to \RR$ has \emph{$\alpha(\varepsilon, n)$-Fourier concentration (f.c.)} if
+  $$ \sum_{\substack{S \subset [n] \\ |S| > \alpha(\varepsilon, n)}} \hat{f}(S)^2 \leq \varepsilon. $$
+\end{definition}
+
+For a Boolean function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$, Parseval's identity gives $\sum_{S \subset [n]} \hat{f}(S)^2 = 1$, so having $\alpha(\varepsilon, n)$-Fourier concentration implies that
+$$ \sum_{\substack{S \subset [n] \\ |S| \leq \alpha(\varepsilon, n)}} \geq 1 - \varepsilon. $$
+Following are two examples of functions that have $\alpha(\varepsilon, n)$-Fourier concentration.
+\begin{enumerate}[label=(\roman*)]
+  \item Any function $f : \{ \pm 1 \}^n \to \RR$ that depends on at most $k$ variables has
+  $$ \sum_{\substack{S \subset [n] \\ |S| > k}} \hat{f}(S)^2 = 0. $$
+  \item Let $f$ be the $\ANDbar$ function on $T \subset [n]$. We claim that $f$ has $\log(4/\varepsilon)$-Fourier concentration. Note $\hat{f}(S) = 0$ for all $S \subset [n]$ with $|S| > |T|$. If $|T| \leq \log(4/\varepsilon)$, then we are done by definition. If $|T| > \log (4/\varepsilon)$, then
+  $$ \hat{f}(\emptyset)^2 = \left(1 - 2\PP\left[f(x) \neq \chi_\emptyset(x)\right]\right)^2 = \left(1 - 2 \cdot \frac{1}{2^{|T|}}\right)^2 > 1 - \varepsilon. $$
+  Therefore, $f$ has $0$-Fourier concentration.
+\end{enumerate}
+
+\subsection{The Low Degree Algorithm}
+
+The \emph{low degree algorithm}, given in Algorithm \ref{alg:low-degree}, approximates a Boolean function with $d$-Fourier concentration, where $d = \alpha(\varepsilon, n)$.
+
+\begin{algorithm}
+  take $m = O((n^d/\tau) \log (n^d/\delta))$ samples \\
+  \ForEach{$S \subset [n]$ such that $|S| \leq d$}{
+    $C_S \leftarrow \text{estimate of $\hat{f}(S)$}$
+  }
+  let $h : \{ \pm 1 \}^n \to \RR$ be defined by $h(x) = \sum_{S \subset [n] : |S| \leq d} C_S \chi_S(x)$ \\
+  \Return{$\sign \circ h$ as hypothesis}
+  \caption{The low degree algorithm given degree $d$, accuracy $\tau$ and confidence $\delta$.}
+  \label{alg:low-degree}
+\end{algorithm}
+
+\begin{proposition}
+  If $f$ has $d$-Fourier concentration with $d = \alpha(\varepsilon, n)$, then $\EE_{x \in \{ 0, 1 \}^n} [(f(x) - h(x))^2] \leq \varepsilon + \tau$ with probability at least $1 - \delta$.
+\end{proposition}
+
+\begin{proof}
+  First, we claim that each low degree Fourier Coefficient is well approximated, i.e., with probability at least $1 - \delta$, we have $|C_S - \hat{f}(S)| \leq \gamma$ for all $S \subset [n]$ with $|S| \leq d$, where $\gamma = \sqrt{\tau/n^d}$. This can be proved using the Chernoff bound and the union bound.
+
+  Second, we show that if all low degree Fourier coefficients are well approximated, then $h$ has a low $\ell_2$-error. Suppose $|C_S - \hat{f}(S)| \leq \gamma$ for all $S \subset [n]$ such that $|S| \leq d$. Let $g : \{ \pm 1 \}^n \to \RR$ be defined by
+  $$ g(x) = f(x) - h(x). $$
+  By the linearity of the Fourier transform, for all $S \subset [n]$,
+  $$ \hat{g}(S) = \hat{f}(S) - \hat{h}(S). $$
+  For all $S \subset [n]$ with $|S| > d$, we have $\hat{h}(S) = 0$, so $\hat{g}(S) = \hat{f}(S)$. For all $S \subset [n]$ with $|S| \leq d$, we have $|\hat{g}(S)| \leq \gamma$, so $\hat{g}(S)^2 \leq \gamma^2$. Therefore,
+  \begin{align*}
+    \EE_{x \in \{ \pm 1 \}^n}\left[(f(x) - h(x))^2\right] &= \EE\left[g(x)^2\right] = \sum_{S \subset [n]} \hat{g}(S)^2 && \text{(Parseval's identity)} \\
+    &= \sum_{\substack{S \subset [n] \\ |S| \leq d}} \hat{g}(S)^2 + \sum_{\substack{S \subset [n] \\ |S| > d}} \hat{g}(S)^2 \\
+    &\leq \sum_{\substack{S \subset [n] \\ |S| \leq d}} \gamma^2 + \sum_{\substack{S \subset [n] \\ |S| > d}} \hat{f}(S)^2 \\
+    &\leq \binom{n}{d} \cdot \gamma^2 + \varepsilon && \text{(by Fourier concentration)} \\
+    &\leq \tau + \varepsilon.
+  \end{align*}
+  This completes the proof.
+\end{proof}
+
+\begin{proposition}
+  Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$. Let $h : \{ \pm 1 \}^n \to \RR$. Then
+  $$ \PP_{x \in \{ \pm 1 \}^n} [f(x) \neq \sign(h(x))] \leq \EE_{x \in \{ \pm 1 \}^n}\left[(f(x) - h(x))^2\right] $$
+\end{proposition}
 
 \end{document}
