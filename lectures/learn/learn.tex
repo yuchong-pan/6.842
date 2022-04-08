@@ -80,6 +80,8 @@
 \DeclareMathOperator{\ANDbar}{\mathsf{\overline{AND}}}
 \DeclareMathOperator{\val}{val}
 \DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\NS}{NS}
+\DeclareMathOperator{\Maj}{Maj}
 \newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \SetKwFor{RepTimes}{repeat}{times}{end}
@@ -196,8 +198,107 @@ In this section, we study learning algorithms that are based on estimating the F
   Recall that $\hat{f}(S) = 2\PP_{x \in \{ 0, 1 \}^n}[f(x) \neq \chi_S(x)] - 1$. Hence, we can approximate $\hat{f}(S)$ by estimating $\PP_{x \in \{ 0, 1 \}^n}[f(x) \neq \chi_S(x)]$ and applying the Chernoff bound.
 \end{proof}
 
-We examine the Fourier representations of some important examples:
+\subsection{Fourier Concentration and the Low Degree Algorithm}
+
+\begin{definition}
+  For all $\varepsilon \in (0, 1)$ and $n \in \NN$, we say that a function $f : \{ \pm 1 \}^n \to \RR$ has \emph{$\alpha(\varepsilon, n)$-Fourier concentration (f.c.)} if
+  $$ \sum_{\substack{S \subset [n] \\ |S| > \alpha(\varepsilon, n)}} \hat{f}(S)^2 \leq \varepsilon. $$
+\end{definition}
+
+For a Boolean function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$, Parseval's identity gives $\sum_{S \subset [n]} \hat{f}(S)^2 = 1$, so having $\alpha(\varepsilon, n)$-Fourier concentration implies that
+$$ \sum_{\substack{S \subset [n] \\ |S| \leq \alpha(\varepsilon, n)}} \geq 1 - \varepsilon. $$
+
+The \emph{low degree algorithm}, given in Algorithm \ref{alg:low-degree}, approximates a Boolean function with $d$-Fourier concentration, where $d = \alpha(\varepsilon, n)$.
+
+\begin{algorithm}
+  take $m = O((n^d/\tau) \log (n^d/\delta))$ samples \\
+  \ForEach{$S \subset [n]$ such that $|S| \leq d$}{
+    $C_S \leftarrow \text{estimate of $\hat{f}(S)$}$
+  }
+  let $h : \{ \pm 1 \}^n \to \RR$ be defined by $h(x) = \sum_{S \subset [n] : |S| \leq d} C_S \chi_S(x)$ \\
+  \Return{$\sign \circ h$ as hypothesis}
+  \caption{The low degree algorithm given degree $d$, accuracy $\tau$ and confidence $\delta$.}
+  \label{alg:low-degree}
+\end{algorithm}
+
+\begin{proposition} \label{prop:expectation}
+  If $f$ has $d$-Fourier concentration with $d = \alpha(\varepsilon, n)$, then $\EE_{x \in \{ 0, 1 \}^n} [(f(x) - h(x))^2] \leq \varepsilon + \tau$ with probability at least $1 - \delta$.
+\end{proposition}
+
+\begin{proof}
+  First, we claim that each low degree Fourier Coefficient is well approximated, i.e., with probability at least $1 - \delta$, we have $|C_S - \hat{f}(S)| \leq \gamma$ for all $S \subset [n]$ with $|S| \leq d$, where $\gamma = \sqrt{\tau/n^d}$. This can be proved using the Chernoff bound and the union bound.
+
+  Second, we show that if all low degree Fourier coefficients are well approximated, then $h$ has a low $\ell_2$-error. Suppose $|C_S - \hat{f}(S)| \leq \gamma$ for all $S \subset [n]$ such that $|S| \leq d$. Let $g : \{ \pm 1 \}^n \to \RR$ be defined by
+  $$ g(x) = f(x) - h(x). $$
+  By the linearity of the Fourier transform, for all $S \subset [n]$,
+  $$ \hat{g}(S) = \hat{f}(S) - \hat{h}(S). $$
+  For all $S \subset [n]$ with $|S| > d$, we have $\hat{h}(S) = 0$, so $\hat{g}(S) = \hat{f}(S)$. For all $S \subset [n]$ with $|S| \leq d$, we have $|\hat{g}(S)| \leq \gamma$, so $\hat{g}(S)^2 \leq \gamma^2$. Therefore,
+  \begin{align*}
+    \EE_{x \in \{ \pm 1 \}^n}\left[(f(x) - h(x))^2\right] &= \EE\left[g(x)^2\right] = \sum_{S \subset [n]} \hat{g}(S)^2 && \text{(Parseval's identity)} \\
+    &= \sum_{\substack{S \subset [n] \\ |S| \leq d}} \hat{g}(S)^2 + \sum_{\substack{S \subset [n] \\ |S| > d}} \hat{g}(S)^2 \\
+    &\leq \sum_{\substack{S \subset [n] \\ |S| \leq d}} \gamma^2 + \sum_{\substack{S \subset [n] \\ |S| > d}} \hat{f}(S)^2 \\
+    &\leq \binom{n}{d} \cdot \gamma^2 + \varepsilon && \text{(by Fourier concentration)} \\
+    &\leq \tau + \varepsilon.
+  \end{align*}
+  This completes the proof.
+\end{proof}
+
+\begin{proposition} \label{prop:prob}
+  Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$. Let $h : \{ \pm 1 \}^n \to \RR$. Then
+  $$ \PP_{x \in \{ \pm 1 \}^n} [f(x) \neq \sign(h(x))] \leq \EE_{x \in \{ \pm 1 \}^n}\left[(f(x) - h(x))^2\right] $$
+\end{proposition}
+
+\begin{proof}
+  Recall that
+  \begin{align}
+    \EE_{x \in \{ \pm 1 \}^n}\left[(f(x) - h(x))^2\right] &= \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} (f(x) - h(x))^2, \label{eq:expecation} \\
+    \PP_{x \in \{ \pm 1 \}^n} \left[f(x) \neq \sign(h(x))\right] &= \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} \mathds 1_{f(x) \neq \sign(h(x))}. \label{eq:prob}
+  \end{align}
+  We compare \eqref{eq:expecation} and \eqref{eq:prob} term by term. Let $x \in \{ \pm 1 \}^n$. If $f(x) = \sign(h(x))$, then $\mathds 1_{f(x) \neq \sign(h(x))} = 0 \leq (f(x) - h(x))^2$. If $f(x) \neq \sign(h(x))$, then $\mathds 1_{f(x) \neq \sign(h(x))} = 1 \leq (f(x) - h(x))^2$; see Figure \ref{fig:proof-prob} for an illustration.
+
+  \begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+      \draw (-2, 0) -- (2, 0);
+      \draw (-2, -.1) -- (-2, .1);
+      \draw (0, -.1) -- (0, .1);
+      \draw (2, -.1) -- (2, .1);
+      \draw (-.618, -.1) -- (-.618, .1);
+      \node[above] at (-2, 0) {$-1$};
+      \node[above] at (0, 0) {$0$};
+      \node[above] at (2, 0) {$+1$};
+      \node[below] at (-.618, 0) {$h(x)$};
+      \node[below] at (2, 0) {$f(x)$};
+      \draw[<->] (-.618, -.7) -- (2, -.7) node[midway, below] {$\geq 1$};
+    \end{tikzpicture}
+    \caption{Illustrating the proof of Proposition \ref{prop:prob}.}
+    \label{fig:proof-prob}
+  \end{figure}
+\end{proof}
+
+\begin{theorem}
+  If a concept class $\mathcal C$ has Fourier concentration $d = \alpha(\varepsilon, n)$, then there exists a uniform distribution learning algorithm for $\mathcal C$ with $q = O((n^d/\varepsilon) \log (n^d/\delta))$ samples; i.e., this algorithm gets $q$ samples and with probability at least $1 - \delta$ outputs a hypothesis $h'$ such that
+  $$ \PP_{x \in \{ \pm 1 \}^n} \left[f(x) \neq h'(x)\right] \leq 2\varepsilon. $$
+\end{theorem}
+
+\begin{proof}
+  Run the low degree algorithm with $\tau = \varepsilon$. By Proposition \ref{prop:expectation}, we get a hypothesis $h$ such that $\EE_{x \in \{ \pm 1 \}^n} [(f(x) - h(x))^2] \leq \varepsilon + \varepsilon = 2\varepsilon$. Let $h' = \sign \circ h$. By Proposition \ref{prop:prob}, $h'$ has error at most $2\varepsilon$ with respect to $f$. This completes the proof.
+\end{proof}
+
+Following are examples of functions that have $\alpha(\varepsilon, n)$-Fourier concentration.
 \begin{enumerate}[label=(\roman*)]
+  \item Any function $f : \{ \pm 1 \}^n \to \RR$ that depends on at most $k$ variables has
+  $$ \sum_{\substack{S \subset [n] \\ |S| > k}} \hat{f}(S)^2 = 0. $$
+  \item Let $T = \{ i_1, \ldots, i_k \} \subset [n]$ be such that $|T| = k$. Let $\AND : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be defined by
+  $$ \AND(x) = \left\{
+    \begin{array}{ll}
+      -1, & \text{if $x_i = -1$ for all $i \in T$}, \\
+      1, & \text{otherwise}.
+    \end{array}
+  \right. $$
+  We claim that $\AND$ has $\log(4/\varepsilon)$-Fourier concentration. Note $\widehat{\AND}(S) = 0$ for all $S \subset [n]$ with $|S| > |T|$. If $|T| \leq \log(4/\varepsilon)$, then we are done by definition. If $|T| > \log (4/\varepsilon)$, then
+  $$ \widehat{\AND}(\emptyset)^2 = \left(1 - 2\PP\left[f(x) \neq \chi_\emptyset(x)\right]\right)^2 = \left(1 - 2 \cdot \frac{1}{2^{|T|}}\right)^2 > 1 - \varepsilon. $$
+  Therefore, $\AND$ has $0$-Fourier concentration.
   \item Let $T = \{ i_1, \ldots, i_k \} \subset [n]$ be such that $|T| = k$. Let $\ANDbar : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be defined by
   $$ \ANDbar(x) = \left\{
     \begin{array}{ll}
@@ -225,7 +326,9 @@ We examine the Fourier representations of some important examples:
   \end{align*}
   Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be defined by
   $$ f(x) = \sum_{\ell: \text{ leaf of $T$}} f_\ell(x) \val(\ell). $$
-  Note that for each $x \in \{ \pm 1 \}^n$, exactly one of the values $f_\ell(x)$ is $1$ for leaves $\ell$ of $T$, and all others are $0$.
+  Note that for each $x \in \{ \pm 1 \}^n$, exactly one of the values $f_\ell(x)$ is $1$ for leaves $\ell$ of $T$, and all others are $0$. Moreover, for each leaf $\ell$ of $T$, the number of variables on which $f_\ell$ depends is at most the depth of $\ell$. By the linearity of the Fourier transform,
+  $$ \hat{f}(S) = \sum_{\ell: \text{ leaf of $T$}} \widehat{f_\ell}(S) \val(\ell). $$
+  Therefore, $\hat{f}(S) = 0$ for all $S \subset [n]$ such that $|S|$ is greater than the depth of $T$.
   
   \begin{figure}[h]
     \centering
@@ -255,66 +358,85 @@ We examine the Fourier representations of some important examples:
     \caption{A decision tree.}
     \label{fig:decision-tree}
   \end{figure}
+  \item {\bf \em Constant depth circuits.} Recall that a Boolean circuit is a DAG whose vertices are gates which represent operations (e.g., $\wedge, \vee, \neg$), constants ($1, 0$) and variables ($x_1, \ldots, x_n$). We allow each operation to have an unbounded number of inputs; the $\neg$ gate can have only one input. Can we compute the parity (XOR) of $n$ bits in a constant depth with a polynomial-size input for each operation? The answe is ``no,'' which follows from the switching lemma by Furst, Saxe and Sipser.
+  
+  \begin{theorem}[Hastad, Linial, Mansour and Nisan]
+    For any function $f$ computable via a size-$s$ depth-$d$ circuit,
+    $$ \sum_{\substack{S \subset [n] \\ |S| > t}} \hat{f}(S)^2 \leq \alpha, $$
+    where $t = O(\log (s/\alpha))^{d - 1}$.
+  \end{theorem}
+
+  Taking $s = \poly(n)$, $d = O(1)$ and $\alpha = O(\varepsilon)$ implies $t = O(\log^d (n/\varepsilon))$. Therefore, the low degree algorithm gives an $n^{O(\log^d (n/\varepsilon))}$ sample algorithm for learning.
+  \item {\bf \em Learning half-spaces.}
+  
+  \begin{definition}
+    For $w \in \RR^n$ and $\theta \in \RR$, the function $h : \{ \pm 1 \}^n \to \{ \pm 1 \}$ defined by $h(x) = \sign(w \cdot x - \theta)$ is called a \emph{half-space function}.
+  \end{definition}
+
+  \begin{theorem}
+    A half-space function $h : \{ \pm 1 \}^n \to \{ \pm 1 \}$ has Fourier concentration $\alpha(\varepsilon) = c/\varepsilon^2$ for some constant $c$.
+  \end{theorem}
+
+  \begin{corollary}
+    The low degree algorithm learns half-spaces with $n^{O(1/\varepsilon^2)}$ samples.
+  \end{corollary}
 \end{enumerate}
 
-\subsection{Fourier Concentration}
+\subsection{Noise Sensitivity}
 
 \begin{definition}
-  For all $\varepsilon \in (0, 1)$ and $n \in \NN$, we say that a function $f : \{ \pm 1 \}^n \to \RR$ has \emph{$\alpha(\varepsilon, n)$-Fourier concentration (f.c.)} if
-  $$ \sum_{\substack{S \subset [n] \\ |S| > \alpha(\varepsilon, n)}} \hat{f}(S)^2 \leq \varepsilon. $$
+  For $\varepsilon \in (0, 1/2)$, the \emph{noise operator} $N_\varepsilon(x)$ randomly flips each bit of $x$ with probability $\varepsilon$, given $x \in \{ \pm 1 \}^n$.
 \end{definition}
 
-For a Boolean function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$, Parseval's identity gives $\sum_{S \subset [n]} \hat{f}(S)^2 = 1$, so having $\alpha(\varepsilon, n)$-Fourier concentration implies that
-$$ \sum_{\substack{S \subset [n] \\ |S| \leq \alpha(\varepsilon, n)}} \geq 1 - \varepsilon. $$
-Following are two examples of functions that have $\alpha(\varepsilon, n)$-Fourier concentration.
+\begin{definition}
+  The \emph{noise sensitivity} of a Boolean function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ is defined to be
+  $$ \NS_\varepsilon(f) = \PP_{\substack{x \in \{ \pm 1 \}^n \\ \text{noise}}}\left[f(x) \neq f\left(N_\varepsilon(x)\right)\right]. $$
+\end{definition}
+
+Following are examples of the noise sensitivity of a Boolean function.
+
 \begin{enumerate}[label=(\roman*)]
-  \item Any function $f : \{ \pm 1 \}^n \to \RR$ that depends on at most $k$ variables has
-  $$ \sum_{\substack{S \subset [n] \\ |S| > k}} \hat{f}(S)^2 = 0. $$
-  \item Let $f$ be the $\ANDbar$ function on $T \subset [n]$. We claim that $f$ has $\log(4/\varepsilon)$-Fourier concentration. Note $\hat{f}(S) = 0$ for all $S \subset [n]$ with $|S| > |T|$. If $|T| \leq \log(4/\varepsilon)$, then we are done by definition. If $|T| > \log (4/\varepsilon)$, then
-  $$ \hat{f}(\emptyset)^2 = \left(1 - 2\PP\left[f(x) \neq \chi_\emptyset(x)\right]\right)^2 = \left(1 - 2 \cdot \frac{1}{2^{|T|}}\right)^2 > 1 - \varepsilon. $$
-  Therefore, $f$ has $0$-Fourier concentration.
-\end{enumerate}
-
-\subsection{The Low Degree Algorithm}
-
-The \emph{low degree algorithm}, given in Algorithm \ref{alg:low-degree}, approximates a Boolean function with $d$-Fourier concentration, where $d = \alpha(\varepsilon, n)$.
-
-\begin{algorithm}
-  take $m = O((n^d/\tau) \log (n^d/\delta))$ samples \\
-  \ForEach{$S \subset [n]$ such that $|S| \leq d$}{
-    $C_S \leftarrow \text{estimate of $\hat{f}(S)$}$
-  }
-  let $h : \{ \pm 1 \}^n \to \RR$ be defined by $h(x) = \sum_{S \subset [n] : |S| \leq d} C_S \chi_S(x)$ \\
-  \Return{$\sign \circ h$ as hypothesis}
-  \caption{The low degree algorithm given degree $d$, accuracy $\tau$ and confidence $\delta$.}
-  \label{alg:low-degree}
-\end{algorithm}
-
-\begin{proposition}
-  If $f$ has $d$-Fourier concentration with $d = \alpha(\varepsilon, n)$, then $\EE_{x \in \{ 0, 1 \}^n} [(f(x) - h(x))^2] \leq \varepsilon + \tau$ with probability at least $1 - \delta$.
-\end{proposition}
-
-\begin{proof}
-  First, we claim that each low degree Fourier Coefficient is well approximated, i.e., with probability at least $1 - \delta$, we have $|C_S - \hat{f}(S)| \leq \gamma$ for all $S \subset [n]$ with $|S| \leq d$, where $\gamma = \sqrt{\tau/n^d}$. This can be proved using the Chernoff bound and the union bound.
-
-  Second, we show that if all low degree Fourier coefficients are well approximated, then $h$ has a low $\ell_2$-error. Suppose $|C_S - \hat{f}(S)| \leq \gamma$ for all $S \subset [n]$ such that $|S| \leq d$. Let $g : \{ \pm 1 \}^n \to \RR$ be defined by
-  $$ g(x) = f(x) - h(x). $$
-  By the linearity of the Fourier transform, for all $S \subset [n]$,
-  $$ \hat{g}(S) = \hat{f}(S) - \hat{h}(S). $$
-  For all $S \subset [n]$ with $|S| > d$, we have $\hat{h}(S) = 0$, so $\hat{g}(S) = \hat{f}(S)$. For all $S \subset [n]$ with $|S| \leq d$, we have $|\hat{g}(S)| \leq \gamma$, so $\hat{g}(S)^2 \leq \gamma^2$. Therefore,
+  \item If $f(x) = x_1$, then $\NS_\varepsilon(f) = \varepsilon$.
+  \item If $f(x) = x_1 \cdots x_k$, then
   \begin{align*}
-    \EE_{x \in \{ \pm 1 \}^n}\left[(f(x) - h(x))^2\right] &= \EE\left[g(x)^2\right] = \sum_{S \subset [n]} \hat{g}(S)^2 && \text{(Parseval's identity)} \\
-    &= \sum_{\substack{S \subset [n] \\ |S| \leq d}} \hat{g}(S)^2 + \sum_{\substack{S \subset [n] \\ |S| > d}} \hat{g}(S)^2 \\
-    &\leq \sum_{\substack{S \subset [n] \\ |S| \leq d}} \gamma^2 + \sum_{\substack{S \subset [n] \\ |S| > d}} \hat{f}(S)^2 \\
-    &\leq \binom{n}{d} \cdot \gamma^2 + \varepsilon && \text{(by Fourier concentration)} \\
-    &\leq \tau + \varepsilon.
+    \NS_\varepsilon(f) &= \PP[f(x) = \F, f(N_\varepsilon(x) = \T)] + \PP[f(x) = \T, f(N_\varepsilon(x) = \F)] \\
+    &= 2\PP[f(x) = \T, f(N_\varepsilon(x) = \F)] \\
+    &= 2 \cdot \frac{1}{2^k} \cdot (1 - (1 - \varepsilon)^k).
   \end{align*}
-  This completes the proof.
-\end{proof}
+  Therefore, if $\varepsilon \ll 1/k$, then $\NS_\varepsilon(f) \approx \varepsilon k/2^{k - 1}$; if $\varepsilon \gg 1/k$, then $\NS_\varepsilon(f) \approx (1 - e^{-\varepsilon k})/2^{k - 1}$.
+  \item If $f(x) = \Maj(x_1, \ldots, x_n)$, then $\NS_\varepsilon(f) = O(\sqrt{\varepsilon})$.
+  
+  To see this, note that $\Maj(x)$ corresponds to a random walk on a line starting at $0$, and that the location corresponds to the sum of the $x_i$'s so far.
 
-\begin{proposition}
-  Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$. Let $h : \{ \pm 1 \}^n \to \RR$. Then
-  $$ \PP_{x \in \{ \pm 1 \}^n} [f(x) \neq \sign(h(x))] \leq \EE_{x \in \{ \pm 1 \}^n}\left[(f(x) - h(x))^2\right] $$
-\end{proposition}
+  \begin{fact} \label{fact:random-walk}
+    If $X_1, \ldots, X_n \in \{ \pm 1 \}$ are i.i.d\ random variables, then $\EE[|X_1 + \ldots + X_n|] = \sqrt{n}$, and (informally) $|X_1 + \ldots + X_n|$ is likely to be close to $\sqrt{n}$.
+  \end{fact}
+
+  Therefore, $N_\varepsilon(x)$ corresponds to a random walk on $\varepsilon n$ bits, where each flip displaces by $\pm 2$. By Fact \ref{fact:random-walk}, the expected displacement is $2\sqrt{\varepsilon n}$.
+
+  Given $x \in \{ \pm 1 \}^n$, we consider the following process:
+  \begin{enumerate}[label=\arabic*., itemsep=0pt]
+    \item Talk a walk specified by $x$.
+    \item Continue the walk according to $2N_\varepsilon(x)$.
+  \end{enumerate}
+
+  Pretend that the first walk leaves us at $\sqrt{n}$. By Markov's inequality,
+  \begin{align*}
+    \PP[\text{the second walk takes us accross $0$}] &= \frac{1}{2} \PP[\text{the second displacement is greater than $\sqrt{n}$}] \\
+    &= \frac{1}{2} \cdot \frac{\EE[\text{the second displacement}]}{\sqrt{n}} \\
+    &= \frac{1}{2} \cdot \frac{2\sqrt{\varepsilon n}}{\sqrt{n}} = \sqrt{\varepsilon}.
+  \end{align*}
+  \item {\bf \em Linear threshold functions (half-spaces).}
+  
+  \begin{theorem}
+    If $f$ is a linear threshold function (i.e., a half-space), then $\NS_\varepsilon(f) < 8.8 \sqrt{\varepsilon}$.
+  \end{theorem}
+  \item {\bf \em Parity functions.}
+  
+  \begin{proposition}
+    Let $S \subset [n]$ be such that $|S| = k$. Then
+    $$ \NS_\varepsilon\left(\chi_S\right) = \frac{1 - (1 - 2\varepsilon)^k}{2}. $$
+  \end{proposition}
+\end{enumerate}
 
 \end{document}
