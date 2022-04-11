@@ -81,7 +81,26 @@
   \item \noindent\emph{Collaborators and sources:} Guanghao Ye, Zixuan Xu.
   
   \begin{proof}
-    
+    Let $L$ be a subset of the left vertices such that $|L| \leq n/2$. If $L = \emptyset$, then the result trivially holds. Hence, assume that $|L| \geq 1$. Let $R_0$ be the set of the right vertices. Then
+    \begin{align*}
+      \PP[|N(L)| < (1 + \varepsilon) |L|] &\leq \PP\left[\exists R \subset R_0, |R| = \lfloor (1 + \varepsilon)|L| \rfloor, N(L) \subset R\right] \\
+      &\leq \sum_{\substack{R \subset R_0 \\ |R| = \lfloor (1 + \varepsilon) |L| \rfloor}} \PP[N(L) \subset R] && \text{(union bound)} \\
+      &= \sum_{\substack{R \subset R_0 \\ |R| = \lfloor (1 + \varepsilon) |L| \rfloor}} \left(\frac{|R|}{n} \cdot \frac{|R| - 1}{n - 1} \cdots \frac{|R| - |L| + 1}{n - |L| + 1}\right)^3 \\
+      &\leq \binom{n}{\lfloor (1 + \varepsilon) |L| \rfloor} \left(\frac{\lfloor (1 + \varepsilon) |L| \rfloor}{n}\right)^{3|L|} && \text{(for $\varepsilon \leq 1$)} \\
+      &\leq \left(\frac{en}{\lfloor (1 + \varepsilon) |L| \rfloor}\right)^{\lfloor (1 + \varepsilon) |L| \rfloor} \left(\frac{\lfloor (1 + \varepsilon) |L| \rfloor}{n}\right)^{3|L|} && \text{(Stirling's approximation)} \\
+      &\leq \left(\frac{en}{\lfloor (1 + \varepsilon) |L| \rfloor}\right)^{(1 + \varepsilon) |L|} \left(\frac{\lfloor (1 + \varepsilon) |L| \rfloor}{n}\right)^{3|L|} && \text{(for $\varepsilon \leq 2e - 1$)} \\
+      &= \left(e^{1 + \varepsilon} \left(\frac{\lfloor (1 + \varepsilon) |L| \rfloor}{n}\right)^{2 - \varepsilon}\right)^{|L|} \\
+      &\leq \left(e^{1 + \varepsilon} \left(\frac{(1 + \varepsilon) |L|}{n}\right)^{2 - \varepsilon}\right)^{|L|} \\
+      &\leq \left(e^{1 + \varepsilon} \left(\frac{(1 + \varepsilon)}{2}\right)^{2 - \varepsilon}\right)^{|L|}. && \text{(since $|L| \leq n/2$)}
+    \end{align*}
+    Let $\varepsilon = 1/2$. Then $0 < e^{1 + \varepsilon} ((1 + \varepsilon)/2)^{2 - \varepsilon} < 1/2$. Since $|L| \geq 1$, then
+    \begin{align*}
+      \PP[|N(L)| \geq (1 + \varepsilon) |L|] &\geq 1 - \PP[|N(L)| < (1 + \varepsilon) |L|] \\
+      &\geq 1 - \left(e^{1 + \varepsilon} \left(\frac{(1 + \varepsilon)}{2}\right)^{2 - \varepsilon}\right)^{|L|} \\
+      &\geq 1 - e^{1 + \varepsilon} \left(\frac{(1 + \varepsilon)}{2}\right)^{2 - \varepsilon} \\
+      &> 1 - \frac{1}{2} = \frac{1}{2}.
+    \end{align*}
+    This completes the proof.
   \end{proof}
 
   \clearpage
