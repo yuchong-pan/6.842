@@ -141,20 +141,36 @@
     \item \noindent\emph{Collaborators and sources:} none.
     
     \begin{proof}
-      Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be such that $f$ passes with probability at least $1 - \varepsilon$. By part (a),
+      Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be such that $f$ passes with probability at least $1 - \varepsilon$ for some $\varepsilon \in (0, 1/2)$. By part (a),
       $$ 1 - \varepsilon \leq \PP[\text{test accepts}] = \frac{1}{2} + \frac{1}{2} \sum_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S)^3. $$
       Rearranging the above inequality and applying Parseval's identity yield
       \begin{align*}
         1 - 2\varepsilon &\leq \sum_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S)^3 \leq \left(\max_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S)\right) \sum_{S \subset [n]} \hat{f}(S)^2 \\
         &= \left(\max_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S)\right) \cdot 1 = \max_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S).
       \end{align*}
-      Hence, there exists $S \subset [n]$ such that $(1 - 2\delta)^{|S|} \hat{f}(S) \geq 1 - 2\varepsilon$. Set $\delta = \varepsilon$ in the test. Then $(1 - 2\varepsilon)^{|S|} \hat{f}(S) \geq 1 - 2\varepsilon$. If $|S| \geq 2$, then $0 < (1 - 2\varepsilon)^{|S|} < 1 - 2\varepsilon$, so $(1 - 2\varepsilon)^{|S|} \hat{f}(S) < 1 - 2\varepsilon$ since $\hat{f}(S) = 1 - 2\dist(f, \chi_S) \in [-1, 1]$, a contradiction. Therefore, one of the following two cases holds:
-      \begin{enumerate}[label=(\roman*), itemsep=0pt]
-        \item $|S| = 1$ and $\hat{f}(S) = 1$;
-        \item $|S| = 0$ and $\hat{f}(S) \geq 1 - 2\varepsilon$.
-      \end{enumerate}
+      Hence, there exists $S \subset [n]$ such that $(1 - 2\delta)^{|S|} \hat{f}(S) \geq 1 - 2\varepsilon$. Set $\delta = \varepsilon$ in the test. Then $(1 - 2\varepsilon)^{|S|} \hat{f}(S) \geq 1 - 2\varepsilon$. Since $\varepsilon \in (0, 1/2)$, then $1 - 2\varepsilon \in (0, 1)$, so $(1 - 2\varepsilon)^{|S|} \in (0, 1]$. Therefore,
+      $$ \hat{f}(S) \geq \frac{1 - 2\varepsilon}{(1 - 2\varepsilon)^{|S|}} \geq \frac{1 - 2\varepsilon}{1} = 1 - 2\varepsilon. $$
       This completes the proof.
     \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} none.
+    
+    By part (c), if $f$ passes with probability at least $1 - \varepsilon$ for some $\varepsilon \in (0, 1/2)$, then there exists $S \subset [n]$ such that $(1 - 2\varepsilon)^{|S|} \hat{f}(S) \geq 1 - 2\varepsilon$ by setting $\delta = \varepsilon$ in the test. Since $\dist(f, \chi_S) \in [0, 1]$, then $\hat{f}(S) = 1 - 2\dist(f, \chi_S) \in [-1, 1]$. Since $\varepsilon \in (0, 1/2)$, then $1 - 2\varepsilon \in (0, 1)$. If $|S| \geq 2$, then $0 < (1 - 2\varepsilon)^{|S|} < 1 - 2\varepsilon$, so $(1 - 2\varepsilon)^{|S|} \hat{f}(S) < 1 - 2\varepsilon$, a contradiction. Therefore, one of the following two cases holds:
+    \begin{enumerate}[label=(\roman*), itemsep=0pt]
+      \item $|S| = 1$ and $\hat{f}(S) = 1$ (so $\dist(f, \chi_S) = 0$, and $f = \chi_S$ is a dictator function);
+      \item $|S| = 0$ and $\hat{f}(S) \geq 1 - 2\varepsilon$ (so $\dist(f, \chi_\emptyset) \leq \varepsilon$).
+    \end{enumerate}
+    Hence, if $f$ is $\varepsilon$-close to $\chi_\emptyset \equiv 1$ (a non-dictator function), then $f$ also passes with probability at least $1 - \varepsilon$.
+
+    Note that for any dictator function, say $\chi_{\{ j \}}$ for some $j \in [n]$,
+    $$ \PP_{x \in \{ \pm 1 \}^n}\left[\chi_{\{ j \}}(x) = 0\right] = \PP_{x \in \{ \pm 1 \}^n}\left[x_j = 0\right] = \frac{\left|\left\{ x \in \{ \pm 1 \}^n : x_j = 0 \right\}\right|}{2^n} = \frac{2^{n - 1}}{2^n} = \frac{1}{2}. $$
+    In other words, any dictator function equals $0$ for half of the inputs, and $1$ for the other half. We give a simple fix to the test by applying the following new test before the original test. For any sufficiently small $\eta > 0$, we independently and uniformly sample $\Theta(\log (1/\eta))$ random inputs from $\{ \pm 1 \}^n$, and reject if and only if more than $3/4$ of the values are $1$. If $f$ is $\varepsilon$-close to $\chi_\emptyset \equiv 1$ for some $\varepsilon \in (0, 1/8)$, then by the Chernoff bound,
+    $$ \PP[\text{new test rejects $f$}] = 1 - \PP[\text{$\leq 3/4$ of the values are $1$}] \geq 1 - e^{-\Theta(\log (1/\eta))} = 1 - \Theta(\eta). $$
+    On the other hand, if $f$ is a dictator function, then by the Chernoff bound,
+    $$ \PP[\text{new test accepts $f$}] = 1 - \PP[\text{$>3/4$ of the values are $1$}] \geq 1 - e^{-\Theta(\log(1/\eta))} = 1 - \Theta(\eta). $$
+    Hence, if $f$ passes the combination of the new test and the original test with probability at least $1 - \varepsilon$ and with $\delta = \varepsilon$ in the original test for some sufficiently small $\varepsilon > 0$, then $f$ is a dictator function with probability at least $1 - \Theta(\eta)$; on the other hand, if $f$ is a dictator function, then the union bound implies that $f$ passes the combined test with probability at least $1 - \Theta(\eta) - \delta$. This shows that the combined test is a dictator test.
   \end{enumerate}
 \end{enumerate}
 
