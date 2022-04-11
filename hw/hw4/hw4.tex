@@ -1,0 +1,125 @@
+
+\documentclass[letterpaper, reqno,11pt]{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{color,latexsym,amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage[linesnumbered,lined,boxed,commentsnumbered,noend,noline]{algorithm2e}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{bbm}
+\usepackage{enumitem}
+\usepackage[numbers]{natbib}
+\usepackage{framed}
+\usepackage{titling}
+\usepackage{subcaption}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+
+\tikzset{invclip/.style={clip,insert path={{[reset cm]
+  (-16383.99999pt,-16383.99999pt) rectangle (16383.99999pt,16383.99999pt)}}}}
+
+\allowdisplaybreaks
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\PP}{\mathop{{}\mathbb{P}}}
+\newcommand{\EE}{\mathop{{}\mathbb{E}}}
+\newcommand{\inci}{\mathds{1}}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\charcone}{char.cone}
+\DeclareMathOperator{\STAB}{STAB}
+\DeclareMathOperator{\Down}{Down}
+\DeclareMathOperator{\lca}{lca}
+\DeclareMathOperator{\ex}{ex}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\T}{T}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\comp}{c}
+\DeclareMathOperator{\bernoulli}{Bernoulli}
+\DeclareMathOperator{\Mod}{mod}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\LowestOne}{\textsc{LowestOne}}
+\SetKwFor{RepTimes}{repeat}{times}{end}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\begin{document}
+\pagenumbering{arabic}
+\title{Homework 4}
+\author{Yuchong Pan}
+\date{\today}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}{Claim}
+\newtheorem{exercise}{Exercise}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{solution}{Solution}
+%\maketitle
+%
+
+\begin{framed}
+\noindent{\bf 6.842 Randomness and Computation} \hfill \thedate
+\begin{center}
+\Large{\thetitle}
+\end{center}
+%\noindent{\em Lecturer: Ronitt Rubinfield} \hfill {\em Scribe: \theauthor}
+\noindent{\em Yuchong Pan} \hfill {\em MIT ID: 911346847}
+\end{framed}
+
+\begin{enumerate}
+  \item \noindent\emph{Collaborators and sources:} Guanghao Ye, Zixuan Xu.
+  
+  \begin{proof}
+    
+  \end{proof}
+
+  \clearpage
+
+  \item \begin{enumerate}
+    \item \noindent\emph{Collaborators and sources:} none.
+    
+    \begin{proof}
+      Note that $\mathds 1_\text{test accepts} = (1 + f(x)f(y)f(z))/2$. By the Fourier transform of $f$ and by linearity of expecation,
+      \begin{align*}
+        \EE[f(x) f(y) f(z)] &= \EE\left[\left(\sum_{S \subset [n]} \hat{f}(S) \chi_S(x)\right) \left(\sum_{T \subset [n]} \hat{f}(T) \chi_T(y)\right) \left(\sum_{U \subset [n]} \hat{f}(U) \chi_U(z)\right)\right] \\
+        &= \sum_{S, T, U \subset [n]} \hat{f}(S) \hat{f}(T) \hat{f}(U) \EE\left[\chi_S(x) \chi_T(y) \chi_U(x \circ y \circ w)\right].
+      \end{align*}
+      Let $S, T, U \subset [n]$. For all $i \in [n]$, since $x_i, y_i \in \{ \pm 1 \}$, then $x_i^2 = y_i^2 = 1$. Hence,
+      \begin{align*}
+        \chi_S(x) \chi_T(y) \chi_U(x \circ y \circ w) &= \left(\prod_{i \in S} x_i\right) \left(\prod_{i \in T} y_i\right) \left(\prod_{i \in U} x_i y_i w_i\right) \\
+        &= \left(\prod_{i \in S \cap U} x_i^2\right) \left(\prod_{i \in T \cap U} y_i^2\right) \left(\prod_{i \in S \triangle U} x_i\right) \left(\prod_{i \in T \triangle U} y_i\right) \left(\prod_{i \in U} w_i\right) \\
+        &= \chi_{S \triangle U}(x) \chi_{T \triangle U}(y) \chi_U(w).
+      \end{align*}
+      If $S = T = U$, since $w_1, \ldots, w_n$ are all chosen independently and since $\EE[w_i] = (-1) \cdot \delta + 1 \cdot (1 - \delta) = 1 - 2\delta$ for all $i \in [m]$, then
+      \begin{align*}
+        \EE\left[\chi_{S \triangle U}(x) \chi_{T \triangle U}(y) \chi_U(w)\right] &= \EE\left[\prod_{i \in S} w_i\right] = \prod_{i \in S} \EE\left[w_i\right] = (1 - 2\delta)^{|S|}.
+      \end{align*}
+      Now, suppose that either $S \neq U$ or $T \neq U$. WLOG assume that $S \neq U$. Then $S \triangle U \neq \emptyset$. Let $j \in S \triangle U$. For $x \in \{ \pm 1 \}^n$, let $x^{\oplus j}$ be the vector obtained by flipping the $j^\text{th}$ bit in $x$. Then we can partition $\{ \pm 1 \}^n$ into (unordered) pairs $(x, x^{\oplus j})$. Therefore,
+      \begin{align*}
+        \EE\left[\chi_{S \triangle U}(x)\right] &= \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} \chi_{S \triangle U}(x) = \frac{1}{2^n} \sum_{\text{pairs $\left(x, x^{\oplus j}\right)$}} \left(\chi_{S \triangle U}(x) + \chi_{S \triangle U}\left(x^{\oplus j}\right)\right) \\
+        &= \frac{1}{2^n} \sum_{\text{pairs $\left(x, x^{\oplus j}\right)$}} \left(x_j \prod_{i \in (S \triangle U) \setminus \{ j \}} x_i + \left(-x_j\right) \prod_{i \in (S \triangle U) \setminus \{ j \}} x_i\right) = 0.
+      \end{align*}
+      Since $x$, $y$ and $w$ are chosen independently, then for all $S, T, U \subset [n]$ such that either $S \neq U$ or $T \neq U$,
+      $$ \EE\left[\chi_{S \triangle U}(x) \chi_{T \triangle U}(y) \chi_U(w)\right] = \EE\left[\chi_{S \triangle U}(x)\right] \EE\left[\chi_{T \triangle U}(y)\right] \EE\left[\chi_U(w)\right] = 0. $$
+      Therefore,
+      \begin{align*}
+        \PP[\text{test accepts}] &= \EE\left[\mathds 1_\text{test accepts}\right] = \EE\left[\frac{1 + f(x)f(y)f(z)}{2}\right] = \frac{1}{2} + \frac{1}{2} \EE[f(x)f(y)f(z)] \\
+        &= \frac{1}{2} + \frac{1}{2} \sum_{S, T, U \subset [n]} \hat{f}(S) \hat{f}(T) \hat{f}(U) \EE\left[\chi_{S \triangle U}(x) \chi_{T \triangle U}(y) \chi_U(w)\right] \\
+        &= \frac{1}{2} + \frac{1}{2} \sum_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S)^3.
+      \end{align*}
+      This completes the proof.
+    \end{proof}
+  \end{enumerate}
+\end{enumerate}
+
+\end{document}
