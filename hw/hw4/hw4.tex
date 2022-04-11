@@ -119,6 +119,21 @@
       \end{align*}
       This completes the proof.
     \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} none.
+    
+    \begin{proof}
+      Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be a dictator function. Then $f = \chi_{\{ j \}}$ for some $j \in [n]$. Therefore, $\hat{f}(\{ j \}) = 1$ and $\hat{f}(S) = 0$ for all $S \subset [n]$ with $S \neq \{ j \}$. By part (a),
+      \begin{align*}
+        \PP[\text{test accepts}] &= \frac{1}{2} + \frac{1}{2} \sum_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S)^3 \\
+        &= \frac{1}{2} + \frac{1}{2} \left((1 - 2\delta)^{|\{ j \}|} \hat{f}(\{ j \})^3 + \sum_{\substack{S \subset [n] \\ S \neq \{ j \}}} (1 - 2\delta)^{|S|} \hat{f}(S)^3\right) \\
+        &= \frac{1}{2} + \frac{1}{2} \left((1 - 2\delta)^1 \cdot 1^3 + \sum_{\substack{S \subset [n] \\ S \neq \{ j \}}} (1 - 2\delta)^{|S|} \cdot 0^3\right) \\
+        &= \frac{1}{2} + \frac{1}{2} (1 - 2\delta) = 1 - \delta.
+      \end{align*}
+      This completes the proof.
+    \end{proof}
   \end{enumerate}
 \end{enumerate}
 
