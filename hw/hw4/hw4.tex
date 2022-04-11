@@ -46,6 +46,7 @@
 \DeclareMathOperator{\Mod}{mod}
 \DeclareMathOperator{\sign}{sign}
 \DeclareMathOperator{\LowestOne}{\textsc{LowestOne}}
+\DeclareMathOperator{\dist}{dist}
 \SetKwFor{RepTimes}{repeat}{times}{end}
 \newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
@@ -132,6 +133,26 @@
         &= \frac{1}{2} + \frac{1}{2} \left((1 - 2\delta)^1 \cdot 1^3 + \sum_{\substack{S \subset [n] \\ S \neq \{ j \}}} (1 - 2\delta)^{|S|} \cdot 0^3\right) \\
         &= \frac{1}{2} + \frac{1}{2} (1 - 2\delta) = 1 - \delta.
       \end{align*}
+      This completes the proof.
+    \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} none.
+    
+    \begin{proof}
+      Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be such that $f$ passes with probability at least $1 - \varepsilon$. By part (a),
+      $$ 1 - \varepsilon \leq \PP[\text{test accepts}] = \frac{1}{2} + \frac{1}{2} \sum_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S)^3. $$
+      Rearranging the above inequality and applying Parseval's identity yield
+      \begin{align*}
+        1 - 2\varepsilon &\leq \sum_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S)^3 \leq \left(\max_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S)\right) \sum_{S \subset [n]} \hat{f}(S)^2 \\
+        &= \left(\max_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S)\right) \cdot 1 = \max_{S \subset [n]} (1 - 2\delta)^{|S|} \hat{f}(S).
+      \end{align*}
+      Hence, there exists $S \subset [n]$ such that $(1 - 2\delta)^{|S|} \hat{f}(S) \geq 1 - 2\varepsilon$. Set $\delta = \varepsilon$ in the test. Then $(1 - 2\varepsilon)^{|S|} \hat{f}(S) \geq 1 - 2\varepsilon$. If $|S| \geq 2$, then $0 < (1 - 2\varepsilon)^{|S|} < 1 - 2\varepsilon$, so $(1 - 2\varepsilon)^{|S|} \hat{f}(S) < 1 - 2\varepsilon$ since $\hat{f}(S) = 1 - 2\dist(f, \chi_S) \in [-1, 1]$, a contradiction. Therefore, one of the following two cases holds:
+      \begin{enumerate}[label=(\roman*), itemsep=0pt]
+        \item $|S| = 1$ and $\hat{f}(S) = 1$;
+        \item $|S| = 0$ and $\hat{f}(S) \geq 1 - 2\varepsilon$.
+      \end{enumerate}
       This completes the proof.
     \end{proof}
   \end{enumerate}
