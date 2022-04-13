@@ -47,6 +47,9 @@
 \DeclareMathOperator{\sign}{sign}
 \DeclareMathOperator{\LowestOne}{\textsc{LowestOne}}
 \DeclareMathOperator{\dist}{dist}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\argmin}{arg\,min}
+\DeclareMathOperator{\error}{error}
 \SetKwFor{RepTimes}{repeat}{times}{end}
 \newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
@@ -191,6 +194,64 @@
     $$ \PP[\text{new test accepts $f$}] = 1 - \PP[\text{$>3/4$ of the values are $1$}] \geq 1 - e^{-\Theta(\log(1/\eta))} = 1 - \Theta(\eta). $$
     Hence, if $f$ passes the combination of the new test and the original test with probability at least $1 - \varepsilon$ and with $\delta = \varepsilon$ in the original test for some sufficiently small $\varepsilon > 0$, then $f$ is a dictator function with probability at least $1 - \Theta(\eta)$; on the other hand, if $f$ is a dictator function, then the union bound implies that $f$ passes the combined test with probability at least $1 - \Theta(\eta) - \delta$. This shows that the combined test is a dictator test.
   \end{enumerate}
+  
+  \clearpage
+
+  \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+  
+  \begin{proof}
+    Let $\mathcal A$ be a PAC learning algorithm for a class $C$ that runs in $\poly(\log n, 1/\varepsilon, 1/\delta)$ time. We denote by $\error_{\mathcal D}(h) = \PP_{x \sim \mathcal D}[h(x) \neq f(x)]$ the error of a hypothesis $h$ with respect to $f$ with inputs drawn from distribution $\mathcal D$. We denote by $\error_S(h) = |\{ x \in S : h(x) \neq f(x) \}|/|S|$ the error of $h$ in the sample set $S$. We give a PAC learning algorithm in Algorithm \ref{alg:confidence} with running time $\poly(\log n, 1/\varepsilon, \log(1/\delta))$. Let $\mathcal D$ be the distribution of inputs.
+
+    \begin{algorithm}
+      $\ell \leftarrow \lceil\log_2 (3/\delta) \rceil$ \\
+      \ForEach{$i \leftarrow 1, \ldots, \ell$}{
+        run $\mathcal A$ with accuracy $\varepsilon/2$ and confidence $1/2$, obtaining a hypothesis $h_i$
+      }
+      $m \leftarrow \lceil (12/\varepsilon^2) \log (6\ell/\delta) \rceil$ \\
+      \ForEach{$j \leftarrow 1, \ldots, m$}{
+        draw $x_j \sim \mathcal D$
+      }
+      $S \leftarrow \{ x_1, \ldots, x_m \}$ \\
+      $i^* \leftarrow \argmin_{i \in [\ell]}(\error_S(h_i))$ \\
+      \Return{$h_{i^*}$}
+      \caption{A PAC learning algorithm with running time $\poly(\log n, 1/\varepsilon, \log(1/\delta))$, given accuracy $\varepsilon > 0$ and confidence $\delta > 0$.}
+      \label{alg:confidence}
+    \end{algorithm}
+
+    Since each call to $\mathcal A$ runs in $\poly(\log n, 1/\varepsilon)$ time, then the running time of Algorithm \ref{alg:confidence} is
+    $$ O\left(\log \frac{1}{\delta}\right) \poly\left(\log n, \frac{1}{\varepsilon}\right) + O\left(\frac{1}{\varepsilon^2} \log \frac{\log \frac{1}{\delta}}{\delta}\right) = \poly\left(\log n, \frac{1}{\varepsilon}, \log \frac{1}{\delta}\right). $$
+
+    First, since $\PP[\error_{\mathcal D}(h_i) \leq \varepsilon/2] \geq 1 - 1/2 = 1/2$ for each $i \in [\ell]$, then
+    $$ \PP\left[\exists i \in [\ell], \error_{\mathcal D}(h_i) \leq \varepsilon/2\right] \geq 1 - \left(1 - \frac{1}{2}\right)^\ell = 1 - \left(\frac{1}{2}\right)^{\lceil\log_2 \left(\frac{3}{\delta}\right) \rceil} \geq 1 - \left(\frac{1}{2}\right)^{\log_2 \left(\frac{3}{\delta}\right)} = 1 - \frac{\delta}{3}. $$
+    Second,
+    \begin{align*}
+      &\quad\, \PP\left[\left|\error_{\mathcal D}\left(h_i\right) - \error_S\left(h_i\right)\right| < \frac{\varepsilon}{4} \; \forall i \in [\ell]\right] \\
+      &= 1 - \PP\left[\exists i \in [\ell], \left|\error_{\mathcal D}\left(h_i\right) - \error_S\left(h_i\right)\right| \geq \frac{\varepsilon}{4}\right] \\
+      &\geq 1 - \sum_{i = 1}^\ell \PP\left[\left|\error_{\mathcal D}\left(h_i\right) - \error_S\left(h_i\right)\right| \geq \frac{\varepsilon}{4}\right] && \text{(union bound)} \\
+      &= 1 - \sum_{i = 1}^\ell \PP\left[\left|\error_{\mathcal D}\left(h_i\right) - \error_S\left(h_i\right)\right| \geq \frac{\varepsilon}{4\error_{\mathcal D}\left(h_i\right)} \cdot \error_{\mathcal D}\left(h_i\right)\right] \\
+      &\geq 1 - \sum_{i = 1}^\ell 2\exp\left(-\frac{1}{3} m\error_{\mathcal D}\left(h_i\right) \cdot \left(\frac{\varepsilon}{4\error_{\mathcal D}\left(h_i\right)}\right)^2\right) && \text{(Chernoff bound)} \\
+      &= 1 - \sum_{i = 1}^\ell 2\exp\left(-\frac{m\varepsilon^2}{12 \error_{\mathcal D}\left(h_i\right)}\right) \\
+      &\geq 1 - \ell \cdot 2\exp\left(-\frac{\left\lceil\frac{12}{\varepsilon^2} \log \frac{6\ell}{\delta}\right\rceil \cdot \varepsilon^2}{12 \cdot 1}\right) \\
+      &\geq 1 - 2\ell\exp\left(-\frac{\frac{12}{\varepsilon^2} \log \frac{6\ell}{\delta} \cdot \varepsilon^2}{12}\right) \\
+      &= 1 - 2\ell\exp\left(-\log \frac{6\ell}{\delta}\right) \\
+      &= 1 - 2\ell \cdot \frac{\delta}{6\ell} \\
+      &= 1 - \frac{\delta}{3}.
+    \end{align*}
+    Since $i^*$ minimizes $\error_S(h_i)$ over $i \in [\ell]$, then by the union bound,
+    \begin{align*}
+      \PP\left[\error_S\left(h_{i^*}\right) < \frac{3\varepsilon}{4}\right] &\geq \PP\left[\exists i \in [\ell], \error_S\left(h_i\right) < \frac{3\varepsilon}{4}\right] \\
+      &\geq \PP\left[\left(\left|\error_{\mathcal D}\left(h_i\right) - \error_S\left(h_i\right)\right| < \frac{\varepsilon}{4} \;\forall i \in [\ell]\right) \wedge \left(\exists i \in [\ell], \error_{\mathcal D}\left(h_i\right) \leq \frac{\varepsilon}{2}\right)\right] \\
+      &\geq 1 - \left(\frac{\delta}{3} + \frac{\delta}{3}\right) \\
+      &= 1 - \frac{2\delta}{3}.
+    \end{align*}
+    By the union bound again,
+    \begin{align*}
+      \PP\left[\error_{\mathcal D}\left(h_{i^*}\right) < \varepsilon\right] &\geq \PP\left[\left(\left|\error_{\mathcal D}\left(h_i\right) - \error_S\left(h_i\right)\right| < \frac{\varepsilon}{4} \;\forall i \in [\ell]\right) \wedge \left(\error_S\left(h_{i^*}\right) < \frac{3\varepsilon}{4}\right)\right] \\
+      &\geq 1 - \left(\frac{\delta}{3} + \frac{2\delta}{3}\right) \\
+      &= 1 - \delta.
+    \end{align*}
+    This completes the proof.
+  \end{proof}
 \end{enumerate}
 
 \end{document}
