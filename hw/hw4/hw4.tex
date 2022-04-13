@@ -84,24 +84,55 @@
   \item \noindent\emph{Collaborators and sources:} Guanghao Ye, Zixuan Xu.
   
   \begin{proof}
-    Let $L$ be a subset of the left vertices such that $|L| \leq n/2$. If $L = \emptyset$, then the result trivially holds. Hence, assume that $|L| \geq 1$. Let $R_0$ be the set of the right vertices. Then
+    Note that if $n \in \{ 1, 2 \}$, then the statement holds trivially. Therefore, WLOG assume that $n \geq 2$. Let $L_0$ be the set of the left vertices in the graph. For each $L \subset L_0$, let $N_1(L)$, $N_2(L)$ and $N_3(L)$ be the neighborhoods of $L$ in the subgraphs of the graph induced by the three random permutations, respectively. Then
+    \begin{align}
+      &\quad\, \PP\left[\exists L \subset L_0, |L| \leq \frac{n}{2}, |N(L)| < (1 + \varepsilon) |L|\right] \nonumber \\
+      &\leq \sum_{\substack{L \subset L_0 \\ 0 < |L| \leq \frac{n}{2}}} \PP[|N(L)| < (1 + \varepsilon) |L|] && \text{(union bound)} \nonumber \\
+      &= \sum_{\substack{L \subset L_0 \\ 0 < |L| \leq \frac{n}{2}}} \PP\left[\exists R \subset R_0 \setminus N_1(L), |R| = \lceil \varepsilon |L| \rceil  - 1, N_2(L) \cup N_3(L) \subset R\right] \nonumber \\
+      &\leq \sum_{\substack{L \subset L_0 \\ 0 < |L| \leq \frac{n}{2}}} \sum_{\substack{R \subset R_0 \setminus N_1(L) \\ |R| = \lceil \varepsilon |L| \rceil - 1}} \PP\left[N_2(L) \cup N_3(L) \subset R\right] && \text{(union bound)} \nonumber \\
+      &= \sum_{\ell = 1}^{\frac{n}{2}} \binom{n}{\ell} \binom{n - \ell}{\lceil \varepsilon \ell \rceil  - 1} \left(\frac{\binom{\ell + \lceil \varepsilon \ell \rceil  - 1}{\ell}}{\binom{n}{\ell}}\right)^2 \nonumber \\
+      &\leq \sum_{\ell = 1}^{\frac{n}{2}} \binom{n}{\ell} \binom{n - \ell}{\lfloor \varepsilon \ell \rfloor} \left(\frac{\binom{\ell + \lfloor \varepsilon \ell \rfloor}{\ell}}{\binom{n}{\ell}}\right)^2 && \text{(for $\varepsilon \leq 1/2$)} \label{eq:binomial} \\
+      &= \sum_{\ell = 1}^{\frac{n}{2}} \frac{n!}{\ell!(n - \ell)!} \cdot \frac{(n - \ell)!}{(\lfloor \varepsilon \ell \rfloor)!(n - \ell - \lfloor \varepsilon \ell \rfloor)!} \cdot \left(\frac{\frac{(\ell + \lfloor \varepsilon \ell \rfloor)!}{\ell!\lfloor\varepsilon\ell\rfloor!}}{\frac{n!}{\ell!(n - \ell)!}}\right)^2 \nonumber \\
+      &= \sum_{\ell = 1}^{\frac{n}{2}} \frac{((n - \ell)!)^2((\ell + \lfloor \varepsilon \ell \rfloor)!)^2}{n!\ell!(\lfloor\varepsilon\ell\rfloor!)^3 (n - \ell - \lfloor \varepsilon\ell \rfloor)!}. \label{eq:factorials}
+    \end{align}
+    Stirling's approximation says that for all $k \in \NN$,
+    \begin{equation} \label{eq:stirling}
+      \sqrt{2\pi k} \left(\frac{k}{e}\right)^k e^{\frac{1}{12k + 1}} < k! < \sqrt{2\pi k} \left(\frac{k}{e}\right)^k e^{\frac{1}{12k}}.
+    \end{equation}
+    We apply \eqref{eq:stirling} to each factorial in \eqref{eq:factorials}; specifically, we apply the upper bound to the numerator and the lower bound to the denominator. First, we count the contributions of $e^k$ from the factorials in each term of \eqref{eq:factorials}:
+    $$ \exp\left(n + \ell + 3\lfloor \varepsilon \ell \rfloor + (n - \ell - \lfloor \varepsilon \ell \rfloor) - (2(n - \ell) + 2(\ell + \lfloor \varepsilon \ell \rfloor))\right) = \exp(0) = 1. $$
+    Second, we count the contributions of $e^{\frac{1}{12k}}$ in the upper bound and $e^{\frac{1}{12k + 1}}$ in the lower bound from the factorials in each term of \eqref{eq:factorials}:
+    \begin{multline*}
+      \exp\left(\frac{1}{12}\left(\frac{2}{n - \ell} + \frac{1}{\ell + \lfloor \varepsilon \ell \rfloor}\right) - \left(\frac{1}{12n + 1} + \frac{1}{12 \ell + 1} + \frac{3}{12\lfloor \varepsilon \ell \rfloor + 1} + \frac{1}{12(n - \ell - \lfloor \varepsilon \ell \rfloor) + 1}\right)\right) \\
+      \leq \exp\left(\frac{1}{12} \cdot \left(2 + 1\right)\right) < 1.29,
+    \end{multline*}
+    by noting that $n - \ell \geq 1$ and $\ell + \lfloor \varepsilon \ell \rfloor \geq 1$ for all $\ell \in [n/2]$. Take $\varepsilon = 0.01$. Third, we count the contributions of $k^k$ from the factorials in each term of \eqref{eq:factorials}:
+    \begin{align}
+      &\quad\, \frac{(n - \ell)^{2(n - \ell)} (\ell + \lfloor \varepsilon \ell \rfloor)^{2(\ell + \lfloor \varepsilon \ell \rfloor)}}{n^n \ell^\ell \lfloor\varepsilon \ell\rfloor^{3\lfloor\varepsilon \ell\rfloor} (n - \ell - \lfloor \varepsilon \ell \rfloor)^{n - \ell - \lfloor \varepsilon \ell \rfloor}} \nonumber \\
+      &\leq \frac{(n - \ell)^{2(n - \ell)} (\ell + \varepsilon \ell)^{2(\ell + \varepsilon \ell)}}{n^n \ell^\ell (\varepsilon \ell)^{3\varepsilon \ell} (n - \ell - \varepsilon \ell)^{n - \ell - \varepsilon \ell}} \label{eq:no-floor} \\
+      &\leq \frac{(1 + \varepsilon)^{2(1 + \varepsilon)}}{\varepsilon^{3\varepsilon}} \left(\frac{n - \ell}{n}\right)^{n - \ell + \lfloor \varepsilon \ell \rfloor} \left(\frac{\ell}{n}\right)^{\ell - \lfloor \varepsilon \ell \rfloor} \left(1 + \frac{\lfloor \varepsilon \ell \rfloor}{n - \ell - \lfloor \varepsilon \ell \rfloor}\right)^{n - \ell - \lfloor \varepsilon \ell \rfloor} \nonumber \\
+      &< 1.18 \cdot 1 \cdot \left(\frac{1}{2}\right)^{0.99\ell} \cdot e^{0.01 \ell} && \text{(since $\ell \leq n/2$)} \nonumber \\
+      &< 1.18 \cdot 0.51^\ell. \nonumber
+    \end{align}
+    Note that \eqref{eq:no-floor} is due to the fact that for each term in \eqref{eq:binomial},
+    $$ \binom{n}{\ell} \binom{n - \ell}{\lfloor \varepsilon \ell \rfloor} \left(\frac{\binom{\ell + \lfloor \varepsilon \ell \rfloor}{\ell}}{\binom{n}{\ell}}\right)^2 \leq \binom{n}{\ell} \binom{n - \ell}{\varepsilon \ell} \left(\frac{\binom{\ell + \varepsilon \ell}{\ell}}{\binom{n}{\ell}}\right)^2, $$
+    by the monotonicity of the generalized binomial coefficient (with factorials replaced by the gamma function $\Gamma(r) = (r - 1)!$). Fourth, we count the contributions of $\sqrt{2\pi k}$ from the factorials in each term of \eqref{eq:factorials}. Note that $k^k > \sqrt{2\pi k}$ for all $k \geq 1.99$. Since $n > 3$, then $n - \ell \geq n - (1 + \varepsilon) \ell \geq 1.99$ for all $\ell \in [n/2]$. Note also that $(1 + \varepsilon) \ell \geq 2$ for all $\ell \in \{ 2, \ldots, n/2 \}$. Hence, the contribution of $\sqrt{2\pi k}$ is not upper bounded by $k^k$ from the factorials in each term only if $\ell = 1$, in which case, since $n \geq 3$,
+    $$ \binom{n}{\ell} \binom{n - \ell}{\lfloor \varepsilon \ell \rfloor} \left(\frac{\binom{\ell + \lfloor \varepsilon \ell \rfloor}{\ell}}{\binom{n}{\ell}}\right)^2 = \binom{n}{1} \binom{n - 1}{\lfloor 0.01 \cdot 1 \rfloor} \left(\frac{\binom{1 + \lfloor 0.01 \cdot 1 \rfloor}{1}}{\binom{n}{1}}\right)^2 = \frac{1}{n} \leq \frac{1}{3}. $$
+    Moreover, the contribution of $\sqrt{2\pi k}$ from each term with $\ell \in \{ 2, \ldots, n/2 \}$ is at most $1.18 \cdot 0.51^\ell$. Therefore,
     \begin{align*}
-      \PP[|N(L)| < (1 + \varepsilon) |L|] &\leq \PP\left[\exists R \subset R_0, |R| = \lfloor (1 + \varepsilon)|L| \rfloor, N(L) \subset R\right] \\
-      &\leq \sum_{\substack{R \subset R_0 \\ |R| = \lfloor (1 + \varepsilon) |L| \rfloor}} \PP[N(L) \subset R] && \text{(union bound)} \\
-      &= \sum_{\substack{R \subset R_0 \\ |R| = \lfloor (1 + \varepsilon) |L| \rfloor}} \left(\frac{|R|}{n} \cdot \frac{|R| - 1}{n - 1} \cdots \frac{|R| - |L| + 1}{n - |L| + 1}\right)^3 \\
-      &\leq \binom{n}{\lfloor (1 + \varepsilon) |L| \rfloor} \left(\frac{\lfloor (1 + \varepsilon) |L| \rfloor}{n}\right)^{3|L|} && \text{(for $\varepsilon \leq 1$)} \\
-      &\leq \left(\frac{en}{\lfloor (1 + \varepsilon) |L| \rfloor}\right)^{\lfloor (1 + \varepsilon) |L| \rfloor} \left(\frac{\lfloor (1 + \varepsilon) |L| \rfloor}{n}\right)^{3|L|} && \text{(Stirling's approximation)} \\
-      &\leq \left(\frac{en}{\lfloor (1 + \varepsilon) |L| \rfloor}\right)^{(1 + \varepsilon) |L|} \left(\frac{\lfloor (1 + \varepsilon) |L| \rfloor}{n}\right)^{3|L|} && \text{(for $\varepsilon \leq 2e - 1$)} \\
-      &= \left(e^{1 + \varepsilon} \left(\frac{\lfloor (1 + \varepsilon) |L| \rfloor}{n}\right)^{2 - \varepsilon}\right)^{|L|} \\
-      &\leq \left(e^{1 + \varepsilon} \left(\frac{(1 + \varepsilon) |L|}{n}\right)^{2 - \varepsilon}\right)^{|L|} \\
-      &\leq \left(e^{1 + \varepsilon} \left(\frac{(1 + \varepsilon)}{2}\right)^{2 - \varepsilon}\right)^{|L|}. && \text{(since $|L| \leq n/2$)}
+      &\quad\, \PP\left[\exists L \subset L_0, |L| \leq \frac{n}{2}, |N(L)| < (1 + \varepsilon) |L|\right] \\
+      &\leq \sum_{\ell = 1}^{\frac{n}{2}} \binom{n}{\ell} \binom{n - \ell}{\lfloor \varepsilon \ell \rfloor} \left(\frac{\binom{\ell + \lfloor \varepsilon \ell \rfloor}{\ell}}{\binom{n}{\ell}}\right)^2 \\
+      &= \binom{n}{1} \binom{n - 1}{\lfloor 0.01 \cdot 1 \rfloor} \left(\frac{\binom{1 + \lfloor 0.01 \cdot 1 \rfloor}{1}}{\binom{n}{1}}\right)^2 + \sum_{\ell = 2}^{\frac{n}{2}} \binom{n}{\ell} \binom{n - \ell}{\lfloor \varepsilon \ell \rfloor} \left(\frac{\binom{\ell + \lfloor \varepsilon \ell \rfloor}{\ell}}{\binom{n}{\ell}}\right)^2 \\
+      &\leq \frac{1}{3} + \sum_{\ell = 2}^{\frac{n}{2}} 1 \cdot 1.29 \cdot \left(1.18 \cdot 0.51^{\ell}\right)^2 \\
+      &< 0.34 + 1.8\sum_{\ell = 2}^{\frac{n}{2}} 0.27^\ell \\
+      &< 0.34 + 1.8\sum_{\ell = 2}^\infty 0.27^\ell \\
+      &= 0.34 + 1.8 \cdot 0.27^2 \cdot \frac{1}{1 - 0.27} \\
+      &< 0.52.
     \end{align*}
-    Let $\varepsilon = 1/2$. Then $0 < e^{1 + \varepsilon} ((1 + \varepsilon)/2)^{2 - \varepsilon} < 1/2$. Since $|L| \geq 1$, then
+    It follows that
     \begin{align*}
-      \PP[|N(L)| \geq (1 + \varepsilon) |L|] &\geq 1 - \PP[|N(L)| < (1 + \varepsilon) |L|] \\
-      &\geq 1 - \left(e^{1 + \varepsilon} \left(\frac{(1 + \varepsilon)}{2}\right)^{2 - \varepsilon}\right)^{|L|} \\
-      &\geq 1 - e^{1 + \varepsilon} \left(\frac{(1 + \varepsilon)}{2}\right)^{2 - \varepsilon} \\
-      &> 1 - \frac{1}{2} = \frac{1}{2}.
+      \PP\left[|N(L)| \geq (1 + \varepsilon) |L| \;\forall L \subset L_0, |L| \leq \frac{n}{2}\right] &\geq 1 - \PP\left[\exists L \subset L_0, |L| \leq \frac{n}{2}, |N(L)| < (1 + \varepsilon) |L|\right] \\
+      &> 1 - 0.52 = 0.48.
     \end{align*}
     This completes the proof.
   \end{proof}
