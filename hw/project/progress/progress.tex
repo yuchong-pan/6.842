@@ -1,0 +1,128 @@
+
+\documentclass[letterpaper, reqno,12pt]{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{color,latexsym,amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage[linesnumbered,lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage[numbers]{natbib}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  mathescape
+}
+\usepackage{enumitem}
+
+\allowdisplaybreaks
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\PP}{\mathop{{}\mathbb{P}}}
+\newcommand{\EE}{\mathop{{}\mathbb{E}}}
+\newcommand{\mynote}[3][red]
+  {{\color{#1} \fbox{\bfseries\sffamily\scriptsize#2}
+  {\small$\blacktriangleright$\textsf{\emph{#3}}$\blacktriangleleft$}}~}
+\newcommand{\yp}[1]{\mynote{YP}{#1}}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\charcone}{char.cone}
+\DeclareMathOperator{\STAB}{STAB}
+\DeclareMathOperator{\Down}{Down}
+\DeclareMathOperator{\lca}{lca}
+\DeclareMathOperator{\LPO}{LPO}
+\DeclareMathOperator{\OPT}{OPT}
+\DeclareMathOperator{\LHS}{LHS}
+\DeclareMathOperator{\RHS}{RHS}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\vol}{vol}
+\DeclareMathOperator{\argmin}{arg\,min}
+\DeclareMathOperator{\argmax}{arg\,max}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\Span}{span}
+\begin{document}
+\pagenumbering{arabic}
+\title{\Large Randomization in Recent Progress on Traveling Salesman Problem \\ {\large \em Progress Report for 6.842 Course Project}}
+\author{Yuchong Pan\thanks{MIT, \href{mailto:yuchong@mit.edu}{yuchong@mit.edu}.}}
+\date{\today}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition} \newtheorem{definition}[theorem]{Definition}
+\maketitle
+%
+
+\section{Project Status}
+
+The objective of this project is to understand key ingredients and relevant backgrounds of randomization in recent progress on the (metric) traveling salesman problem (TSP). We study various distributions of spanning trees in a graph, such as the max-entropy distribution (in \cite{karlin2021slightly,karlin2021slightlyig}) and a combination of the max-entropy distribution and sampling from the matroid intersection polytope (in \cite{gupta2021matroid} for half-integral solutions), help break the $3/2$-barrier of the upper bound on the integrality gap of the subtour elimination polytope in the framework of the Christofides-Serdyukov algorithm \cite{christofides1976worst,serdyukov1978nekotorykh}.
+
+In order to understand the aforementioned works on the TSP, we have studied two important graph-theoretic structures, namely the cactus representation of min-cuts \cite{dinits1976structure,nagamochi1994canonical} and the deformable polygon representation of $6/5$-near-min-cuts \cite{benczur1995structure,benczur1995representation,benczur1997cut, benczur2008deformable}. These two structures give compact representations of min-cuts and $6/5$-near-min-cuts, respectively. Note that the cactus representation suffices for half-integral solutions because the support graph is a $4$-regular, $4$-edge-connected graph, and any proper cut has at least $6$ edges (so all $6/5$-near-min-cuts are min-cuts).
+
+All recent works on the TSP proceed as follows: first sample a spanning tree $T$ from some distribution, and then add an $O$-join on the odd-degree vertices in $T$. It is important to understand $O$-joins to understand the TSP. Therefore, we have also studied classic results on $O$-joins and the $O$-join polytope.\footnote{The standard name of this in the literature is ``$T$-join.'' However, $T$ is usually used to denote the sampled spanning tree in recent works on the TSP, so we call them $O$-joins.} These results are covered by the books of Schrijver \cite{schrijver2003combinatorial} and Cook et al.\ \cite{cook2009combinatorial}. One important theorem is Edmonds and Johnson's characterization of the up hull of the $O$-join polytope \cite{edmonds1973matching}:
+
+\begin{theorem}[Edmonds and Johnson \cite{edmonds1973matching}]
+  The up hull $P_\text{$O$-join}^\uparrow(G) := P_\text{$O$-join} + \RR_+^E$ of the $O$-join polytope $P_\text{$O$-join} := \conv\{ \chi_J : \text{$J$ is an $O$-join} \}$ is determined by
+  \begin{align*}
+    x_e &\geq 0 && \forall e \in E, \\
+    x(C) &\geq 1 && \forall \text{$O$-cut } C.
+  \end{align*}
+\end{theorem}
+
+The max-entropy distribution of \emph{the} key to the breaking of the $3/2$-barrier, and it is a special case of strongly Rayleigh (SR) distributions. We need the following definitions:
+
+\begin{definition}
+  Let $\mu$ be a probability distribution on spanning trees. The \emph{generating polynomial} $p : \RR^E \to \RR$ of $\mu$ is defined to be
+  $$ p(z) := \sum_{T \in \mathcal T} \mu(T) \prod_{e \in T} z_e, $$
+  where $\mathcal T$ is the family of spanning trees. We say that $\mu$ is \emph{strongly Rayleigh (SR)} if $p$ is a real stable polynomial, i.e., $p(z) \neq 0$ if $z$ lies in the upper half of the plane.
+\end{definition}
+
+\begin{definition}
+  We say that a distribution $\mu$ on spanning trees is \emph{$\lambda$-uniform} or \emph{weighted uniform} if there exists $\lambda : E \to \RR_+$ such that $\mu(T) \propto \prod_{e \in T} \lambda(e)$ for all $T \in \mathcal T$.
+\end{definition}
+
+Borcea et al. \cite{borcea2009negative} show that $\lambda$-uniform distributions are SR. On the algorithmic perspective, Asadpour et al.\ \cite{asadpour2017log} use convex programming to prove that given a vector $z$ in the spanning tree polytope, one can efficiently find $\tilde{\lambda} : E \to \RR_+$ which approximately respect the marginals given by $z$:
+
+\begin{theorem}[Asadpour et al.\ \cite{asadpour2017log}]
+  Given a vector $z$ in the spanning tree polytope and $\varepsilon > 0$, one can find $\tilde{\lambda} : E \to \RR_+$ so that for $e \in E$, the $\tilde{\lambda}$-uniform distribution $\mu$ satisfies
+  $$ \sum_{\substack{T \in \mathcal T \\ e \in E(T)}} \mu(T) \leq (1 + \varepsilon) z_e. $$
+  The running time is polynomial in $|V|$, $\log (1/\min_{e \in E} z_e)$ and $\log (1/\varepsilon)$.
+\end{theorem}
+
+We notice that the negative correlation property of SR distributions and a theorem of Hoeffding on sums of Bernoulli random variables are extensively used in recent works on the TSP. We have studied the proof of Theorem \ref{thm:hoeffding} in detail.
+
+\begin{theorem}[negative correlation, \cite{gharan2011randomized}] \label{thm:neg-corr}
+  Let $\mu$ be an SR distribution on spanning trees.
+  \begin{enumerate}[label=(\alph*), itemsep=0pt]
+    \item Let $S \subset E$ and $X_S = |S \cap T|$, where $T \sim \mu$. Then $X_S \sim \sum_{i = 1}^{|S|} Y_i$, where $Y_1, \ldots, Y_{|S|}$ are independent Bernoulli random variables with probabilities $p_i$ and $\sum_{i = 1}^{|S|} p_i = \EE[X_S]$.
+    \item For any $S \subset E$ and $e \in E \setminus S$,
+    \begin{enumerate}[label=\roman*., itemsep=0pt]
+      \item $\EE_\mu[X_S] \leq \EE_\mu[X_S \mid X_e = 0] \leq \EE_\mu[X_S] + \PP_\mu[e \in T]$;
+      \item $\EE_\mu[X_S] - 1 + \PP_\mu[e \in T] \leq \EE_\mu[X_S \mid X_e = 1] \leq \EE_\mu[X_S]$.
+    \end{enumerate}
+  \end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Hoeffding \cite{hoeffding1956distribution}] \label{thm:hoeffding}
+  Let $g : [m] \to \RR$. Let $p \in [0, m]$. Let $B_1, \ldots, B_m$ be Bernoulli random variables with probabilities $p_1^*, \ldots, p_m^*$ that maximize (or minimize) $\EE[g(B_1 + \ldots + B_m)]$ over all possible probabilities $p_1, \ldots, p_m$ for $B_1, \ldots, B_m$, respectively, for which $p_1 + \ldots + p_m = p$. Then $p_1^*, \ldots, p_m^* \in \{ 0, x, 1 \}$ for some $x \in (0, 1)$.
+\end{theorem}
+
+Lastly, we have read the paper of Gupta et al. \cite{gupta2021matroid} which combines the max-entropy distribution and sampling from the matroid intersection polytope to give a better approximation guarantee than previous results. Moreover, we note that \cite{gupta2021matroid} uses combinatorial techniques, namely matroid intersection and a charging argument based upon the max-flow min-cut theorem, which have not been used in previous works. We believe that these techniques amongst other combinatorial techniques can be explored further to potentially push the approximation ratio towards the conjectured $4/3$-bound.
+
+\section{Next Steps}
+
+First, we note that although we have read the paper of Gupta et al.\ \cite{gupta2021matroid} and were able to follow along with their proof, there still remain many underlying intuitions unclear to us. For instance, despite tedious calculations, we did not see why the two sampler of spanning trees (namely the max-entropy sampler and the matroid intersection sampler) achieve better lower bounds for different types of edges on certain probability statements (see Section 3.2 of \cite{gupta2021matroid}), and why their combination achieve a better guarantee than previous results. Moreover, the authors of \cite{gupta2021matroid} simply optimize over several parameters, without stating the intuition behind this optimization. Therefore, we believe that it would be beneficial to re-read this paper in greater detail and discuss it with other people.
+
+Second, since this is a project on randomization, we shall focus more on distributions on spanning trees and sums of Bernoulli random variables. To start with, it would be interesting to understand the proof of the negative correlation property of SR distributions (Theorem \ref{thm:neg-corr}). For instance, the paper of Karlin, Klein and Oveis Gharan \cite{karlin2021slightly} covers many properties of SR distributions and sums of Bernoulli random variables, and \cite{borcea2009negative} is a good reference for SR distributions and the geometry of polynomials.
+
+Third, it would be good to apply the aforementioned background materials and try to understand the paper of Karlin, Klein and Oveis Gharan on the integrality gap of the subtour elimination polytope \cite{karlin2021slightlyig}. As a stretch research goal that is probably beyond the scope of this course project, it would be very interesting and important to see how one can use various ideas from \cite{gupta2021matroid} and other papers (e.g., combinatorial techniques) to improve the approximation ratio and the upper bound on the integrality gap for the general case.
+
+\bibliographystyle{alpha}
+\bibliography{progress.bib}
+
+\end{document}
