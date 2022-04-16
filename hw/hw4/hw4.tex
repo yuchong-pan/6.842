@@ -21,6 +21,8 @@
   (-16383.99999pt,-16383.99999pt) rectangle (16383.99999pt,16383.99999pt)}}}}
 
 \allowdisplaybreaks
+\DontPrintSemicolon
+\SetKw{Break}{break}
 
 \newcommand{\RR}{\mathbb{R}}
 \newcommand{\CC}{\mathbb{C}}
@@ -282,6 +284,63 @@
       &= 1 - \delta.
     \end{align*}
     This completes the proof.
+  \end{proof}
+
+  \clearpage
+
+  \item \begin{enumerate}
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+    
+    \bigskip
+
+    First, we give an algorithm in Algorithm \ref{alg:4a} which, given a set $S$ of samples, finds a consistent decision list $h$ such that $h(x) = f(x)$ for all $x \in S$.
+
+    \begin{algorithm}
+      $h \leftarrow \text{empty decision list}$ \\
+      \Repeat{$S \neq \emptyset$}{
+        \ForEach{literal $\ell$ (i.e., a variable or its negation)}{
+          $S' \leftarrow \{ x \in S : \ell(x) = f(x) \}$ \\
+          \If{there exists $b \in \{ 0, 1 \}$ such that $f(x) = b$ for all $x \in S'$}{
+            append to $h$ a decision ``if $\ell(x)$ then output $b$'' \\
+            $S \leftarrow S \setminus S'$ \\
+            \Break
+          }
+        }
+      }
+      \Return{$h$}
+      \caption{An algorithm which, given a set $S$ of samples, finds a consistent decision list $h$ such that $h(x) = f(x)$ for all $x \in S$.}
+      \label{alg:4a}
+    \end{algorithm}
+
+    We show that Algorithm \ref{alg:4a} is correct. Consider an iteration of the {\bf repeat} loop, with set $S_0$ of remaining samples. Then $S_0 \neq \emptyset$. It suffices to show that there exist a literal $\ell$ and $b \in \{ 0, 1 \}$ such that $S' \neq \emptyset$ and $f(x) = b$ for all $x \in S'$, where $S' = \{ x \in S_0 : \ell(x) = f(x) \}$. Since $f$ is a decision list, let ``if $\ell^*(x)$ then output $b^*$'' be the first decision in $f$ that has not been added to $h$ so far. Let $S_0^*$ be the set of samples that are not output by decisions prior to $\ell^*$ in $f$. Let $S^*$ be the set of samples output by decision ``if $\ell^*(x)$ then output $b^*$'' in $f$. Then $S^* = \{ x \in S_0^* : \ell^*(x) = f(x) \}$ and $f(x) = b^*$ for all $x \in S^*$. Let $S' = \{ x \in S_0 : \ell^*(x) = f(x) \}$. Since all decisions prior to $\ell^*$ in $f$ has been added to $h$, then $S_0 \subset S_0^*$, so $S' \subset S^*$. Therefore, $f(x) = b^*$ for all $x \in S'$. If $S' \neq \emptyset$, then we are done. Otherwise, we run the same argument for the next decision in $f$, until we find a decision in $f$ for which $S' \neq \emptyset$. We claim that this is possible. To see this, since $\emptyset \neq S_0 \subset S_0^*$, then there exists a decision after literal $\ell^*$ in $f$ for which $S' \neq \emptyset$. This completes the proof.
+
+    Second, we show that $|S| = \ln(n! 4^n)$ is necessary to ensure $(\varepsilon, \delta)$ PAC learning. To see this, we claim that each variable appears at most once in a decision list. Suppose that variable $x_i$ first appears in a decision list $f$ as literal $\ell$. Let $S_0$ be the set of points $\{ 0, 1 \}^n$ that remain after this decision. Then $\ell(x) \neq f(x)$ for all $x \in S_0$. This shows that literal $\ell$ need not appear in $h$ again. Moreover, $\neg \ell(x) = f(x)$ for all $x \in S_0$. At any point after literal $\ell$ in $f$, if we were to add literal $\neg \ell$, then there would exist $b \in \{ 0, 1 \}$ such that $f(x) = b$ for all remaining $x$ such that $\neg f(x) = f(x)$; since $\neg \ell(x) = f(x)$ for all remaining $x$, then we can simply end the decision list. Therefore, if $|S| < \ln(n!4^n)$, then we can possibly output wrong answers for $2^{n-1}$ points.
+  \end{enumerate}
+
+  \clearpage
+
+  \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+  
+  \begin{proof}
+    We apply Occam's Razor; i.e., we give Algorithm \ref{alg:4b}. 
+
+    \begin{algorithm}
+      draw $M = (1/\varepsilon) (\ln|\mathcal C| + \ln(1/\delta))$ samples from $\{ 0, 1 \}^n$, where $\mathcal C$ is the set of all decision lists \\
+      run Algorithm \ref{alg:4a} to find a consistent decision list $h$ such that $h(x) = f(x)$ for all $x \in S$ \\
+      \Return{$h$}
+      \caption{An algorithm which finds a decision list $h$ such that $\PP_{x \sim \mathcal D}[f(x) \neq h(x)] < \varepsilon$ with probability at least $1 - \delta$.}
+      \label{alg:4b}
+    \end{algorithm}
+
+    First, we claim that each variable appears at most once in a decision list. Suppose that variable $x_i$ first appears in a decision list $f$ as literal $\ell$. Let $S_0$ be the set of points $\{ 0, 1 \}^n$ that remain after this decision. Then $\ell(x) \neq f(x)$ for all $x \in S_0$. This shows that literal $\ell$ need not appear in $h$ again. Moreover, $\neg \ell(x) = f(x)$ for all $x \in S_0$. At any point after literal $\ell$ in $f$, if we were to add literal $\neg \ell$, then there would exist $b \in \{ 0, 1 \}$ such that $f(x) = b$ for all remaining $x$ such that $\neg f(x) = f(x)$; since $\neg \ell(x) = f(x)$ for all remaining $x$, then we can simply end the decision list.
+    
+    Therefore,
+    $$ |\mathcal C| = \sum_{k = 1}^n k! 2^k 2^k \leq n \cdot n! 4^n \leq n \cdot n^n 4^n = n^{n + 1} 4^n. $$
+    It follows that
+    $$ M = \frac{1}{\varepsilon} \left(\ln |\mathcal C| + \ln \frac{1}{\delta}\right) \leq \frac{1}{\varepsilon} \left(\ln \left(n^{n + 1} 4^n\right) + \ln \frac{1}{\delta}\right) = O\left(\frac{1}{\varepsilon}\left(n \log n + \log \frac{1}{\delta}\right)\right). $$
+    It is easy to see that Algorithm \ref{alg:4b} runs in $O(|S| \cdot 2n \cdot n) = O(Mn^2) = O((n^2/\varepsilon)(n \log n + \log(1/\delta)))$ time, which is polynomial in $n$, $1/\varepsilon$ and $\log(1/\delta)$.
+
+    By Occam's Razor, the probability that any decision list $h$ such that $\PP_{x \in \mathcal D}[f(x) \neq h(x)] \geq \varepsilon$ is consistent with the samples with probability at most $\delta$. This completes the proof.
   \end{proof}
 \end{enumerate}
 
