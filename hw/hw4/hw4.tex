@@ -340,7 +340,7 @@
     $$ M = \frac{1}{\varepsilon} \left(\ln |\mathcal C| + \ln \frac{1}{\delta}\right) \leq \frac{1}{\varepsilon} \left(\ln \left(n^{n + 1} 4^n\right) + \ln \frac{1}{\delta}\right) = O\left(\frac{1}{\varepsilon}\left(n \log n + \log \frac{1}{\delta}\right)\right). $$
     It is easy to see that Algorithm \ref{alg:4b} runs in $O(|S| \cdot 2n \cdot n) = O(Mn^2) = O((n^2/\varepsilon)(n \log n + \log(1/\delta)))$ time, which is polynomial in $n$, $1/\varepsilon$ and $\log(1/\delta)$.
 
-    By Occam's Razor, the probability that any decision list $h$ such that $\PP_{x \in \mathcal D}[f(x) \neq h(x)] \geq \varepsilon$ is consistent with the samples with probability at most $\delta$. This completes the proof.
+    By Occam's Razor, the probability that any decision list $h$ such that $\PP_{x \in \mathcal D}[f(x) \neq h(x)] \geq \varepsilon$ is not consistent with the samples with probability at most $\delta$. This completes the proof.
   \end{proof}
 \end{enumerate}
 
