@@ -437,6 +437,118 @@ Following are examples of the noise sensitivity of a Boolean function.
     Let $S \subset [n]$ be such that $|S| = k$. Then
     $$ \NS_\varepsilon\left(\chi_S\right) = \frac{1 - (1 - 2\varepsilon)^k}{2}. $$
   \end{proposition}
+
+  \item {\bf \em Any function.}
+  
+  \begin{theorem} \label{thm:noise-sensitivity}
+    For any $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$,
+    $$ \NS_\varepsilon(f) = \frac{1}{2} - \frac{1}{2} \sum_{S \subset [n]} (1 - 2\varepsilon)^{|S|} \hat{f}(S)^2. $$
+  \end{theorem}
+  
+  The proof of Theorem \ref{thm:noise-sensitivity} is in homework.
 \end{enumerate}
+
+Next, we show the relation between noise sensitivity and Fourier concentration.
+
+\begin{theorem} \label{thm:noise-fourier}
+  For any $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ and $\gamma \in (0, 1/2)$,
+  $$ \sum_{\substack{S \subset [n] \\ |S| \geq \frac{1}{\gamma}}} \hat{f}(S)^2 < 2.32 \NS_\gamma(f). $$
+\end{theorem}
+
+\begin{proof}
+  We have
+  \begin{align*}
+    2\NS_\gamma(f) &= 1 - \sum_{S \subset [n]} (1 - 2\gamma)^{|S|} \hat{f}(S)^2 && \text{(Theorem \ref{thm:noise-fourier})} \\
+    &= \sum_{S \subset [n]} \left(\hat{f}(S)^2 - (1 - 2\gamma)^{|S|} \hat{f}(S)^2\right) && \text{(Boolean Parseval's identity)} \\
+    &= \sum_{S \subset [n]} \left(1 - (1 - 2\gamma)^{|S|}\right) \hat{f}(S)^2 \\
+    &\geq \sum_{\substack{S \subset [n] \\ |S| \geq \frac{1}{\gamma}}} \left(1 - (1 - 2\gamma)^\frac{1}{\gamma}\right) \hat{f}(S)^2 \\
+    &> \sum_{\substack{S \subset [n] \\ S| \geq \frac{1}{\gamma}}} \left(1 - e^{-2}\right) \hat{f}(S)^2.
+  \end{align*}
+  Therefore,
+  $$ \sum_{\substack{S \subset [n] \\ |S| \geq \frac{1}{\gamma}}} \hat{f}(S)^2 \leq \NS_\gamma(f) \left(\frac{1}{1 - e^{-2}}\right) < 2.32 \NS_\gamma(f). $$
+  This completes the proof.
+\end{proof}
+
+\begin{corollary}
+  For any half-space $h : \{ \pm 1 \}^n \to \{ \pm 1 \}$,
+  $$ \sum_{\substack{S \subset [n] \\ |S| \geq O(1/\varepsilon^2)}} \hat{f}(S)^2 \leq \varepsilon. $$
+  Therefore, one can learn any half-space from $n^{O(1/\varepsilon^2)}$ random examples.
+\end{corollary}
+
+\begin{corollary}
+  Any function of $k$ half-spaces can be learned with $n^{O(k^2/\varepsilon^2)}$ samples.
+\end{corollary}
+
+\subsection{Learning Heavy Fourier Coefficients}
+
+Given $\theta > 0$ and black box access to $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$, we want to
+\begin{enumerate}[label=(\roman*), itemsep=0pt]
+  \item output all coefficients $S \subset [n]$ such that $|\hat{f}(S)| \geq \theta$;
+  \item only output coefficients $S \subset [n]$ such that $|\hat{f}(S)| \geq \theta/2$.
+\end{enumerate}
+
+The main idea is \emph{exhaustive search with good pruning}. The search tree consists of $n$ levels, each representing a variable $x_i$ for $i \in [n]$. For each level $i \in [n]$, going left means $x_i \in S$, and going right means $x_i \not \in S$. Informally, we only go down paths with lots of ``weights,'' and we output leaves reached at the bottom level.
+
+Fix $k \in \{ 0, \ldots, n \}$ representing the current level of search. Fix $S_1 \subset [k]$ representing the current node of search. Let $f_{k, S_1} : \{ \pm 1 \}^{n - k} \to \RR$ be defined by
+$$ f_{k, S_1}(x) = \sum_{T \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right) \chi_{T_2}(x). $$
+Note that we could replace $\chi_{T_2}$ with $\chi_{S_1 \cup T_2} = \chi_{S_1} \cdot \chi_{T_2}$, but $\chi_{S_1}$ remains the same. If $k = 0$, then
+$$ f_{0, \emptyset}(x) = \sum_{T_2 \subset [n]} \hat{f}\left(T_2\right) \chi_{T_2}(x) = f(x). $$
+On the other hand, if $k = n$, then for any $S_1 \subset [n]$,
+$$ f(n, S_1)(x) = \sum_{T_2 \subset \emptyset} \hat{f}\left(S_1 \cup T_2\right) \chi_{T_2}(x) = \hat{f}\left(S_1\right). $$
+
+The plan is to only go down paths with $\EE[f_{k, S_1}(x)^2] \geq \theta^2$. There are several questions to answer:
+\begin{enumerate}[label=(\roman*), itemsep=0pt]
+  \item Can we compute it?
+  \item Does it bring us to right leaves? In other words, do we get to all heavy leaves, and do we get to junks (i.e., light leaves)?
+  \item How many paths do we take? In other words, are there a lot of dead ends, and is the running time good?
+\end{enumerate}
+
+First, we show that there are not too many paths.
+
+\begin{lemma} \label{lem:not-too-many}
+  Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$.
+  \begin{enumerate}[label=(\roman*), itemsep=0pt]
+    \item At most $1/\theta^2$ sets $S \subset [n]$ satisfy $|\hat{f}(S)| \geq \theta$.
+    \item For all $k \in \{ 0, \ldots, n \}$, at most $1/\theta^2$ functions $f_{k, S_1}$ have $\EE_{x \in \{ \pm 1 \}^{n - k}}[f_{k, S_1}(x)^2] \geq \theta^2$.
+  \end{enumerate}
+\end{lemma}
+
+Lemma \ref{lem:not-too-many} implies that our algorithm explores at most $O(1/\theta^2)$ nodes of the search tree.
+
+\begin{proof}
+  \begin{enumerate}[label=(\roman*)]
+    \item By the Boolean Parseval's identity,
+    $$ 1 = \EE_{x \in \{ \pm 1 \}^n}\left[f(x)^2\right] = \sum_{S \subset [n]} \hat{f}(S)^2. $$
+    Therefore, if more than $1/\theta^2$ sets $S \subset [n]$ had $|\hat{f}(S)| \geq \theta$, then
+    $$ \sum_{S \subset [n]} \hat{f}(S)^2 > \frac{1}{\theta} \cdot \theta^2 = 1, $$
+    a contradiction.
+    \item Let $k \in \{ 0, \ldots, n \}$. First, we claim that for all $S_1 \subset [k]$,
+    $$ \EE_{x \in \{ \pm 1 \}^{n - k}} \left[f_{k, S_1}(x)^2\right] = \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right)^2. $$
+    To se this, we have
+    \begin{align*}
+      \EE_{x \in \{ \pm 1 \}^{n - k}} \left[f_{k, S_1}(x)^2\right] &= \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\left(\sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right) \chi_{T_2}\right)^2\right] \\
+      &= \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\sum_{T_2, T_2' \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right) \hat{f}\left(S_1 \cup T_2'\right) \chi_{T_2}(x) \chi_{T_2'}(x)\right] \\
+      &= \sum_{T_2, T_2' \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right) \hat{f}\left(S_1 \cup T_2'\right) \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\chi_{T_2}(x) \chi_{T_2'}(x)\right].
+    \end{align*}
+    Note that
+    $$ \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\chi_{T_2}(x) \chi_{T_2'}(x)\right] = \left\{
+      \begin{array}{ll}
+        0, & \text{if $T_2 \neq T_2'$}, \\
+        1, & \text{if $T_2 = T_2'$}.
+      \end{array}
+    \right. $$
+    Therefore,
+    $$ \EE_{x \in \{ \pm 1 \}^{n - k}} \left[f_{k, S_1}(x)^2\right] = \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right)^2. $$
+    This proves the claim.
+
+    Therefore,
+    \begin{align*}
+      1 &= \sum_{S \subset [n]} \hat{f}(S)^2 && \text{(Boolean Parseval's identity)} \\
+      &= \sum_{S_1 \subset [k]} \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right)^2 \\
+      &= \sum_{S_1 \subset [k]} \EE_{x \in \{ \pm 1 \}^{n - k}}\left[f_{k, S_1}(x)^2\right] && \text{(above claim)}
+    \end{align*}
+    Therefore, at most $1/\theta^2$ sets $S_1 \subset [k]$ have $\EE_{x \pm \{ \pm 1 \}^{n - k}}[f_{k, S_1}(x)^2] \geq \theta^2$.
+  \end{enumerate}
+\end{proof}
 
 \end{document}
