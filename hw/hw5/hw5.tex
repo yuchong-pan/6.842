@@ -1,0 +1,130 @@
+
+\documentclass[letterpaper, reqno,11pt]{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{color,latexsym,amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage[linesnumbered,lined,boxed,commentsnumbered,noend,noline]{algorithm2e}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{bbm}
+\usepackage{enumitem}
+\usepackage[numbers]{natbib}
+\usepackage{framed}
+\usepackage{titling}
+\usepackage{subcaption}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+
+\tikzset{invclip/.style={clip,insert path={{[reset cm]
+  (-16383.99999pt,-16383.99999pt) rectangle (16383.99999pt,16383.99999pt)}}}}
+
+\allowdisplaybreaks
+\DontPrintSemicolon
+\SetKw{Break}{break}
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\PP}{\mathop{{}\mathbb{P}}}
+\newcommand{\EE}{\mathop{{}\mathbb{E}}}
+\newcommand{\inci}{\mathds{1}}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\charcone}{char.cone}
+\DeclareMathOperator{\STAB}{STAB}
+\DeclareMathOperator{\Down}{Down}
+\DeclareMathOperator{\lca}{lca}
+\DeclareMathOperator{\ex}{ex}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\T}{T}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\comp}{c}
+\DeclareMathOperator{\bernoulli}{Bernoulli}
+\DeclareMathOperator{\Mod}{mod}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\LowestOne}{\textsc{LowestOne}}
+\DeclareMathOperator{\dist}{dist}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\argmin}{arg\,min}
+\DeclareMathOperator{\error}{error}
+\DeclareMathOperator{\NS}{\mathit{NS}}
+\SetKwFor{RepTimes}{repeat}{times}{end}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\begin{document}
+\pagenumbering{arabic}
+\title{Homework 5}
+\author{Yuchong Pan}
+\date{\today}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}{Claim}
+\newtheorem{exercise}{Exercise}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{solution}{Solution}
+%\maketitle
+%
+
+\begin{framed}
+\noindent{\bf 6.842 Randomness and Computation} \hfill \thedate
+\begin{center}
+\Large{\thetitle}
+\end{center}
+%\noindent{\em Lecturer: Ronitt Rubinfield} \hfill {\em Scribe: \theauthor}
+\noindent{\em Yuchong Pan} \hfill {\em MIT ID: 911346847}
+\end{framed}
+
+\begin{enumerate}
+  \item \noindent\emph{Collaborators and sources:} none.
+  
+  \begin{proof}
+    Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$. Let $\varepsilon \in (0, 1/2)$. Then
+    \begin{align*}
+      \NS_\varepsilon(f) &= \PP_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[f(x) \neq f\left(N_\varepsilon(x)\right)\right] \\
+      &= \PP_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[f(x) f\left(N_\varepsilon(x)\right) = -1\right] \\
+      &= \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\frac{1}{2} - \frac{1}{2}f(x) f\left(N_\varepsilon(x)\right)\right] \\
+      &= \frac{1}{2} - \frac{1}{2} \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[f(x) f\left(N_\varepsilon(x)\right)\right] \\
+      &= \frac{1}{2} - \frac{1}{2} \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\left(\sum_{S \subset [n]} \hat{f}(S) \chi_S(x)\right) \left(\sum_{T \subset [n]} \hat{f}(T) \chi_T\left(N_\varepsilon(x)\right)\right)\right] \\
+      &= \frac{1}{2} - \frac{1}{2} \sum_{S, T \subset [n]} \hat{f}(S) \hat{f}(T) \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\chi_S(x) \chi_T\left(N_\varepsilon(x)\right)\right].
+    \end{align*}
+    For all $x \in \{ \pm 1 \}^n$ and $i \in [n]$, we denote by $x_i$ and $N_\varepsilon(x)_i$ the $i^\text{th}$ coordinates of $x$ and $N_\varepsilon(x)$, respectively. For all $S \subset [n]$,
+    \begin{align}
+      \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\chi_S(x) \chi_S\left(N_\varepsilon(x)\right)\right] &= \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[\left(\prod_{i \in S} x_i\right)\left(\prod_{i \in S} N_\varepsilon(x)_i\right)\right] \nonumber \\
+      &= \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\prod_{i \in S} x_i N_\varepsilon(x)_i\right] \nonumber \\
+      &= \prod_{i \in S} \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[x_i N_\varepsilon(x)_i\right] \label{eq:1-indep} \\
+      &= (\varepsilon \cdot (-1) + (1 - \varepsilon) \cdot 1)^{|S|} \label{eq:1-symmetry} \\
+      &= (1 - 2\varepsilon)^{|S|}. \nonumber
+    \end{align}
+    Note that \eqref{eq:1-indep} is due to the independence of each bit in $N_\varepsilon(x)$, and \eqref{eq:1-symmetry} is due to the fact that each bit of $x$ uniformly chosen from $\{ \pm 1 \}^n$ is uniform in $\{ \pm 1 \}$. For all $S, T \subset [n]$ with $S \neq T$,
+    \begin{align}
+      &\quad\, \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\chi_S(x) \chi_T\left(N_\varepsilon(x)\right)\right] \nonumber \\
+      &= \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[\left(\prod_{i \in S} x_i\right)\left(\prod_{i \in T} N_\varepsilon(x)_i\right)\right] \nonumber \\
+      &= \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[\left(\prod_{i \in S \cap T} x_i N_\varepsilon(x)_i\right) \left(\prod_{i \in S \setminus T} x_i\right)\left(\prod_{i \in T \setminus S} N_\varepsilon(x)_i\right)\right] \nonumber \\
+      &= \left(\prod_{i \in S \cap T} \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[x_i N_\varepsilon(x)_i\right]\right) \left(\prod_{i \in S \setminus T} \EE_{x \in \{ \pm 1 \}^n}\left[x_i\right]\right) \left(\prod_{i \in T \setminus S} \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[N_\varepsilon(x)_i\right]\right). \label{eq:1-indep-diff}
+    \end{align}
+    Note that \eqref{eq:1-indep-diff} is again due to the independence of each bit in $N_\varepsilon(x)$. For $S, T \subset [n]$ with $S \neq T$, either $S \setminus T \neq \emptyset$ or $T \setminus S \neq \emptyset$. Note that each bit of $x$ uniformly chosen from $\{ \pm 1 \}^n$ is uniform in $\{ \pm 1 \}$. Therefore, if $S \setminus T \neq \emptyset$,
+    \begin{align*}
+      \prod_{i \in S \setminus T} \EE_{x \in \{ \pm 1 \}^n}\left[x_i\right] = \left(\EE_{b \in \{ \pm 1 \}}[b]\right)^{|S \setminus T|} = 0^{|S \setminus T|} = 0.
+    \end{align*}
+    Moreover, if $T \setminus S \neq \emptyset$,
+    $$ \prod_{i \in T \setminus S} \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[N_\varepsilon(x)_i\right] = \left(\frac{1}{2}(\varepsilon (-1) + (1 - \varepsilon) \cdot 1) + \frac{1}{2} (\varepsilon \cdot 1 + (1 - \varepsilon) (-1))\right)^{|T \setminus S|} = 0^{|T \setminus S|} = 0. $$
+    Therefore, for all $S, T \subset [n]$ with $S \neq T$,
+    $$ \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\chi_S(x) \chi_T\left(N_\varepsilon(x)\right)\right] = 0. $$
+    It follows that
+    \begin{align*}
+      \NS_\varepsilon(f) = \frac{1}{2} - \frac{1}{2} \sum_{S, T \subset [n]} \hat{f}(S) \hat{f}(T) \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\chi_S(x) \chi_T\left(N_\varepsilon(x)\right)\right] = \frac{1}{2} - \frac{1}{2} \sum_{S \subset [n]} \hat{f}(S)^2 (1 - 2 \varepsilon)^{|S|}.
+    \end{align*}
+    This completes the proof.
+  \end{proof}
+\end{enumerate}
+
+\end{document}
