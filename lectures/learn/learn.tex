@@ -515,40 +515,115 @@ First, we show that there are not too many paths.
 
 Lemma \ref{lem:not-too-many} implies that our algorithm explores at most $O(1/\theta^2)$ nodes of the search tree.
 
+\begin{proposition} \label{prop:level-parseval}
+  For any $k \in \{ 0, \ldots, n \}$ and $S_1 \subset [n]$,
+  $$ \EE_{x \in \{ \pm 1 \}^{n - k}} \left[f_{k, S_1}(x)^2\right] = \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right)^2. $$
+\end{proposition}
+
 \begin{proof}
+  we have
+  \begin{align*}
+    \EE_{x \in \{ \pm 1 \}^{n - k}} \left[f_{k, S_1}(x)^2\right] &= \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\left(\sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right) \chi_{T_2}\right)^2\right] \\
+    &= \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\sum_{T_2, T_2' \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right) \hat{f}\left(S_1 \cup T_2'\right) \chi_{T_2}(x) \chi_{T_2'}(x)\right] \\
+    &= \sum_{T_2, T_2' \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right) \hat{f}\left(S_1 \cup T_2'\right) \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\chi_{T_2}(x) \chi_{T_2'}(x)\right].
+  \end{align*}
+  Note that
+  $$ \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\chi_{T_2}(x) \chi_{T_2'}(x)\right] = \left\{
+    \begin{array}{ll}
+      0, & \text{if $T_2 \neq T_2'$}, \\
+      1, & \text{if $T_2 = T_2'$}.
+    \end{array}
+  \right. $$
+  Therefore,
+  $$ \EE_{x \in \{ \pm 1 \}^{n - k}} \left[f_{k, S_1}(x)^2\right] = \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right)^2. $$
+  This completes the proof.
+\end{proof}
+
+\begin{proof}[Proof of Lemma \ref{lem:not-too-many}]
   \begin{enumerate}[label=(\roman*)]
     \item By the Boolean Parseval's identity,
     $$ 1 = \EE_{x \in \{ \pm 1 \}^n}\left[f(x)^2\right] = \sum_{S \subset [n]} \hat{f}(S)^2. $$
     Therefore, if more than $1/\theta^2$ sets $S \subset [n]$ had $|\hat{f}(S)| \geq \theta$, then
     $$ \sum_{S \subset [n]} \hat{f}(S)^2 > \frac{1}{\theta} \cdot \theta^2 = 1, $$
     a contradiction.
-    \item Let $k \in \{ 0, \ldots, n \}$. First, we claim that for all $S_1 \subset [k]$,
-    $$ \EE_{x \in \{ \pm 1 \}^{n - k}} \left[f_{k, S_1}(x)^2\right] = \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right)^2. $$
-    To se this, we have
-    \begin{align*}
-      \EE_{x \in \{ \pm 1 \}^{n - k}} \left[f_{k, S_1}(x)^2\right] &= \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\left(\sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right) \chi_{T_2}\right)^2\right] \\
-      &= \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\sum_{T_2, T_2' \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right) \hat{f}\left(S_1 \cup T_2'\right) \chi_{T_2}(x) \chi_{T_2'}(x)\right] \\
-      &= \sum_{T_2, T_2' \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right) \hat{f}\left(S_1 \cup T_2'\right) \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\chi_{T_2}(x) \chi_{T_2'}(x)\right].
-    \end{align*}
-    Note that
-    $$ \EE_{x \in \{ \pm 1 \}^{n - k}}\left[\chi_{T_2}(x) \chi_{T_2'}(x)\right] = \left\{
-      \begin{array}{ll}
-        0, & \text{if $T_2 \neq T_2'$}, \\
-        1, & \text{if $T_2 = T_2'$}.
-      \end{array}
-    \right. $$
-    Therefore,
-    $$ \EE_{x \in \{ \pm 1 \}^{n - k}} \left[f_{k, S_1}(x)^2\right] = \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right)^2. $$
-    This proves the claim.
+    \item Let $k \in \{ 0, \ldots, n \}$. 
 
     Therefore,
     \begin{align*}
       1 &= \sum_{S \subset [n]} \hat{f}(S)^2 && \text{(Boolean Parseval's identity)} \\
       &= \sum_{S_1 \subset [k]} \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right)^2 \\
-      &= \sum_{S_1 \subset [k]} \EE_{x \in \{ \pm 1 \}^{n - k}}\left[f_{k, S_1}(x)^2\right] && \text{(above claim)}
+      &= \sum_{S_1 \subset [k]} \EE_{x \in \{ \pm 1 \}^{n - k}}\left[f_{k, S_1}(x)^2\right] && \text{(Proposition \ref{prop:level-parseval})}
     \end{align*}
     Therefore, at most $1/\theta^2$ sets $S_1 \subset [k]$ have $\EE_{x \pm \{ \pm 1 \}^{n - k}}[f_{k, S_1}(x)^2] \geq \theta^2$.
   \end{enumerate}
 \end{proof}
+
+Second, we show that the algorithm does not miss out heavy Fourier coefficients. To see this, for any $k \in \{ 0, \ldots, n \}$ and $S_1 \subset [k]$, if there exists $T_2^* \subset \{ k + 1, \ldots, n \}$ such that $|\hat{f}(S_1 \cup T_2^*)| > \theta$, then Proposition \ref{prop:level-parseval} implies that
+$$ \EE_{x \in \{ \pm 1 \}^n}\left[f_{k, S_1}(x)^2\right] = \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right)^2 \geq \hat{f}\left(S_! \cup T_2^*\right) \geq \theta^2. $$
+To avoid outputting junks (i.e., light Fourier coefficients), we add a simple fix to the algorithm: For each candidate to $S$, estimate its Fourier coefficient and make sure it is big enough before outputting it.
+
+\begin{lemma} \label{lem:estimate}
+  For $x \in \{ \pm 1 \}^{n - k}$,
+  $$ f_{k, S_1}(x) = \EE_{y \in \{ \pm 1 \}^k}\left[f(yx) \chi_{S_1}(y)\right], $$
+  where $yx$ denotes the concatenation operation.
+\end{lemma}
+
+By Lemma \ref{lem:estimate}, we can estimate $f_{k, S_1}(x)$ by picking random $y$, outputting the average and using the Chernoff bound.
+
+\begin{proof}
+  Let $x \in \{ \pm 1 \}^{n - k}$. Then
+  $$ f(yx) = \sum_{T \subset [n]} \hat{f}(T) \chi_T(yx). $$
+  Since $T = T_1 \cup T_2$ where $T_1 \subset [k]$ and $T_2 \subset \{ k + 1, \ldots, n\}$, then $\chi_T(yx) = \chi_{T_1}(y) \chi_{T_2}(x)$. Therefore,
+  \begin{align*}
+    \EE_{y \in \{ \pm 1 \}^k}\left[f(yx) \chi_{S_1}(y)\right] &= \EE_{y \in \{ \pm 1 \}^k}\left[\sum_{T_1 \subset [k]} \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(T_1 \cup T_2\right) \chi_{T_1}(y) \chi_{T_2}(x) \chi_{S_1}(y)\right] \\
+    &= \sum_{T_1 \subset [k]} \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(T_1 \cup T_2\right) \chi_{T_2}(x) \EE_{y \in \{ \pm 1 \}^k}\left[\chi_{T_1}(y) \chi_{S_1}(y)\right].
+  \end{align*}
+  Note that
+  $$ \EE_{y \in \{ \pm 1 \}^k}\left[\chi_{T_1}(y) \chi_{S_1}(y)\right] = \left\{
+    \begin{array}{ll}
+      0, & \text{if $T_1 \neq S_1$}, \\
+      1, & \text{if $T_1 = S_1$}.
+    \end{array}
+  \right. $$
+  Therefore,
+  $$ \EE_{y \in \{ \pm 1 \}^k}\left[f(yx) \chi_{S_1}(y)\right] = \sum_{T_2 \subset \{ k + 1, \ldots, n \}} \hat{f}\left(S_1 \cup T_2\right) \chi_{T_2}(x) = f_{k, S_1}(x). $$
+  This completes the proof.
+\end{proof}
+
+Now we are ready to summarize the full algorithm, called the Kushilevitz-Mansour algorithm, in Algorithm \ref{alg:km}.
+
+\begin{algorithm}
+  \If(\CommentSty{(leaf)}){$k = n$}{
+    \If{the $\theta/4$-additive estimate of $\hat{f}(S_1)$ is at least $3/4$}{
+      \Return{$S_1$}
+    }
+  }
+  \ElseIf(\CommentSty{(check left subtree)}){$\EE_{x \in \{ \pm 1 \}^{n - k}}[f_{k, S_1 \cup \{ k + 1 \}}(x)^2] \geq \theta^2/2$}{
+    recurse on $(k + 1, S_1 \cup \{ k + 1 \})$
+  }
+  \ElseIf(\CommentSty{(check right subtree)}){$\EE_{x \in \{ \pm 1 \}^{n - k}}[f_{k, S_1}(x)^2] \geq \theta^2/2$}{
+    recurse on $(k + 1, S_1)$
+  }
+  \caption{The Kushilevitz-Mansour algorithm, given the current level $k \in \{ 0, \ldots, n \}$ and the current prefix $S_1 \subset [n]$.}
+  \label{alg:km}
+\end{algorithm}
+
+The Kushilevitz-Mansour algorithm has the following applications:
+\begin{enumerate}[label=(\roman*), itemsep=0pt]
+  \item Learn decision trees of size $\leq t$ (not just small depth);
+  \item functions of small $L_1$-norm, where the \emph{$L_1$-norm} of a function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ is defined to be $L_1(f) = \sum_{S \subset [n]} |\hat{f}(S)|$ (by setting $\theta \leftarrow \varepsilon/L_1(f)$).
+\end{enumerate}
+
+\section{Monotone Functions}
+
+\begin{definition}
+  We define $\preccurlyeq$ to be a partial order over $\{ \pm 1 \}^n$ such that $x \leq y$ if and only if $x_i \leq y_i$ for all $i \in [n]$.
+\end{definition}
+
+\begin{definition}
+  A Boolean function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ is \emph{monotone} if $f(x) \leq f(y)$ for all $x, y \in \{ \pm 1 \}^n$ with $x \preccurlyeq y$.
+\end{definition}
+
+Are monotone functions learnable? Occam's Razor implies that $O(\log|\mathcal C|)$ samples suffice, where $\mathcal C$ is the class of monotone functions. We have the following lower bound on $|\mathcal C|$: Consider \emph{slice functions} which have values $+ 1$ on level greater than $n/2$ in the Boolean hypercube, values $-1$ on level less than $n/2$, and arbitrary values on level $n/2$. Then slice functions are all monotone. There are $\binom{n}{n/2}$ nodes on level $n/2$, so there are $2^{\binom{n}{n/2}}$ monotone functions. Therefore, the sample complexity implied by Occam's Razor is $O(\binom{n}{n/2}) = O(2^n/\sqrt{n})$. In homework, we shall show that $2^{O(\sqrt{n})}$ samples suffice.
 
 \end{document}
