@@ -458,7 +458,7 @@ Next, we show the relation between noise sensitivity and Fourier concentration.
 \begin{proof}
   We have
   \begin{align*}
-    2\NS_\gamma(f) &= 1 - \sum_{S \subset [n]} (1 - 2\gamma)^{|S|} \hat{f}(S)^2 && \text{(Theorem \ref{thm:noise-fourier})} \\
+    2\NS_\gamma(f) &= 1 - \sum_{S \subset [n]} (1 - 2\gamma)^{|S|} \hat{f}(S)^2 && \text{(Theorem \ref{thm:noise-sensitivity})} \\
     &= \sum_{S \subset [n]} \left(\hat{f}(S)^2 - (1 - 2\gamma)^{|S|} \hat{f}(S)^2\right) && \text{(Boolean Parseval's identity)} \\
     &= \sum_{S \subset [n]} \left(1 - (1 - 2\gamma)^{|S|}\right) \hat{f}(S)^2 \\
     &\geq \sum_{\substack{S \subset [n] \\ |S| \geq \frac{1}{\gamma}}} \left(1 - (1 - 2\gamma)^\frac{1}{\gamma}\right) \hat{f}(S)^2 \\
