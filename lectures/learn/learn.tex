@@ -82,6 +82,7 @@
 \DeclareMathOperator{\sign}{sign}
 \DeclareMathOperator{\NS}{NS}
 \DeclareMathOperator{\Maj}{Maj}
+\DeclareMathOperator{\Inf}{Inf}
 \newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \SetKwFor{RepTimes}{repeat}{times}{end}
@@ -625,5 +626,92 @@ The Kushilevitz-Mansour algorithm has the following applications:
 \end{definition}
 
 Are monotone functions learnable? Occam's Razor implies that $O(\log|\mathcal C|)$ samples suffice, where $\mathcal C$ is the class of monotone functions. We have the following lower bound on $|\mathcal C|$: Consider \emph{slice functions} which have values $+ 1$ on level greater than $n/2$ in the Boolean hypercube, values $-1$ on level less than $n/2$, and arbitrary values on level $n/2$. Then slice functions are all monotone. There are $\binom{n}{n/2}$ nodes on level $n/2$, so there are $2^{\binom{n}{n/2}}$ monotone functions. Therefore, the sample complexity implied by Occam's Razor is $O(\binom{n}{n/2}) = O(2^n/\sqrt{n})$. In homework, we shall show that $2^{O(\sqrt{n})}$ samples suffice.
+
+We show that monotone functions have weak agreement with some dictator function.
+
+\begin{theorem} \label{thm:monotone-dictator}
+  For any monotone Boolean function $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$, there exists $g \in S := \{ \pm 1, x_1, x_2, \ldots, x_n \}$ such that
+  $$ \PP_{x \in \{ \pm 1 \}^n}[f(x) = g(x)] \geq \frac{1}{2} + \Omega\left(\frac{1}{n}\right). $$
+\end{theorem}
+
+Note that if we add the majority function to $S$, then we can get $1/2 + O(1/\sqrt{n})$. Theorem \ref{thm:monotone-dictator} suggests the following learning algorithm: Estimate the agreement of $f$ with each member of $S$, and output the best.
+
+If $f$ has weak agreement with $+1$ or $-1$, then we are done. Otherwise, $\PP[f(x) = 1] \in [1/4, 3/4]$. Consider a ``graphic'' view of the Boolean hypercube in Figure \ref{fig:monotone-hypercube}, where vertices with value $1$ are colored red and vertices with value $-1$ are colored blue.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.4\textwidth]{figures/hypercube.png}
+  \caption{A ``graphic'' view of the Boolean hypercube, where vertices with value $1$ are colored red and vertices with value $-1$ are colored blue.}
+  \label{fig:monotone-hypercube}
+\end{figure}
+
+\begin{definition}
+  Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be a monotone Boolean function. The \emph{influence of $f$ at the $i^\text{th}$ direction} is defined to be
+  $$ \Inf_i(f) = \frac{\text{\# red-blue edges in the $i^\text{th}$ direction}}{2^{n - 1}} = \PP_{x \in \{ \pm 1 \}^n}\left[f(x) \neq f\left(x^{\oplus i}\right)\right], $$
+  where $x^{\oplus i}$ is the vector obtained by flipping the $i^\text{th}$ bit in $x$. The \emph{influence} of $f$ is defined to be
+  $$ \Inf(f) = \frac{\text{\# red-blue edges}}{2^n} = \sum_{i = 1}^n \Inf_i(f). $$
+\end{definition}
+
+\begin{theorem} \label{thm:inf-i}
+  Any monotone Boolean function has $\Inf_i(f) = \hat{f}(\{ i \})$.
+\end{theorem}
+
+\begin{theorem} \label{thm:majority}
+  The majority function $f(x) := \sign(\sum_{i = 1}^n x_i)$, where $n$ is odd, maximizes the influence among monotone functions.
+\end{theorem}
+
+Theorems \ref{thm:inf-i} and \ref{thm:majority} will be proved in homework. By Theorem \ref{thm:inf-i}, any monotone Boolean function $f$ has
+$$ \Inf_i(f) = \hat{f}(\{ i \}) = 2\PP_{x \in \{ \pm 1 \}^n}\left[f(x) = \chi_{\{ i \}}(x)\right] - 1 = 2\PP_{x \in \{ \pm 1 \}^n}\left[f(x) = x_i\right] - 1. $$
+Therefore, showing $\Inf_i(f) \geq \Omega(1/n)$ is equivalent to showing
+$$ \PP_{x \in \{ \pm 1 \}^n} \geq \frac{1}{2} + \frac{\Inf_i(f)}{2} = \frac{1}{2} + \Omega\left(\frac{1}{n}\right). $$
+Hence, such an index $i \in [n]$ would prove Theorem \ref{thm:monotone-dictator}.
+
+We introduce the \emph{canonical path argument}, which proceeds as follows:
+\begin{enumerate}[label=(\roman*), itemsep=0pt]
+  \item Define the canonical path for every red-blue pair of vertices (which must cross at least one red-blue edge).
+  \item Show an upper bound on the number of canonical paths passing through any edge (called \emph{bounding the congestion}).
+  \item Conclude a lower bound on the number of red-blue edges.
+\end{enumerate}
+
+First, we define the canonical path for every red-blue pair of vertices.
+
+\begin{definition}
+  For all $(x, y) \in \{ 0, 1 \}^n \times \{ 0, 1 \}^n$ such that $x$ is red and $y$ is blue, the \emph{canonical path} from $x$ to $y$ is defined by the following procedure: Scan bits from left to right, and flip where needed. Each flip corresponds to a step in the canonical path (in the undirected Boolean hypercube).
+\end{definition}
+
+Note that if $x$ is red and $y$ is blue, then the canonical path from $x$ to $y$ must include some red-blue edge. Recall that $\PP[f(x) = 1] \in [1/4, 3/4]$, then the number of red-blue $(x, y)$ pairs that have canonical paths is at least
+$$ \left(\frac{1}{4} \cdot 2^n\right) \cdot \left(\frac{1}{4} \cdot 2^n\right) = \frac{1}{16} \cdot 2^{2n}. $$
+
+Second, we show an upper bound on the number of canonical paths passing through any (red-blue) edge. Note that any red-blue pair $(x, y)$ taking edge $(u, u^{\oplus i})$ must have
+\begin{align*}
+  y_1 \ldots y_{i - 1} y_i &= u_1 \ldots u_{i - 1} \overline{u_i}, \\
+  x_i x_{i + 1} \ldots x_n &= u_i u_{i + 1} \ldots u_n.
+\end{align*}
+Hence, we can pick $y_{i + 1}, \ldots, y_n$ and $x_1, \ldots, x_{i - 1}$ freely, so there are at most $2^n$ total choices.
+
+Third, since each red-blue canonical path crosses at least one red-blue edge,
+$$ (\text{\# red-blue edges}) \cdot (\text{max \# canonical paths using each edge}) \geq \text{\# red-blue canonical paths}. $$
+Therefore, the number of red-blue edges is at least
+$$ \frac{\frac{1}{16} \cdot 2^{2n}}{2^n} = \frac{1}{16} \cdot 2^n. $$
+It follows that there exists $i \in [n]$ such that there exist at least $2^n/(16n)$ red-blue edges in the $i^\text{th}$ direction, so
+$$ 2\PP_{x \in \{ \pm 1 \}^n}\left[f(x) = x_i\right] - 1 = \hat{f}(\{ i \}) = \Inf_i(f) \geq \frac{\frac{2^n}{16n}}{2^{n - 1}} = \frac{1}{8n}. $$
+This proves that there exists $i \in [n]$ such that $\PP_{x \in \{ \pm 1 \}^n}[f(x) = x_i] \geq 1/2 + 1/(16n)$.
+
+\section{Weak and Strong Learning}
+
+\begin{definition}
+  An algorithm $\mathcal A$ \emph{weakly PAC learns} a concept class $\mathcal C$ if for any $C \in \mathcal C$ and distribution $\mathcal D$, there exists $\gamma > 0$ such that for all $\delta > 0$, with probability at least $1 - \delta$, given $\Ex(C)$, $\mathcal A$ outputs $h$ such that
+  \begin{equation} \label{eq:weak}
+    \PP_{x \sim \mathcal D}[h(x) = C(x)] \geq \frac{1}{2} + \frac{\gamma}{2}.
+  \end{equation}
+\end{definition}
+
+Note that we used to ask for $\PP_{x \sim \mathcal D}[h(x) = C(x)] \geq 1 - \varepsilon$ for all $\varepsilon > 0$; this is called \emph{(strong) PAC learning}.
+
+\begin{theorem}
+  If a concept class $\mathcal C$ can be weakly learned on any distribution $\mathcal D$, then $\mathcal C$ can be (strongly) learned, i.e., with error at most $\varepsilon$ for all $\varepsilon > 0$.
+\end{theorem}
+
+We are interested in the dependence on $\gamma$, $\delta$ and $\varepsilon$.
 
 \end{document}
