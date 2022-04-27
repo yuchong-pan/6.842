@@ -90,22 +90,18 @@
   \begin{proof}
     Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$. Let $\varepsilon \in (0, 1/2)$. Then
     \begin{align*}
-      \NS_\varepsilon(f) &= \PP_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[f(x) \neq f\left(N_\varepsilon(x)\right)\right] \\
-      &= \PP_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[f(x) f\left(N_\varepsilon(x)\right) = -1\right] \\
-      &= \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\frac{1}{2} - \frac{1}{2}f(x) f\left(N_\varepsilon(x)\right)\right] \\
-      &= \frac{1}{2} - \frac{1}{2} \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[f(x) f\left(N_\varepsilon(x)\right)\right] \\
+      \NS_\varepsilon(f) &= \PP_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[f(x) \neq f\left(N_\varepsilon(x)\right)\right] = \PP_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[f(x) f\left(N_\varepsilon(x)\right) = -1\right] \\
+      &= \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\frac{1}{2} - \frac{1}{2}f(x) f\left(N_\varepsilon(x)\right)\right] = \frac{1}{2} - \frac{1}{2} \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[f(x) f\left(N_\varepsilon(x)\right)\right] \\
       &= \frac{1}{2} - \frac{1}{2} \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\left(\sum_{S \subset [n]} \hat{f}(S) \chi_S(x)\right) \left(\sum_{T \subset [n]} \hat{f}(T) \chi_T\left(N_\varepsilon(x)\right)\right)\right] \\
       &= \frac{1}{2} - \frac{1}{2} \sum_{S, T \subset [n]} \hat{f}(S) \hat{f}(T) \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\chi_S(x) \chi_T\left(N_\varepsilon(x)\right)\right].
     \end{align*}
     For all $x \in \{ \pm 1 \}^n$ and $i \in [n]$, we denote by $x_i$ and $N_\varepsilon(x)_i$ the $i^\text{th}$ coordinates of $x$ and $N_\varepsilon(x)$, respectively. For all $S \subset [n]$,
     \begin{align}
-      \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\chi_S(x) \chi_S\left(N_\varepsilon(x)\right)\right] &= \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[\left(\prod_{i \in S} x_i\right)\left(\prod_{i \in S} N_\varepsilon(x)_i\right)\right] \nonumber \\
-      &= \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\prod_{i \in S} x_i N_\varepsilon(x)_i\right] \nonumber \\
-      &= \prod_{i \in S} \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[x_i N_\varepsilon(x)_i\right] \label{eq:1-indep} \\
-      &= (\varepsilon \cdot (-1) + (1 - \varepsilon) \cdot 1)^{|S|} \label{eq:1-symmetry} \\
+      \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\chi_S(x) \chi_S\left(N_\varepsilon(x)\right)\right] &= \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[\left(\prod_{i \in S} x_i\right)\left(\prod_{i \in S} N_\varepsilon(x)_i\right)\right] \nonumber = \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\prod_{i \in S} x_i N_\varepsilon(x)_i\right] \nonumber \\
+      &= \prod_{i \in S} \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[x_i N_\varepsilon(x)_i\right] = (\varepsilon \cdot (-1) + (1 - \varepsilon) \cdot 1)^{|S|} \label{eq:1-indep-symmetry} \\
       &= (1 - 2\varepsilon)^{|S|}. \nonumber
     \end{align}
-    Note that \eqref{eq:1-indep} is due to the independence of each bit in $N_\varepsilon(x)$, and \eqref{eq:1-symmetry} is due to the fact that each bit of $x$ uniformly chosen from $\{ \pm 1 \}^n$ is uniform in $\{ \pm 1 \}$. For all $S, T \subset [n]$ with $S \neq T$,
+    Note that \eqref{eq:1-indep-symmetry} is due to the independence of each bit in $N_\varepsilon(x)$ and the fact that each bit of $x$ uniformly chosen from $\{ \pm 1 \}^n$ is uniform in $\{ \pm 1 \}$. For all $S, T \subset [n]$ with $S \neq T$,
     \begin{align}
       &\quad\, \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}}\left[\chi_S(x) \chi_T\left(N_\varepsilon(x)\right)\right] \nonumber \\
       &= \EE_{\substack{x \in \{ \pm 1 \}^n \\ N_\varepsilon}} \left[\left(\prod_{i \in S} x_i\right)\left(\prod_{i \in T} N_\varepsilon(x)_i\right)\right] \nonumber \\
