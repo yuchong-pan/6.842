@@ -53,6 +53,7 @@
 \DeclareMathOperator{\argmin}{arg\,min}
 \DeclareMathOperator{\error}{error}
 \DeclareMathOperator{\NS}{\mathit{NS}}
+\DeclareMathOperator{\Inf}{\mathit{Inf}}
 \SetKwFor{RepTimes}{repeat}{times}{end}
 \newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
@@ -125,6 +126,40 @@
     \end{align*}
     This completes the proof.
   \end{proof}
+
+  \clearpage
+
+  \item \begin{enumerate}
+    \item \noindent\emph{Collaborators and sources:} none.
+    
+    \begin{proof}
+      Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be monotone. Let $i \in [n]$. WLOG, assume $i = 1$. Then
+      \begin{align*}
+        \hat{f}(\{ 1 \}) &= \left\langle f, \chi_{\{ 1 \}} \right\rangle \\
+        &= \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} f(x) \chi_{\{ 1 \}}(x) \\
+        &= \frac{1}{2^n} \sum_{x = \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n} f(x) x_1 \\
+        &= \frac{1}{2^n}\left(\sum_{\substack{x = \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n \\ x_1 = 1}} f(x) \cdot 1 + \sum_{\substack{x = \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n \\ x_1 = -1}} f(x) \cdot (-1)\right) \\
+        &= \frac{1}{2^n} \left(\sum_{x' \in \{ \pm 1 \}^{n - 1}} f\left(1, x'\right) - \sum_{x' \in \{ \pm 1 \}^{n - 1}} f\left(-1, x'\right)\right) \\
+        &= \frac{1}{2^n} \sum_{x' \in \{ \pm 1 \}^{n - 1}} \left(f\left(1, x'\right) - f\left(-1, x'\right)\right) \\
+        &= \frac{1}{2^n} \sum_{\substack{x' \in \{ \pm 1 \}^{n - 1} \\ f\left(1, x'\right) \neq f\left(-1, x'\right)}} \left(f\left(1, x'\right) - f\left(-1, x'\right)\right).
+      \end{align*}
+      Since $f$ is monotone, then $f(1, x') \geq f(-1, x')$ for all $x' \in \{ \pm 1 \}^{n - 1}$. Hence, for all $x' \in \{ \pm 1 \}^{n - 1}$, if $f(1, x') \neq f(-1, x')$, then $f(1, x') = 1$ and $f(-1, x') = -1$, so $f(1, x') - f(-1, x') = 1 - (-1) = 2$. Therefore,
+      \begin{align*}
+        \hat{f}(\{ 1 \}) &= \frac{1}{2^n} \sum_{\substack{x' \in \{ \pm 1 \}^{n - 1} \\ f\left(1, x'\right) \neq f\left(-1, x'\right)}} 2 \\
+        &= \frac{1}{2^n} \cdot 2 \left|\left\{ x' \in \{ \pm 1 \}^{n - 1} : f\left(1, x'\right) \neq f\left(-1, x'\right) \right\}\right| \\
+        &= \frac{1}{2^{n - 1}} \left|\left\{ x' \in \{ \pm 1 \}^{n - 1} : f\left(1, x'\right) \neq f\left(-1, x'\right) \right\}\right|.
+      \end{align*}
+      On the other hand,
+      \begin{align*}
+        \Inf_1(f) &= \PP_{x \in \{ \pm 1 \}^n}\left[f(x) \neq f\left(x^{\oplus 1}\right)\right] \\
+        &= \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} \mathds 1\left[f(x) \neq f\left(x^{\oplus 1}\right)\right] \\
+        &= \frac{1}{2^n} \cdot 2 \sum_{x' \in \{ \pm 1 \}^{n - 1}} \mathds 1\left[f\left(1, x'\right) \neq f\left(-1, x'\right)\right] \\
+        &= \frac{1}{2^{n - 1}} \left|\left\{ x' \in \{ \pm 1 \}^{n - 1} : f\left(1, x'\right) \neq f\left(-1, x'\right) \right\}\right| \\
+        &= \hat{f}(\{ 1 \}).
+      \end{align*}
+      This completes the proof.
+    \end{proof}
+  \end{enumerate}
 \end{enumerate}
 
 \end{document}
