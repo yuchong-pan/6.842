@@ -219,6 +219,33 @@
       \end{align*}
       a contradiction. This completes the proof.
     \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
+    
+    \begin{proof}
+      Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be monotone. Then
+      \begin{align*}
+        \Inf(f) &= \sum_{i = 1}^n \Inf_i(f) \\
+        &= \sum_{i = 1}^n \hat{f}(\{ i \}) && \text{(Problem 2 part (a))} \\
+        &\leq \sqrt{n\sum_{i = 1}^n \hat{f}(\{ i \})^2} && \text{(Cauchy-Schwarz inequality)} \\
+        &\leq \sqrt{n\sum_{S \subset [n]} \hat{f}(S)^2} \\
+        &= \sqrt{n \cdot 1} && \text{(Boolean Parseval's identity)} \\
+        &= \sqrt{n}.
+      \end{align*}
+      By part (a), there exists an absolute constant $C$ such that for all $\varepsilon > 0$,
+      $$ \sum_{\substack{S \subset [n] \\ |S| \geq \frac{\sqrt{n}}{\varepsilon}}} \hat{f}(S)^2 \leq \sum_{\substack{S \subset [n] \\ |S| \geq \frac{\Inf(f)}{\varepsilon}}} \hat{f}(S)^2 \leq C\varepsilon. $$
+      Hence, any monotone Boolean function has Fourier concentration $\alpha(\varepsilon, n) = C\sqrt{n}/\varepsilon$. The low degree algorithm gives a uniform distribution learning algorithm $\mathcal A$ for the class of monotone Boolean functions with sample complexity
+      \begin{align*}
+        O\left(\frac{n^{\alpha(\varepsilon, n)}}{\varepsilon} \log \frac{n^{\alpha(\varepsilon, n)}}{\delta}\right) &= O\left(\frac{n^{\alpha(\varepsilon, n)}}{\varepsilon} \cdot \alpha(\varepsilon, n) \log n\right) \\
+        &= O\left(\frac{n^{\frac{C\sqrt[]{n}}{\varepsilon}}}{\varepsilon} \cdot \frac{C\sqrt[]{n}}{\varepsilon} \log n\right) \\
+        &= O\left(\frac{n^{\frac{C\sqrt[]{n}}{\varepsilon} + \frac{1}{2}}}{\varepsilon^2} \log n\right).
+      \end{align*}
+      Since $1/\varepsilon^2 \leq (n^{\sqrt{n}})^{1/\varepsilon}$ for sufficiently large $n$ and sufficiently small $\varepsilon$, then the sample complexity of $\mathcal A$ is
+      $$ O\left(n^{\frac{C\sqrt[]{n}}{\varepsilon} + \frac{1}{2}} \log n\right) \leq n^{\Theta\left(\frac{\sqrt[]{n}}{\varepsilon}\right)} = \left(2^{\log_2 n}\right)^{\Theta\left(\frac{\sqrt[]{n}}{\varepsilon}\right)} = 2^{(\log_2 n) \Theta\left(\frac{\sqrt[]{n}}{\varepsilon}\right)} = 2^{\Theta\left(\frac{\sqrt[]{n}}{\varepsilon} \log n\right)} = 2^{\widetilde{O}\left(\frac{\sqrt[]{n}}{\varepsilon}\right)}. $$
+      This completes the proof.
+    \end{proof}
   \end{enumerate}
 \end{enumerate}
 
