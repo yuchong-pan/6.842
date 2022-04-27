@@ -83,6 +83,8 @@
 \DeclareMathOperator{\NS}{NS}
 \DeclareMathOperator{\Maj}{Maj}
 \DeclareMathOperator{\Inf}{Inf}
+\DeclareMathOperator{\WL}{WL}
+\DeclareMathOperator{\SL}{\textsc{StrongLearn}}
 \newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \SetKwFor{RepTimes}{repeat}{times}{end}
@@ -700,18 +702,107 @@ This proves that there exists $i \in [n]$ such that $\PP_{x \in \{ \pm 1 \}^n}[f
 \section{Weak and Strong Learning}
 
 \begin{definition}
-  An algorithm $\mathcal A$ \emph{weakly PAC learns} a concept class $\mathcal C$ if for any $C \in \mathcal C$ and distribution $\mathcal D$, there exists $\gamma > 0$ such that for all $\delta > 0$, with probability at least $1 - \delta$, given $\Ex(C)$, $\mathcal A$ outputs $h$ such that
+  An algorithm $\mathcal A$ \emph{weakly PAC learns} a concept class $\mathcal C$ if there exists $\gamma > 0$ such that for any $C \in \mathcal C$, distribution $\mathcal D$ and $\delta > 0$, with probability at least $1 - \delta$, given $\Ex_\mathcal{D}(C)$, $\mathcal A$ outputs $h$ such that
   \begin{equation} \label{eq:weak}
-    \PP_{x \sim \mathcal D}[h(x) = C(x)] \geq \frac{1}{2} + \frac{\gamma}{2}.
+    \error_{\mathcal D}(h) := \PP_{x \sim \mathcal D}[h(x) \neq C(x)] \leq \frac{1}{2} - \frac{\gamma}{2}.
   \end{equation}
+  Here, $\gamma/2$ is called the \emph{advantage over guessing}.
 \end{definition}
 
 Note that we used to ask for $\PP_{x \sim \mathcal D}[h(x) = C(x)] \geq 1 - \varepsilon$ for all $\varepsilon > 0$; this is called \emph{(strong) PAC learning}.
 
-\begin{theorem}
+\begin{theorem} \label{thm:weak-strong}
   If a concept class $\mathcal C$ can be weakly learned on any distribution $\mathcal D$, then $\mathcal C$ can be (strongly) learned, i.e., with error at most $\varepsilon$ for all $\varepsilon > 0$.
 \end{theorem}
 
-We are interested in the dependence on $\gamma$, $\delta$ and $\varepsilon$.
+We are interested in the dependence of the running time of learning on $\gamma$, $\delta$ and $\varepsilon$. The plan for the proof of Theorem \ref{thm:weak-strong} is as follows:
+\begin{enumerate}[label=(\roman*), itemsep=0pt]
+  \item \label{item:modest} ``Modest'' accuracy boosting.
+  \item Recursively use \ref{item:modest} to drive down error.
+\end{enumerate}
+
+First, we present a modest accuracy boosting algorithm in Algorithm \ref{alg:modest}, given an example oracle $\Ex_{\mathcal D}(f)$ to $f$ with distribution $\mathcal D$ and a weak learner $\WL$. Let
+\begin{align*}
+  \beta_1 &= \PP_{x \in \mathcal D}\left[h_1(x) \neq f(x)\right], \\
+  \beta_2 &= \PP_{x \in \mathcal D_2}\left[h_2(x) \neq f(x)\right], \\
+  \beta_3 &= \PP_{x \in \mathcal D_3}\left[h_3(x) \neq f(x)\right],
+\end{align*}
+We observe that if $h_1(x) = f(x)$, then $\mathcal D(x) = 2(1 - \beta_1) \mathcal D_2(x)$ (i.e., $\mathcal D_2(x) = \mathcal D(x) \cdot 1/(2(1 - \beta_1))$); if $h_1(x) \neq f(x)$, then $\mathcal D(x) = 2\beta_1 \mathcal D_2(x)$. See Figure \ref{fig:modest} for an illustration. Moreover, we divide $\mathcal D_2$ into four regions in Table \ref{tab:regions}, also illustrated in Figure \ref{fig:modest}. We have the following lemma, the proof of which we omit for now.
+
+\begin{lemma}
+  $\error_{\mathcal D}(h) \leq g(\beta) := 3\beta^3 - 2\beta^3$.
+\end{lemma}
+
+\begin{algorithm}[h]
+  $h_1 \leftarrow \text{run $\WL$ on $\mathcal D$ for function $f$}$ \\
+  create a distribution $\mathcal D_2$ by flipping a coin such that \\
+  {\Indp\If{head}{
+    draw examples from $\mathcal D$ until finding $x$ such that $h_1(x) = f(x)$ \CommentSty{($h_1$ is correct)} \\
+    output $x$
+  }
+  \Else{
+    draw examples from $\mathcal D$ until finding $x$ such that $h_1(x) \neq f(x)$ \CommentSty{($h_1$ is incorrect)} \\
+    output $x$
+  }}
+  $h_2 \leftarrow \text{run $\WL$ on $\mathcal D_2$ for function $f$}$ \CommentSty{($\error_{\mathcal D_2}(h_1) = 1/2$)} \\
+  create a distribution $\mathcal D_3$ by drawing examples from $\mathcal D$ until finding $x$ with $h_1(x) \neq h_2(x)$ \\
+  $h_3 \leftarrow \text{run $\WL$ on $\mathcal D_3$ for function $f$}$
+  \caption{A modest accuracy boosting algorithm, given an example oracle $\Ex_{\mathcal D}(f)$ to $f$ with distribution $\mathcal D$ and a weak learner $\WL$.}
+  \Return{$\Maj(h_1, h_2, h_3)$} \CommentSty{(on $x$, compute $h_1(x), h_2(x), h_3(x)$, output majority answer)}
+  \label{alg:modest}
+\end{algorithm}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.5\textwidth]{figures/modest.png}
+  \caption{Illustrating the analysis of Algorithm \ref{alg:modest}.}
+  \label{fig:modest}
+\end{figure}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|l|l}
+    $R_1$ & $h_1(x) = h_2(x) = f(x)$ & $\Maj(h_1, h_2, h_3)$ is correct \\
+    \hline
+    $R_2$ & $h_1(x) = f(x) \neq h_2(x)$ & maybe $h_3$ helps? \\
+    \hline
+    $R_3$ & $h_1(x) = h_2(x) \neq f(x)$ & $\Maj(h_1, h_2, h_3)$ is incorrect \\
+    \hline
+    $R_4$ & $h_1(x) \neq h_2(x) = f(x)$ & maybe $h_3$ helps?
+  \end{tabular}
+  \caption{Four regions of $\mathcal D_2$.}
+  \label{tab:regions}
+\end{table}
+
+Second, we give a recursive accuracy boosting algorithm in Algorithm \ref{alg:recursive}. We illustrate the recursion from Algorithm \ref{alg:recursive} in Figure \ref{fig:recursion}.
+
+\begin{algorithm}[h]
+  \If{$\rho$ is already good enough}{
+    \Return{$\WL$ on $\mathcal D'$}
+  }
+  $\beta \leftarrow g^{-1}(\rho)$ \CommentSty{(error bound requried from below to get error $\rho$)} \\
+  define $\mathcal D_2'$ and $\mathcal D_3'$ as in Algorithm \ref{alg:modest} \\
+  \ForEach{$i \in [3]$}{
+    $h_i \leftarrow \SL(\beta, \mathcal D_i')$
+  }
+  \Return{$\Maj(h_1, h_2, h_3)$}
+  \caption{A recursive accuracy boosting algorithm $\SL$, given required error $\rho$ and distribution $\mathcal D'$.}
+  \label{alg:recursive}
+\end{algorithm}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/recursion.png}
+  \caption{Illustrating the recursion of Algorithm \ref{alg:recursive}.}
+  \label{fig:recursion}
+\end{figure}
+
+\begin{corollary}
+  If a concept class $\mathcal C$ is learnable, then any concept $C \in \mathcal C$ has a polynomial size circuit.
+\end{corollary}
+
+\begin{theorem}
+  Suppose that a function $f$ cannot be computed by polynomial size circuits. Then there exists a distribution $\mathcal D$ such that $f$ is \emph{average-case hard} on $\mathcal D$ (i.e., there exists no polynomial size circuit that gets it right more than $1/2$ in time $1/\poly(n)$).
+\end{theorem}
 
 \end{document}
