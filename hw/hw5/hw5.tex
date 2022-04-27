@@ -159,6 +159,34 @@
       \end{align*}
       This completes the proof.
     \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} none.
+    
+    \begin{proof}
+      Let $n \in \NN$ be odd. Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be the majority function, i.e., $f(x) = \sign(\sum_{i = 1}^n x_i)$ for all $x = (x_1, \ldots, x_n) \in \{ \pm 1 \}^n$. First, we show that $f$ is monotone. Let $x = (x_1, \ldots, x_n), y = (y_1, \ldots, y_n) \in \{ \pm 1 \}^n$ be such that $x_i \leq y_i$ for all $i \in [n]$. Then $\sum_{i = 1}^n x_i \leq \sum_{i = 1}^n y_i$, so $f(x) = \sign(\sum_{i = 1}^n x_i) \leq \sign(\sum_{i = 1}^n y_i) = f(y)$. This proves that $f$ is monotone.
+
+      Second, let $g : \{ \pm 1 \}^n \to \{ \pm 1 \}$ be monotone. Then
+      \begin{align*}
+        \Inf(g) &= \sum_{i = 1}^n \Inf_i(g) \\
+        &= \sum_{i = 1}^n \hat{g}(\{ i \}) && \text{(part (a))} \\
+        &= \sum_{i = 1}^n \left\langle g, \chi_{\{ i \}} \right\rangle \\
+        &= \sum_{i = 1}^n \frac{1}{2^n} \sum_{x \in \{ \pm 1 \}^n} g(x) \chi_{\{ i \}}(x) \\
+        &= \frac{1}{2^n} \sum_{x = \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n} g(x) \sum_{i = 1}^n x_i \\
+        &\leq \left|\frac{1}{2^n} \sum_{x = \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n} g(x) \sum_{i = 1}^n x_i\right| \\
+        &\leq \frac{1}{2^n} \sum_{x = \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n} |g(x)| \left|\sum_{i = 1}^n x_i\right| && \text{(triangle inequality)} \\
+        &= \frac{1}{2^n} \sum_{x = \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n} \left|\sum_{i = 1}^n x_i\right|. && \text{(since $g(x) \in \{ \pm 1 \}$ for all $x \in \{ \pm 1 \}^n$)}
+      \end{align*}
+
+      Third, since $f$ is monotone,
+      $$ \Inf(f) = \frac{1}{2^n} \sum_{x = \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n} f(x) \sum_{i = 1}^n x_i. $$
+      Since $n$ is odd, then $\sum_{i = 1}^n x_i \neq 0$. If $\sum_{i = 1}^n x_i < 0$, then $f(x) = \sign(\sum_{i = 1}^n x_i) < 0$, so
+      \begin{equation} \label{eq:2b-maj}
+        \Inf(f) = \frac{1}{2^n} \sum_{x = \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n} |f(x)| \left|\sum_{i = 1}^n x_i\right| = \frac{1}{2^n} \sum_{x = \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n} \left|\sum_{i = 1}^n x_i\right|,
+      \end{equation}
+      since $f(x) \in \{ \pm 1 \}$ for all $x \in \{ \pm 1 \}^n$. Otherwise, $\sum_{i = 1}^n x_i > 0$, so $f(x) = \sign(\sum_{i = 1}^n x_i) > 0$, implying that \eqref{eq:2b-maj} holds. Hence, \eqref{eq:2b-maj} holds in both cases. It follows that $\Inf(g) \leq \Inf(f)$ for any monotone $g : \{ \pm 1 \}^n \to \{ \pm 1 \}$, completing the proof.
+    \end{proof}
   \end{enumerate}
 \end{enumerate}
 
