@@ -188,6 +188,42 @@
       since $f(x) \in \{ \pm 1 \}$ for all $x \in \{ \pm 1 \}^n$. Otherwise, $\sum_{i = 1}^n x_i > 0$, so $f(x) = \sign(\sum_{i = 1}^n x_i) > 0$, implying that \eqref{eq:2b-maj} holds. Hence, \eqref{eq:2b-maj} holds in both cases. It follows that $\Inf(g) \leq \Inf(f)$ for any monotone $g : \{ \pm 1 \}^n \to \{ \pm 1 \}$, completing the proof.
     \end{proof}
   \end{enumerate}
+
+  \clearpage
+
+  \item \begin{enumerate}
+    \item \noindent\emph{Collaborators and sources:} none.
+    
+    \begin{proof}
+      Let $f : \{ \pm 1 \}^n \to \{ \pm 1 \}$. Let $\varepsilon > 0$. We show that the statement holds with $C = 1$. Suppose for the sake of contradiction that $\sum_{\substack{S \subset [n], |S| \geq \Inf(f) / \varepsilon}} \hat{f}(S)^2 > C \varepsilon = \varepsilon$.
+      For each $i \in [n]$, let $g_i : \{ \pm 1 \}^n \to \{ 0, \pm 1 \}$ be defined by
+      \begin{align*}
+        g_i(x) &= \frac{f(x) - f\left(x^{\oplus i}\right)}{2} = \frac{1}{2} \left(\sum_{S \subset [n]} \hat{f}(S) \chi_S(x) - \sum_{S \subset [n]} \hat{f}(S) \chi_S\left(x^{\oplus i}\right)\right) \\
+        &= \frac{1}{2} \sum_{S \subset [n]} \hat{f}(S) \left(\chi_S(x) - \chi_S\left(x^{\oplus i}\right)\right).
+      \end{align*}
+      Then $g_i(x)^2 = \mathds 1[f(x) \neq f(x^{\oplus i})]$ for all $i \in [n]$ and $x \in \{ \pm 1 \}^n$. Fix $i \in [n]$, $x = (x_1, \ldots, x_n) \in \{ \pm 1 \}^n$ and $S \subset [n]$. If $i \in S$, then
+      \begin{align*}
+        \chi_S(x) - \chi_S\left(x^{\oplus i}\right) &= \prod_{j \in S} x_j - \left(-x_i\right) \prod_{j \in S \setminus \{ i \}} x_j = x_i \prod_{j \in S \setminus \{ i \}} x_j - \left(-x_i\right) \prod_{j \in S \setminus \{ i \}} x_j \\
+        &= \left(x_i - \left(-x_i\right)\right) \prod_{j \in S \setminus \{ i \}} x_j = 2x_i \prod_{j \in S \setminus \{ i \}} x_j = 2\prod_{j \in S} x_j = 2\chi_S(x).
+      \end{align*}
+      If $i \not \in S$, then
+      $$ \chi_S(x) - \chi_S\left(x^{\oplus i}\right) = \prod_{j \in S} x_j - \prod_{j \in S} x_j = 0. $$
+      Hence, for all $i \in [n]$ and $x \in \{ \pm 1 \}^n$,
+      $$ g_i(x) = \frac{1}{2} \sum_{\substack{S \subset [n] \\ i \in S}} \hat{f}(S) \cdot 2\chi_S(x) = \frac{1}{2} \cdot 2 \sum_{\substack{S \subset [n] \\ i \in S}} \hat{f}(S) \chi_S(x) = \sum_{\substack{S \subset [n] \\ i \in S}} \hat{f}(S) \chi_S(x). $$
+      For all $i \in [n]$, by the orthonormality of the Fourier basis $\{ \chi_S : S \subset [n] \}$,
+      \begin{align*}
+        \Inf_i(f) &= \PP_{x \in \{ \pm 1 \}^n}\left[f(x) \neq f\left(x^{\oplus i}\right)\right] = \EE_{x \in \{ \pm 1 \}^n}\left[\mathds 1\left[f(x) \neq f\left(x^{\oplus i}\right)\right]\right] = \EE_{x \in \{ \pm 1 \}^n}\left[g_i(x)^2\right] \\
+        &= \EE_{x \in \{ \pm 1 \}^n}\left[\left(\sum_{\substack{S \subset [n] \\ i \in S}} \hat{f}(S) \chi_S(x)\right)^2\right] = \EE_{x \in \{ \pm 1 \}^n}\left[\sum_{\substack{S \subset [n] \\ i \in S}} \sum_{\substack{T \subset [n] \\ i \in T}} \hat{f}(S) \hat{f}(T) \chi_S(x) \chi_T(x)\right] \\
+        &= \EE_{x \in \{ \pm 1 \}^n}\left[\sum_{\substack{S \subset [n] \\ i \in S}} \hat{f}(S)^2\right] = \sum_{\substack{S \subset [n] \\ i \in S}} \hat{f}(S)^2.
+      \end{align*}
+      Therefore,
+      \begin{align*}
+        \Inf(f) &= \sum_{i = 1}^n \Inf_i(f) = \sum_{i = 1}^n \sum_{\substack{S \subset [n] \\ i \in S}} \hat{f}(S)^2 = \sum_{S \subset [n]} \sum_{i \in S} \hat{f}(S)^2 = \sum_{S \subset [n]} |S| \hat{f}(S)^2 \\
+        &\geq \sum_{\substack{S \subset [n] \\ |S| \geq \frac{\Inf(f)}{\varepsilon}}} |S| \hat{f}(S)^2 \geq \frac{\Inf(f)}{\varepsilon} \sum_{\substack{S \subset [n] \\ |S| \geq \frac{\Inf(f)}{\varepsilon}}} \hat{f}(S)^2 > \frac{\Inf(f)}{\varepsilon} \cdot \varepsilon = \Inf(f),
+      \end{align*}
+      a contradiction. This completes the proof.
+    \end{proof}
+  \end{enumerate}
 \end{enumerate}
 
 \end{document}
