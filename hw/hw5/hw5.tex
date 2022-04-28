@@ -265,7 +265,9 @@
       \begin{enumerate}[label=(\roman*), itemsep=0pt]
         \item With probability $\lambda$, let $Y = X$.
         \item With probability $1 - \lambda$, let $Y$ be uniform over
-        $$ \mathcal W := \left\{ \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n : \prod_{i \in S} x_i = -1 \right\}. $$
+        \begin{equation} \label{eq:4b-case2}
+          \mathcal W := \left\{ \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n : \prod_{i \in S} x_i = -1 \right\}.
+        \end{equation}
       \end{enumerate}
       Then
       $$ \PP_Y\left[\prod_{i \in S} Y_i = 1\right] = \lambda \PP_X\left[\prod_{i \in S} X_i = 1\right] + (1 - \lambda) \cdot 0 = \frac{1}{1 + \varepsilon_0} \cdot \frac{1 + \varepsilon_0}{2} = \frac{1}{2}. $$
@@ -283,10 +285,39 @@
 
     \clearpage
 
-    \item \noindent\emph{Collaborators and sources:} none.
+    \item \noindent\emph{Collaborators and sources:} Guanghao Ye.
     
     \begin{proof}
-      
+      Let $X \in \{ \pm 1 \}^n$ be an $(\varepsilon, k)$-wise independent random vector for some $\varepsilon \in (0, 1)$ and $k \in [n]$. We give a procedure in Algorithm \ref{alg:4b-k-wise} to obtain a $k$-wise independent random vector $Z \in \{ \pm 1 \}^n$ such that $\Delta(X, Z) \leq 2\varepsilon n^k$, where line \ref{line:4b-single-set} uses part (a). We denote by subscript $i \in [n]$ the $i^\text{th}$ coordinate of a vector.
+
+      \begin{algorithm}
+        $Y \leftarrow X$ \\
+        \ForEach{$S \subset [n]$ with $0 < |S| \leq k$}{
+          construct a random vector $Y' \in \{ \pm 1 \}^n$ with $\PP_{Y'}[\prod_{i \in S} Y_i' = 1] = 1/2$ and $\Delta(Y, Y') \leq 2\varepsilon$ \label{line:4b-single-set} \\
+          $Y \leftarrow Y'$
+        }
+        $Z \leftarrow Y$ \\
+        \Return{$Z$}
+        \caption{A procedure that, given an $(\varepsilon, k)$-wise independent random vector $X \in \{ \pm 1 \}^n$ where $\varepsilon \in (0, 1)$ and $k \in [n]$, returns a $k$-wise independent random vector $Z \in \{ \pm 1 \}^n$ such that $\Delta(X, Z) \leq 2\varepsilon n^k$.}
+        \label{alg:4b-k-wise}
+      \end{algorithm}
+
+      Note that $\Delta(Y, Y') \leq 2\varepsilon$ during each iteration. Let $(S_1, \ldots, S_\ell)$ be an enumeration of subsets $S \subset [n]$ with $0 < |S| \leq k$. By the triangle inequality,
+      \begin{align}
+        \Delta(X, Z) &\leq \Delta\left(X, S_1\right) + \sum_{i = 2}^\ell \Delta\left(S_{i - 1}, S_i\right) \nonumber \\
+        &= 2\varepsilon |\{ S \subset [n] : 0 < |S| \leq k \}| \nonumber \\
+        &\leq 2\varepsilon \left|[n]^k\right| = 2\varepsilon n^k. \label{eq:4b-count}
+      \end{align}
+      Note that \eqref{eq:4b-count} follows from the fact that each $k$-tuple $(i_1, \ldots, i_k) \in [n]^k$ corresponds to a subset $S = \{ i_1, \ldots, i_k \} \subset [n]$ with $0 < |S| \leq k$.
+
+      Now, we prove that $Z$ is $k$-wise independent. Since $\PP_{Y'}[\prod_{i \in S} Y_i' = 1] = 1/2$ in the iteration for each subset $S \subset [n]$ with $0 < |S| \leq k$, then it suffices to show that the iteration for a subset $S \subset [n]$ with $0 < |S| \leq k$ does not increase $|\PP_{Y'}[\prod_{i \in T} Y_i'] - 1/2|$ for all $T \subset [n]$ with $0 < |T| \leq k$ and $S \neq T$. To see this, we first note that
+      $$ \PP_{W \sim \Unif \mathcal W}\left[\sum_{i \in T} W_i = 1\right] = \frac{1}{2}, $$
+      where $\mathcal W$ is defined as in \eqref{eq:4b-case2}, by straightforward calculations (see, e.g., the proof of Problem 1 part (a) in Homework 2). Then
+      \begin{align*}
+        \left|\PP_{Y'}\left[\prod_{i \in T} Y_i' = 1\right] - \frac{1}{2}\right| &= \left|\left(\lambda\PP_Y\left[\prod_{i \in T} Y_i = 1\right] + (1 - \lambda) \cdot \frac{1}{2}\right) - \frac{1}{2}\right| \\
+        &= \left|\lambda\left(\PP_Y\left[\prod_{i \in T} Y_i = 1\right] - \frac{1}{2}\right)\right| = \lambda \left|\PP_Y\left[\prod_{i \in T} Y_i = 1\right] - \frac{1}{2}\right|.
+      \end{align*}
+      Since $\lambda \in (0, 1]$, then this shows that the iteration for a subset $S \subset [n]$ with $0 < |S| \leq k$ does not increase $|\PP_{Y'}[\prod_{i \in T} Y_i'] - 1/2|$ for all $T \subset [n]$ with $0 < |T| \leq k$ and $S \neq T$. Hence, at the end of the procedure, $\PP_Z[\prod_{i \in S} Z_i] = 1/2$ for all $S \subset [n]$ with $0 < |S| \leq k$. This shows that $Z$ is $k$-wise independent, completing the proof.
     \end{proof}
   \end{enumerate}
 \end{enumerate}
