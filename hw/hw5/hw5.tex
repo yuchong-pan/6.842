@@ -54,6 +54,7 @@
 \DeclareMathOperator{\error}{error}
 \DeclareMathOperator{\NS}{\mathit{NS}}
 \DeclareMathOperator{\Inf}{\mathit{Inf}}
+\DeclareMathOperator{\Unif}{\mathsf{Unif}}
 \SetKwFor{RepTimes}{repeat}{times}{end}
 \newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
@@ -244,6 +245,39 @@
       \end{align*}
       Since $1/\varepsilon^2 \leq (n^{\sqrt{n}})^{1/\varepsilon}$ for sufficiently large $n$ and sufficiently small $\varepsilon$, then the sample complexity of $\mathcal A$ is
       $$ O\left(n^{\frac{C\sqrt[]{n}}{\varepsilon} + \frac{1}{2}} \log n\right) \leq n^{\Theta\left(\frac{\sqrt[]{n}}{\varepsilon}\right)} = \left(2^{\log_2 n}\right)^{\Theta\left(\frac{\sqrt[]{n}}{\varepsilon}\right)} = 2^{(\log_2 n) \Theta\left(\frac{\sqrt[]{n}}{\varepsilon}\right)} = 2^{\Theta\left(\frac{\sqrt[]{n}}{\varepsilon} \log n\right)} = 2^{\widetilde{O}\left(\frac{\sqrt[]{n}}{\varepsilon}\right)}. $$
+      This completes the proof.
+    \end{proof}
+  \end{enumerate}
+
+  \clearpage
+
+  \item \begin{enumerate}
+    \item \noindent\emph{Collaborators and sources:} none.
+    
+    \begin{proof}
+      Let $X = (X_1, \ldots, X_n) \in \{ \pm 1 \}^n$ be an $(\varepsilon, k)$-wise independent random vector for some $\varepsilon \in (0, 1)$ and $k \in [n]$. Let $S \subset [n]$ be such that $0 < |S| \leq k$. By straightforward calculations (see, e.g., the proof of Problem 1 part (a) in Homework 2), for all $\ell \in [n]$,
+      $$ \PP_{\left(W_1, \ldots, W_\ell\right) \sim \Unif\{ \pm 1 \}^\ell}\left[\prod_{i = 1}^\ell W_\ell = 1\right] = \frac{1}{2}. $$
+      Since $X$ is $(\varepsilon, k)$-wise independent and since $0 < |S| \leq k$,
+      $$ \left|\PP_X\left[\prod_{i \in S} X_i = 1\right] - \frac{1}{2}\right| = \left|\PP_X\left[\prod_{i \in S} X_i = 1\right] - \PP_{\left(W_1, \ldots, W_\ell\right) \sim \Unif\{ \pm 1 \}^\ell}\left[\prod_{i = 1}^\ell W_\ell = 1\right]\right| \leq \varepsilon. $$
+      WLOG, assume that
+      $$ \PP_X\left[\prod_{i \in S} X_i = 1\right] = \frac{1 + \varepsilon_0}{2}, $$
+      for some $\varepsilon_0 \in [0, 2\varepsilon]$ (the case $\PP_X[\prod_{i \in S} X_i = 1] = (1 - \varepsilon_0)/2$ for some $\varepsilon_0 \in [0, 2\varepsilon]$ is symmetric). Let $\lambda = 1/(1 + \varepsilon_0) \in (0, 1]$. Let $Y = (Y_1, \ldots, Y_n) \in \{ \pm 1 \}^n$ be a random vector defined as follows:
+      \begin{enumerate}[label=(\roman*), itemsep=0pt]
+        \item With probability $\lambda$, let $Y = X$.
+        \item With probability $1 - \lambda$, let $Y$ be uniform over
+        $$ \mathcal W := \left\{ \left(x_1, \ldots, x_n\right) \in \{ \pm 1 \}^n : \prod_{i \in S} x_i = -1 \right\}. $$
+      \end{enumerate}
+      Then
+      $$ \PP_Y\left[\prod_{i \in S} Y_i = 1\right] = \lambda \PP_X\left[\prod_{i \in S} X_i = 1\right] + (1 - \lambda) \cdot 0 = \frac{1}{1 + \varepsilon_0} \cdot \frac{1 + \varepsilon_0}{2} = \frac{1}{2}. $$
+      For all $\mathcal T \subset \{ \pm 1 \}^n$,
+      \begin{align*}
+        \PP_X[X \in \mathcal T] - \PP_Y[Y \in \mathcal T] &= \PP_X[X \in \mathcal T] - \left(\lambda \PP_X[X \in \mathcal T] + (1 - \lambda) \PP_{W \sim \Unif \mathcal W}[W \in \mathcal T]\right) \\
+        &= (1 - \lambda) \left(\PP_X[X \in \mathcal T] - \PP_{W \sim \Unif \mathcal W}[W \in \mathcal T]\right) \\
+        &\leq (1 - \lambda) (1 - 0) = 1 - \frac{1}{1 + \varepsilon_0} = \frac{\varepsilon_0}{1 + \varepsilon_0} \\
+        &\leq \varepsilon_0 \leq 2\varepsilon.
+      \end{align*}
+      Therefore,
+      $$ \Delta(X, Y) = \max_{\mathcal T \subset \{ \pm 1 \}^n} \left(\PP_X[X \in \mathcal T] - \PP_Y[Y \in \mathcal T]\right) \leq 2\varepsilon. $$
       This completes the proof.
     \end{proof}
   \end{enumerate}
