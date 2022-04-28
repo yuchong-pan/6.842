@@ -237,13 +237,13 @@
       \end{align*}
       By part (a), there exists an absolute constant $C$ such that for all $\varepsilon > 0$,
       $$ \sum_{\substack{S \subset [n] \\ |S| \geq \frac{\sqrt{n}}{\varepsilon}}} \hat{f}(S)^2 \leq \sum_{\substack{S \subset [n] \\ |S| \geq \frac{\Inf(f)}{\varepsilon}}} \hat{f}(S)^2 \leq C\varepsilon. $$
-      Hence, any monotone Boolean function has Fourier concentration $\alpha(\varepsilon, n) = C\sqrt{n}/\varepsilon$. The low degree algorithm gives a uniform distribution learning algorithm $\mathcal A$ for the class of monotone Boolean functions with sample complexity
+      Therefore, any monotone Boolean function $\{ \pm 1 \}^n \to \{ \pm 1 \}$ has Fourier concentration $\alpha(\varepsilon, n) = C\sqrt{n}/\varepsilon$. The low degree algorithm induces a uniform distribution learning algorithm $\mathcal A$ for the class of monotone Boolean functions $\{ \pm 1 \}^n \to \{ \pm 1 \}$ to accuracy $\varepsilon$ with sample complexity
       \begin{align*}
-        O\left(\frac{n^{\alpha(\varepsilon, n)}}{\varepsilon} \log \frac{n^{\alpha(\varepsilon, n)}}{\delta}\right) &= O\left(\frac{n^{\alpha(\varepsilon, n)}}{\varepsilon} \cdot \alpha(\varepsilon, n) \log n\right) \\
-        &= O\left(\frac{n^{\frac{C\sqrt[]{n}}{\varepsilon}}}{\varepsilon} \cdot \frac{C\sqrt[]{n}}{\varepsilon} \log n\right) \\
-        &= O\left(\frac{n^{\frac{C\sqrt[]{n}}{\varepsilon} + \frac{1}{2}}}{\varepsilon^2} \log n\right).
+        O\left(\frac{n^{\alpha\left(\frac{\varepsilon}{2}, n\right)}}{\frac{\varepsilon}{2}} \log \frac{n^{\alpha\left(\frac{\varepsilon}{2}, n\right)}}{\delta}\right) &= O\left(\frac{n^{\alpha\left(\frac{\varepsilon}{2}, n\right)}}{\varepsilon} \cdot \alpha\left(\frac{\varepsilon}{2}, n\right) \log n\right) \\
+        &= O\left(\frac{n^{\frac{C\sqrt[]{n}}{\frac{\varepsilon}{2}}}}{\varepsilon} \cdot \frac{C\sqrt[]{n}}{\frac{\varepsilon}{2}} \log n\right) \\
+        &= O\left(\frac{n^{\frac{2C\sqrt[]{n}}{\varepsilon} + \frac{1}{2}}}{\varepsilon^2} \log n\right).
       \end{align*}
-      Since $1/\varepsilon^2 \leq (n^{\sqrt{n}})^{1/\varepsilon}$ for sufficiently large $n$ and sufficiently small $\varepsilon$, then the sample complexity of $\mathcal A$ is
+      Since $1/\varepsilon^2 \leq (n^{2C\sqrt{n}})^{1/\varepsilon}$ for sufficiently large $n$ and sufficiently small $\varepsilon$, then the sample complexity of $\mathcal A$ is
       $$ O\left(n^{\frac{C\sqrt[]{n}}{\varepsilon} + \frac{1}{2}} \log n\right) \leq n^{\Theta\left(\frac{\sqrt[]{n}}{\varepsilon}\right)} = \left(2^{\log_2 n}\right)^{\Theta\left(\frac{\sqrt[]{n}}{\varepsilon}\right)} = 2^{(\log_2 n) \Theta\left(\frac{\sqrt[]{n}}{\varepsilon}\right)} = 2^{\Theta\left(\frac{\sqrt[]{n}}{\varepsilon} \log n\right)} = 2^{\widetilde{O}\left(\frac{\sqrt[]{n}}{\varepsilon}\right)}. $$
       This completes the proof.
     \end{proof}
@@ -279,6 +279,14 @@
       Therefore,
       $$ \Delta(X, Y) = \max_{\mathcal T \subset \{ \pm 1 \}^n} \left(\PP_X[X \in \mathcal T] - \PP_Y[Y \in \mathcal T]\right) \leq 2\varepsilon. $$
       This completes the proof.
+    \end{proof}
+
+    \clearpage
+
+    \item \noindent\emph{Collaborators and sources:} none.
+    
+    \begin{proof}
+      
     \end{proof}
   \end{enumerate}
 \end{enumerate}
