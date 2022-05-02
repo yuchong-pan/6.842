@@ -1,0 +1,202 @@
+
+\documentclass[letterpaper, reqno,11pt]{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{color,latexsym,amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage[linesnumbered,lined,boxed,commentsnumbered,noend,noline]{algorithm2e}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{bbm}
+\usepackage[inline]{enumitem}
+\usepackage[numbers]{natbib}
+\usepackage{framed}
+\usepackage{titling}
+\usepackage{subcaption}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{hobby}
+\usetikzlibrary{shapes.multipart}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.7}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{patterns}
+
+\tikzset{invclip/.style={clip,insert path={{[reset cm]
+  (-16383.99999pt,-16383.99999pt) rectangle (16383.99999pt,16383.99999pt)}}}}
+
+\allowdisplaybreaks
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\PP}{\mathop{{}\mathbb{P}}}
+\newcommand{\EE}{\mathop{{}\mathbb{E}}}
+\newcommand{\LL}{\mathbb{L}}
+\newcommand{\TT}{\mathbb{T}}
+\newcommand{\GI}{\textrm{GI}}
+\newcommand{\coGI}{\overline{\textrm{GI}}}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\charcone}{char.cone}
+\DeclareMathOperator{\STAB}{STAB}
+\DeclareMathOperator{\Down}{Down}
+\DeclareMathOperator{\lca}{lca}
+\DeclareMathOperator{\ex}{ex}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\T}{\mathsf{T}}
+\DeclareMathOperator{\F}{\mathsf{F}}
+\DeclareMathOperator{\shP}{\# P}
+\DeclareMathOperator{\shSAT}{\# SAT}
+\DeclareMathOperator{\shDNF}{\# DNF}
+\DeclareMathOperator{\DNF}{\mathsf{DNF}}
+\DeclareMathOperator{\Poly}{\mathsf{P}}
+\DeclareMathOperator{\CNF}{\mathsf{CNF}}
+\DeclareMathOperator{\SAT}{\mathsf{SAT}}
+\DeclareMathOperator{\BPP}{\mathsf{BPP}}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\RP}{\mathsf{RP}}
+\DeclareMathOperator{\EXP}{\mathsf{EXP}}
+\DeclareMathOperator{\DTIME}{\mathsf{DTIME}}
+\DeclareMathOperator{\NP}{\mathsf{NP}}
+\DeclareMathOperator{\MCprime}{MC'}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\IP}{\mathsf{IP}}
+\DeclareMathOperator{\PSPACE}{\mathsf{PSPACE}}
+\DeclareMathOperator{\lollipop}{lollipop}
+\DeclareMathOperator{\ustconn}{\textsf{UST-Conn}}
+\DeclareMathOperator{\RL}{\mathsf{RL}}
+\DeclareMathOperator{\dist}{dist}
+\DeclareMathOperator{\Ex}{Ex}
+\DeclareMathOperator{\error}{error}
+\DeclareMathOperator{\AND}{\mathsf{AND}}
+\DeclareMathOperator{\ANDbar}{\mathsf{\overline{AND}}}
+\DeclareMathOperator{\val}{val}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\NS}{NS}
+\DeclareMathOperator{\Maj}{Maj}
+\DeclareMathOperator{\Inf}{Inf}
+\DeclareMathOperator{\WL}{WL}
+\DeclareMathOperator{\SL}{\textsc{StrongLearn}}
+\DeclareMathOperator{\PCP}{\mathsf{PCP}}
+\DeclareMathOperator{\threeSAT}{\mathsf{3SAT}}
+\newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\SetKwFor{RepTimes}{repeat}{times}{end}
+\begin{document}
+\pagenumbering{arabic}
+\title{Lectures on Probabilistically Checkable Proofs}
+\author{Yuchong Pan}
+\date{\today}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{claim}{Claim}
+\newtheorem{exercise}{Exercise}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+%\maketitle
+%
+
+\begin{framed}
+\noindent{\bf 6.842 Randomness and Computation} \hfill \thedate
+\begin{center}
+\Large{\thetitle}
+\end{center}
+\noindent{\em Lecturer: Ronitt Rubinfield} \hfill {\em Scribe: \theauthor}
+\end{framed}
+
+The probablistically checkable proof (PCP) model consists of a polynomial time verifier, which is given an input $x$, a random string $\$$, and a proof $\pi$ (i.e., a fixed function).
+
+\begin{definition}
+  We say that a language $L \in \PCP(r, q)$ if there exists a polynomial time verifier $V$ such that
+  \begin{enumerate}[label=(\roman*), itemsep=0pt]
+    \item for all $x \in L$, there exists a proof $\pi$ such that $\PP_{\$}[\text{$V, \pi$ accepts}] = 1$;
+    \item for all $x \not \in L$, for any proof $\pi'$, $\PP_\text{\$}[\text{$V, \pi'$ accepts}] < 1/4$.
+  \end{enumerate}
+  Moreover, $V$ uses at ist $r(n)$ random bits and makes $q(n)$ queries to $\pi$ (each using $1$ bit).
+\end{definition}
+
+It is easy to see that $\SAT \in \PCP(0, n)$. Recall that the $\threeSAT$ problem asks for the satisfiability of a Boolean function $F$ of the form $F = \bigwedge_i C_i$, where each clause $C_i$ is of the form $C_i = y_{i_1} \vee y_{i_2} \vee y_{i_3}$ and each literal $y_{i_j} \in \{ x_1, \ldots, x_n, \overline{x_1}, \ldots, \overline{x_n} \}$. We shall show the following theorem:
+
+\begin{theorem} \label{thm:3sat-pcp}
+  $\threeSAT \in \PCP(O(n^3), O(1))$.
+\end{theorem}
+
+\begin{corollary}
+  $\NP \subseteq \PCP(O(n^3), O(1))$.
+\end{corollary}
+
+Indeed, the following theorem holds:
+
+\begin{theorem}
+  $\NP \subseteq \PCP(O(\log n), O(1))$.
+\end{theorem}
+
+The first attempt of proving Theorem \ref{thm:3sat-pcp} is defining the proof $\pi$ to be the settings of an assignment $a$, e.g., $a_1 = \T, a_2 = \F, \ldots$, and defining the verifier to pick a random clause $C_i$ and check if $a$ satisfies $C_i$. This is good because if $a$ satisfies $F$, then $\PP[\text{$V$ succeeds}] = 1$. However, this is bad because if $a$ does not satisfy $F$, then there exists a clause $i$ such that $a$ does not satisfy $C_i$, so $\PP_\$[\text{$V$ finds an unsatisfied $C_i$}] \geq 1/m$, where $m$ is the number of clauses in $F$.
+
+Recall Freivald's test:
+
+\begin{theorem}[Freivald's test]
+  If $a, b \in \ZZ_2^n$ are such that $a \neq b$, then $\PP_{r \in \ZZ_2^n}[a \cdot r \neq b \cdot r] \geq 1/2$. If $A, B, C$ are $\{ 0, 1 \}$-valued $n \times n$ matrices such that $A \cdot B \neq C$, then $\PP_{r \in \ZZ_2^n}[A \cdot B \cdot r \neq C \cdot r] \geq 1/2$. This also holds for equality modulo $2$.
+\end{theorem}
+
+\begin{proof}
+  See Homework 1 and the orthogonality of the Fourier basis.
+\end{proof}
+
+\begin{proof}[Proof of Theorem \ref{thm:3sat-pcp}]
+  We introduce an arithmetrization $A(F)$ of a Boolean formula $F$ over $\ZZ_2$ in Table \ref{tab:arithmetrization}. Then a Boolean formula $F$ is satisfied by an assignment $a$ if and only if $A(F)(a) = 1$. For a Boolean formula $F$ consisting of clauses with $3$ literals, $\deg A(F) \leq 3$.
+
+  \begin{table}[h]
+    \centering
+    \begin{tabular}{c|c}
+      Boolean formula $F$ & $A(F)$ over $\ZZ_2$ \\
+      \hline \hline
+      $\T$ & $1$ \\
+      \hline
+      $\F$ & $0$ \\
+      \hline
+      $x_i$ & $x_i$ \\
+      \hline
+      $\overline{x_i}$ & $1 - x_i$ \\
+      \hline
+      $\alpha \wedge \beta$ & $\alpha \cdot \beta$ \\
+      \hline
+      $\alpha \vee \beta = \overline{\bar \alpha \wedge \bar \beta}$ & $1 - (1 - \alpha) (1 - \beta)$ \\
+      \hline
+      $\alpha \vee \beta \vee \gamma$ & $1 - (1 - \alpha)(1 - \beta)(1 - \gamma)$
+    \end{tabular}
+    \caption{An arithmetrization $A(F)$ of a Boolean formula $F$.}
+    \label{tab:arithmetrization}
+  \end{table}
+
+  We arithmetrize the complement of each clause separately (using $\hat{}$ for complements), i.e., let
+  $$ \mathcal C(x) = \left(\widehat{C_1}(x), \widehat{C_2}(x), \ldots\right). $$
+  Then $\widehat{C_i}(x) = 0$ if $x$ satisfies $C_i$, so $\mathcal C(x) = (0, 0, \ldots)$ if $F$ is satisfied by $x$. Recall that each $C_i$ is a polynomial of degree at most $3$, and the verifier $V$ knows the coefficients.
+
+  We apply Freivald's test to $\mathcal C(a)$. Fix an assignment $a$. For all $r \in \ZZ_2^m$,
+  $$ \left(\widehat{C_1}(a), \ldots, \widehat{C_m}(a)\right) \cdot \left(r_1, \ldots, r_m\right) \equiv \sum_{i = 1}^m r_i \widehat{C_i}(a) \pmod{2}, $$
+  so by Freivald's test,
+  $$ \PP_{r \in \ZZ_2^m}\left[\sum_{i = 1}^m r_i \widehat{C_i}(a) \equiv 0 \pmod{2}\right] = \left\{
+    \begin{array}{ll}
+      1, & \text{if $\widehat{C_i}(a) = 0$ (i.e., $F$ is satisfied by $a$) for all $i \in [m]$}, \\
+      \frac{1}{2}, & \text{otherwise}.
+    \end{array}
+  \right. $$
+\end{proof}
+
+\textcolor{red}{\bf TODO.}
+
+\end{document}
