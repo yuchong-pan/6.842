@@ -1,0 +1,104 @@
+\usepackage[margin=1.0in]{geometry}
+\usepackage{color,latexsym,amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage[linesnumbered,lined,boxed,commentsnumbered,noend,noline]{algorithm2e}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{bbm}
+\usepackage[inline]{enumitem}
+\usepackage[numbers]{natbib}
+\usepackage{framed}
+\usepackage{titling}
+\usepackage{subcaption}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{mathdots}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usetikzlibrary{hobby}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{intersections, calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.7}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{patterns}
+
+\tikzset{invclip/.style={clip,insert path={{[reset cm]
+  (-16383.99999pt,-16383.99999pt) rectangle (16383.99999pt,16383.99999pt)}}}}
+
+\allowdisplaybreaks
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\PP}{\mathop{{}\mathbb{P}}}
+\newcommand{\EE}{\mathop{{}\mathbb{E}}}
+\newcommand{\LL}{\mathbb{L}}
+\newcommand{\TT}{\mathbb{T}}
+\newcommand{\GI}{\textrm{GI}}
+\newcommand{\coGI}{\overline{\textrm{GI}}}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\charcone}{char.cone}
+\DeclareMathOperator{\STAB}{STAB}
+\DeclareMathOperator{\Down}{Down}
+\DeclareMathOperator{\lca}{lca}
+\DeclareMathOperator{\ex}{ex}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\T}{\mathsf{T}}
+%\DeclareMathOperator{\F}{\mathsf{F}}
+\DeclareMathOperator{\shP}{\# P}
+\DeclareMathOperator{\shSAT}{\# SAT}
+\DeclareMathOperator{\shDNF}{\# DNF}
+\DeclareMathOperator{\DNF}{\mathsf{DNF}}
+\DeclareMathOperator{\Poly}{\mathsf{P}}
+\DeclareMathOperator{\CNF}{\mathsf{CNF}}
+\DeclareMathOperator{\SAT}{\mathsf{SAT}}
+\DeclareMathOperator{\BPP}{\mathsf{BPP}}
+%\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\RP}{\mathsf{RP}}
+\DeclareMathOperator{\EXP}{\mathsf{EXP}}
+\DeclareMathOperator{\DTIME}{\mathsf{DTIME}}
+\DeclareMathOperator{\NP}{\mathsf{NP}}
+\DeclareMathOperator{\MCprime}{MC'}
+%\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\IP}{\mathsf{IP}}
+\DeclareMathOperator{\PSPACE}{\mathsf{PSPACE}}
+\DeclareMathOperator{\lollipop}{lollipop}
+\DeclareMathOperator{\ustconn}{\textsf{UST-Conn}}
+\DeclareMathOperator{\RL}{\mathsf{RL}}
+\DeclareMathOperator{\dist}{dist}
+\DeclareMathOperator{\Ex}{Ex}
+\DeclareMathOperator{\error}{error}
+%\DeclareMathOperator{\AND}{\mathsf{AND}}
+\DeclareMathOperator{\ANDbar}{\mathsf{\overline{AND}}}
+\DeclareMathOperator{\val}{val}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\NS}{NS}
+\DeclareMathOperator{\Maj}{Maj}
+\DeclareMathOperator{\Inf}{Inf}
+\DeclareMathOperator{\WL}{WL}
+\DeclareMathOperator{\SL}{\textsc{StrongLearn}}
+\DeclareMathOperator{\PCP}{\mathsf{PCP}}
+\DeclareMathOperator{\threeSAT}{\mathsf{3SAT}}
+\newcommand\mycommfont[1]{\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\SetKwFor{RepTimes}{repeat}{times}{end}
+\SetKw{Reject}{reject}
+\SetKw{Accept}{accept}
+% \newtheorem{theorem}{Theorem}
+% \newtheorem{corollary}[theorem]{Corollary}
+% \newtheorem{lemma}[theorem]{Lemma}
+% \newtheorem{observation}[theorem]{Observation}
+% \newtheorem{proposition}[theorem]{Proposition}
+% \newtheorem{definition}[theorem]{Definition}
+% \newtheorem{claim}[theorem]{Claim}
+% \newtheorem{fact}[theorem]{Fact}
+% \newtheorem{assumption}[theorem]{Assumption}
